@@ -21,6 +21,8 @@ export const PrivateSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
               subtitle={record.description || 'Private Item'}
               icon={Lock}
               badge="Private"
+              data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
           {records.length === 0 && (

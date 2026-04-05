@@ -15,6 +15,8 @@ export const VehiclesSection = ({ onAddClick, onRefresh }: { onAddClick: (file?:
               title={`${record.year || ''} ${record.make || ''} ${record.model || ''}`}
               subtitle={`License: ${record.license_plate || 'N/A'} • VIN: ${record.vin || 'N/A'}`}
               icon={Car}
+              data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
           <div className="space-y-3">

@@ -16,6 +16,8 @@ export const FuneralSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
               subtitle={`${record.location_name || ''} • ${record.notes || ''}`}
               icon={Flower2}
               badge={record.scope === 'shared' ? 'Shared' : 'Individual'}
+              data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
         </div>

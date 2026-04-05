@@ -16,6 +16,8 @@ export const AdvisorsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?:
               subtitle={`${record.advisor_type} • ${record.firm || ''}`}
               icon={ShieldCheck}
               badge={record.advisor_type}
+              data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
         </div>

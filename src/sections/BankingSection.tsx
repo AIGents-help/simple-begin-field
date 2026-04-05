@@ -17,6 +17,7 @@ export const BankingSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
               icon={CreditCard}
               badge={record.scope === 'shared' ? 'Shared' : undefined}
               data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
         </div>

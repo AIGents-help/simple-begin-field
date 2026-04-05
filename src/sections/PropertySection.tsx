@@ -16,6 +16,8 @@ export const PropertySection = ({ onAddClick, onRefresh }: { onAddClick: (file?:
               subtitle={`${record.category} • ${record.location || ''}`}
               icon={Package}
               badge={record.category}
+              data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
         </div>

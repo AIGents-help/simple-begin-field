@@ -24,6 +24,8 @@ export const PasswordsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?
                 subtitle={record.username}
                 icon={Key}
                 badge={record.requires_reauth ? 'Secure' : undefined}
+                data={record}
+                onClick={() => onAddClick(undefined, record)}
               />
             ))}
           </div>

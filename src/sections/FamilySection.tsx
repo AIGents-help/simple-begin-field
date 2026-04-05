@@ -17,6 +17,7 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
               icon={User}
               badge={record.birthday ? 'Birthday' : undefined}
               data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
         </div>
