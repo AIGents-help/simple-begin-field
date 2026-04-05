@@ -1218,6 +1218,45 @@ export type Database = {
           },
         ]
       }
+      referral_codes: {
+        Row: {
+          brand_color: string | null
+          code: string
+          created_at: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          owner_id: string | null
+          professional_name: string | null
+          stripe_account_id: string | null
+        }
+        Insert: {
+          brand_color?: string | null
+          code: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          owner_id?: string | null
+          professional_name?: string | null
+          stripe_account_id?: string | null
+        }
+        Update: {
+          brand_color?: string | null
+          code?: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          owner_id?: string | null
+          professional_name?: string | null
+          stripe_account_id?: string | null
+        }
+        Relationships: []
+      }
       retirement_records: {
         Row: {
           account_number_encrypted: string | null

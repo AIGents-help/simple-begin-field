@@ -123,10 +123,10 @@ export const SECTIONS_CONFIG: Section[] = [
   },
   { 
     id: 'affiliate', 
-    label: 'Affiliate', 
+    label: 'Referral', 
     icon: Share2, 
-    description: 'Referral tracking and attribution.',
-    emptyStateText: 'No affiliate records yet.',
-    addButtonLabel: 'Add Affiliate'
+    description: 'Enter a referral code if you were referred.',
+    emptyStateText: '',
+    addButtonLabel: ''
   },
 ];
