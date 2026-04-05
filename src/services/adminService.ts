@@ -102,7 +102,7 @@ export const adminService = {
       packets (
         title
       ),
-      profiles!packet_invites_invited_by_fkey (
+      profiles!partner_invites_invited_by_fkey (
         full_name
       )
     `).order('created_at', { ascending: false });
