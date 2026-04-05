@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { PRICING_PLANS, PlanId } from '../config/pricingConfig';
 import { User } from '@supabase/supabase-js';
 
