@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate } from '../components/sections/SectionScreenTemplate';
 import { InfoRecordCard } from '../components/sections/InfoRecordCard';
@@ -29,6 +29,7 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedEntryLabel, setSelectedEntryLabel] = useState<string | null>(null);
   const [isEntryFormOpen, setIsEntryFormOpen] = useState(false);
+  const refreshRef = useRef<(() => void) | null>(null);
 
   const handleQuickUploadClick = () => {
     const input = document.createElement('input');
