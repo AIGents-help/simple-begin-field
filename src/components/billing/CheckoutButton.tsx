@@ -39,30 +39,22 @@ export const CheckoutButton = ({
         return;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-        },
-        body: JSON.stringify({
+      const { data: result, error: invokeError } = await supabase.functions.invoke('create-checkout', {
+        body: {
           priceId: stripePriceId,
-          planKey: planKey,
+          planKey,
           userId: session.user.id,
           packetId: currentPacket?.id,
           successUrl: window.location.origin + '/checkout/success',
           cancelUrl: window.location.origin + '/pricing'
-        })
+        }
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || result.message || 'Failed to create checkout session');
+      if (invokeError) {
+        throw new Error(invokeError.message || 'Failed to create checkout session');
       }
 
-      if (!result.url) {
+      if (!result?.url) {
         throw new Error('No checkout URL returned');
       }
 
