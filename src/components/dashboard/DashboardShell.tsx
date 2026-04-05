@@ -55,7 +55,7 @@ export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ childr
   const userRole = profile?.role as 'admin' | 'professional' | 'user';
   const filteredNav = NAV_ITEMS.filter(item => item.roles.includes(userRole as any));
 
-  if (userRole === 'user') {
+  if (userRole !== 'admin' && userRole !== 'professional') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50 p-6">
         <div className="text-center max-w-md">
