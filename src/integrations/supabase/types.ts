@@ -523,6 +523,7 @@ export type Database = {
       }
       medical_records: {
         Row: {
+          category: string | null
           created_at: string | null
           id: string
           is_na: boolean | null
@@ -536,6 +537,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
           id?: string
           is_na?: boolean | null
@@ -549,6 +551,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
           id?: string
           is_na?: boolean | null
