@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           address: string | null
           advisor_type: string | null
+          category: string | null
           created_at: string | null
           email: string | null
           firm: string | null
@@ -34,6 +35,7 @@ export type Database = {
         Insert: {
           address?: string | null
           advisor_type?: string | null
+          category?: string | null
           created_at?: string | null
           email?: string | null
           firm?: string | null
@@ -50,6 +52,7 @@ export type Database = {
         Update: {
           address?: string | null
           advisor_type?: string | null
+          category?: string | null
           created_at?: string | null
           email?: string | null
           firm?: string | null
@@ -180,6 +183,7 @@ export type Database = {
           account_number_encrypted: string | null
           account_number_masked: string | null
           account_type: string | null
+          category: string | null
           contact_info: string | null
           created_at: string | null
           id: string
@@ -197,6 +201,7 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          category?: string | null
           contact_info?: string | null
           created_at?: string | null
           id?: string
@@ -214,6 +219,7 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          category?: string | null
           contact_info?: string | null
           created_at?: string | null
           id?: string
@@ -348,6 +354,7 @@ export type Database = {
         Row: {
           address: string | null
           birthday: string | null
+          category: string | null
           created_at: string | null
           email: string | null
           id: string
@@ -364,6 +371,7 @@ export type Database = {
         Insert: {
           address?: string | null
           birthday?: string | null
+          category?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
@@ -380,6 +388,7 @@ export type Database = {
         Update: {
           address?: string | null
           birthday?: string | null
+          category?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
@@ -407,6 +416,7 @@ export type Database = {
         Row: {
           additional_instructions: string | null
           burial_or_cremation: string | null
+          category: string | null
           cemetery_plot_details: string | null
           created_at: string | null
           funeral_director: string | null
@@ -426,6 +436,7 @@ export type Database = {
         Insert: {
           additional_instructions?: string | null
           burial_or_cremation?: string | null
+          category?: string | null
           cemetery_plot_details?: string | null
           created_at?: string | null
           funeral_director?: string | null
@@ -445,6 +456,7 @@ export type Database = {
         Update: {
           additional_instructions?: string | null
           burial_or_cremation?: string | null
+          category?: string | null
           cemetery_plot_details?: string | null
           created_at?: string | null
           funeral_director?: string | null
@@ -720,6 +732,7 @@ export type Database = {
       password_records: {
         Row: {
           access_instructions: string | null
+          category: string | null
           created_at: string | null
           id: string
           is_na: boolean | null
@@ -739,6 +752,7 @@ export type Database = {
         }
         Insert: {
           access_instructions?: string | null
+          category?: string | null
           created_at?: string | null
           id?: string
           is_na?: boolean | null
@@ -758,6 +772,7 @@ export type Database = {
         }
         Update: {
           access_instructions?: string | null
+          category?: string | null
           created_at?: string | null
           id?: string
           is_na?: boolean | null
@@ -788,6 +803,7 @@ export type Database = {
       personal_property_records: {
         Row: {
           beneficiary: string | null
+          category: string | null
           created_at: string | null
           description: string | null
           estimated_value: number | null
@@ -803,6 +819,7 @@ export type Database = {
         }
         Insert: {
           beneficiary?: string | null
+          category?: string | null
           created_at?: string | null
           description?: string | null
           estimated_value?: number | null
@@ -818,6 +835,7 @@ export type Database = {
         }
         Update: {
           beneficiary?: string | null
+          category?: string | null
           created_at?: string | null
           description?: string | null
           estimated_value?: number | null
@@ -845,6 +863,7 @@ export type Database = {
         Row: {
           age: string | null
           care_instructions: string | null
+          category: string | null
           created_at: string | null
           emergency_notes: string | null
           feeding_instructions: string | null
@@ -863,6 +882,7 @@ export type Database = {
         Insert: {
           age?: string | null
           care_instructions?: string | null
+          category?: string | null
           created_at?: string | null
           emergency_notes?: string | null
           feeding_instructions?: string | null
@@ -881,6 +901,7 @@ export type Database = {
         Update: {
           age?: string | null
           care_instructions?: string | null
+          category?: string | null
           created_at?: string | null
           emergency_notes?: string | null
           feeding_instructions?: string | null
@@ -950,6 +971,7 @@ export type Database = {
       }
       private_items: {
         Row: {
+          category: string | null
           created_at: string | null
           description: string | null
           id: string
@@ -965,6 +987,7 @@ export type Database = {
           visibility: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -980,6 +1003,7 @@ export type Database = {
           visibility?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -1138,6 +1162,7 @@ export type Database = {
       real_estate_records: {
         Row: {
           address: string | null
+          category: string | null
           created_at: string | null
           id: string
           insurance_details: string | null
@@ -1153,6 +1178,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          category?: string | null
           created_at?: string | null
           id?: string
           insurance_details?: string | null
@@ -1168,6 +1194,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          category?: string | null
           created_at?: string | null
           id?: string
           insurance_details?: string | null
@@ -1197,6 +1224,7 @@ export type Database = {
           account_number_masked: string | null
           account_type: string | null
           beneficiary_notes: string | null
+          category: string | null
           contact_info: string | null
           created_at: string | null
           id: string
@@ -1213,6 +1241,7 @@ export type Database = {
           account_number_masked?: string | null
           account_type?: string | null
           beneficiary_notes?: string | null
+          category?: string | null
           contact_info?: string | null
           created_at?: string | null
           id?: string
@@ -1229,6 +1258,7 @@ export type Database = {
           account_number_masked?: string | null
           account_type?: string | null
           beneficiary_notes?: string | null
+          category?: string | null
           contact_info?: string | null
           created_at?: string | null
           id?: string
@@ -1290,6 +1320,7 @@ export type Database = {
       }
       vehicle_records: {
         Row: {
+          category: string | null
           created_at: string | null
           id: string
           insurance: string | null
@@ -1307,6 +1338,7 @@ export type Database = {
           year: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
           id?: string
           insurance?: string | null
@@ -1324,6 +1356,7 @@ export type Database = {
           year?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
           id?: string
           insurance?: string | null
