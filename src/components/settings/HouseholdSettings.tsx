@@ -77,7 +77,7 @@ export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) 
       // For this demo, we'll just show the link.
       const inviteLink = `${window.location.origin}/invite/${token}`;
       console.log('Invite Link:', inviteLink);
-      alert(`Invite sent! (Demo Link: ${inviteLink})`);
+      toast.success(`Invite sent! (Demo Link: ${inviteLink})`);
       
       setInviteEmail('');
       setInviteName('');

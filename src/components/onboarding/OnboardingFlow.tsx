@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Users, User, CheckCircle2, Package, ShieldCheck, Lock, Eye } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAppContext } from '../../context/AppContext';
 import { OnboardingStep } from '../../config/types';
 import { authService } from '../../services/authService';
@@ -70,7 +71,7 @@ export const OnboardingFlow = () => {
         if (error) throw error;
         // With auto-confirm, user is immediately logged in
         if (!data?.user) {
-          alert("Check your email for a confirmation link!");
+          toast.info("Check your email for a confirmation link!");
         }
       } else {
         const { error } = await authService.signIn(email, password);
@@ -85,7 +86,7 @@ export const OnboardingFlow = () => {
         }
       }
     } catch (err: any) {
-      alert(err.message || "Auth failed");
+      toast.error(err.message || "Auth failed");
     } finally {
       setAuthLoading(false);
     }
@@ -146,7 +147,7 @@ export const OnboardingFlow = () => {
       }
     } catch (err: any) {
       console.error("Error creating packet:", err);
-      alert("Failed to create packet: " + err.message);
+      toast.error("Failed to create packet: " + err.message);
     }
   };
 
