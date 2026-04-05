@@ -1,7 +1,4 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
-
-type Tables = Database['public']['Tables'];
 
 export const inviteService = {
   async invitePartner(packetId: string, email: string, name: string, invitedBy: string) {
@@ -10,16 +7,13 @@ export const inviteService = {
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     const { data, error } = await supabase
-      .from('packet_invites')
+      .from('partner_invites')
       .insert({
         packet_id: packetId,
         invited_email: email,
         invited_name: name,
-        invited_by_user_id: invitedBy,
+        invited_by: invitedBy,
         token: token,
-        expires_at: expiresAt.toISOString(),
-        role: 'partner',
-        household_scope: 'personB',
         status: 'pending'
       })
       .select()
@@ -30,7 +24,7 @@ export const inviteService = {
 
   async getInviteByToken(token: string) {
     const { data, error } = await supabase
-      .from('packet_invites')
+      .from('partner_invites')
       .select('*, packets(title, person_a_name)')
       .eq('token', token)
       .single();
@@ -41,35 +35,37 @@ export const inviteService = {
     const { data: invite, error: inviteError } = await this.getInviteByToken(token);
     if (inviteError || !invite) return { error: inviteError || new Error('Invite not found') };
     if (invite.status !== 'pending') return { error: new Error(`Invite is already ${invite.status}`) };
-    if (new Date(invite.expires_at) < new Date()) return { error: new Error('Invite has expired') };
+    if (invite.expires_at && new Date(invite.expires_at) < new Date()) return { error: new Error('Invite has expired') };
 
     const { error: memberError } = await supabase
       .from('packet_members')
       .insert({
         packet_id: invite.packet_id,
         user_id: userId,
-        role: invite.role as any,
-        household_scope: invite.household_scope as any
+        role: 'partner',
+        household_scope: 'personB'
       });
 
     if (memberError) return { error: memberError };
 
     const { error: updateError } = await supabase
-      .from('packet_invites')
-      .update({ status: 'accepted', accepted_at: new Date().toISOString() })
+      .from('partner_invites')
+      .update({ status: 'accepted' })
       .eq('id', invite.id);
 
-    await supabase
-      .from('packets')
-      .update({ household_mode: 'couple' })
-      .eq('id', invite.packet_id);
+    if (invite.packet_id) {
+      await supabase
+        .from('packets')
+        .update({ household_mode: 'couple' })
+        .eq('id', invite.packet_id);
+    }
 
     return { success: true, error: updateError, packetId: invite.packet_id };
   },
 
   async revokeInvite(inviteId: string) {
     const { error } = await supabase
-      .from('packet_invites')
+      .from('partner_invites')
       .update({ status: 'revoked' })
       .eq('id', inviteId);
     return { error };
@@ -77,7 +73,7 @@ export const inviteService = {
 
   async getPacketInvites(packetId: string) {
     const { data, error } = await supabase
-      .from('packet_invites')
+      .from('partner_invites')
       .select('*')
       .eq('packet_id', packetId)
       .order('created_at', { ascending: false });
