@@ -8,11 +8,16 @@ import {
   DollarSign,
   User,
   Link as LinkIcon,
-  QrCode
+  QrCode,
+  Plus,
+  Loader2,
+  Check
 } from 'lucide-react';
 import { DataTable, StatusPill, KPIStatCard } from './DashboardComponents';
 import { affiliateService } from '../../services/adminService';
+import { referralCodeService } from '../../services/referralCodeService';
 import { useAppContext } from '../../context/AppContext';
+import { toast } from 'sonner';
 
 export const MyReferrals: React.FC = () => {
   const { profile } = useAppContext();
@@ -78,11 +83,6 @@ export const MyReferrals: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-serif italic text-stone-900">My Referrals</h3>
-        <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-50 transition-colors">
-            Export Referrals
-          </button>
-        </div>
       </div>
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
         <DataTable columns={columns} data={referrals} isLoading={loading} />
@@ -92,86 +92,126 @@ export const MyReferrals: React.FC = () => {
 };
 
 export const MyLinks: React.FC = () => {
-  const { profile } = useAppContext();
-  const [stats, setStats] = useState<any>(null);
+  const { user, profile } = useAppContext();
+  const [codes, setCodes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const loadCodes = async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    try {
+      const data = await referralCodeService.getMyCodes(user.id);
+      setCodes(data);
+    } catch (err) {
+      console.error('Failed to load codes', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (profile?.id) {
-      affiliateService.getMyStats(profile.id).then(setStats);
-    }
-  }, [profile?.id]);
+    loadCodes();
+  }, [user?.id]);
 
-  const referralLink = `${window.location.origin}/signup?ref=${stats?.referralCode}`;
+  const handleGenerate = async () => {
+    if (!user?.id || !profile) return;
+    setGenerating(true);
+    try {
+      await referralCodeService.generateCode(
+        user.id,
+        profile.full_name || 'Professional',
+        profile.email || ''
+      );
+      toast.success('Referral code generated');
+      await loadCodes();
+    } catch (err: any) {
+      if (err?.code === '23505') {
+        toast.error('Code collision — please try again');
+      } else {
+        toast.error('Failed to generate code');
+      }
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleCopy = (code: string, id: string) => {
+    const link = `${window.location.origin}?ref=${code}`;
+    navigator.clipboard.writeText(link);
+    setCopiedId(id);
+    toast.success('Referral link copied');
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   return (
-    <div className="max-w-2xl space-y-8">
-      <div className="bg-white p-8 rounded-xl border border-stone-200 shadow-sm">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 bg-stone-900 rounded-xl flex items-center justify-center">
-            <LinkIcon className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-serif italic text-stone-900">Your Referral Link</h3>
-            <p className="text-sm text-stone-400">Share this link to track your referrals and earn rewards.</p>
-          </div>
+    <div className="max-w-3xl space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xl font-serif italic text-stone-900">My Referral Codes</h3>
+          <p className="text-sm text-stone-400 mt-1">Generate and manage your unique referral codes.</p>
         </div>
-
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Referral Code</label>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 px-4 py-3 bg-stone-50 border border-stone-100 rounded-lg text-lg font-mono text-stone-900">
-                {stats?.referralCode || '...'}
-              </code>
-              <button 
-                onClick={() => navigator.clipboard.writeText(stats?.referralCode)}
-                className="p-3 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
-              >
-                <Copy className="w-5 h-5 text-stone-400" />
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Full Referral Link</label>
-            <div className="flex items-center gap-2">
-              <input
-                readOnly
-                value={referralLink}
-                className="flex-1 px-4 py-3 bg-stone-50 border border-stone-100 rounded-lg text-sm text-stone-600 focus:outline-none"
-              />
-              <button 
-                onClick={() => navigator.clipboard.writeText(referralLink)}
-                className="p-3 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors"
-              >
-                <Copy className="w-5 h-5 text-stone-400" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <button
+          onClick={handleGenerate}
+          disabled={generating}
+          className="px-4 py-2.5 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors disabled:opacity-50 flex items-center gap-2"
+        >
+          {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          Generate Code
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col items-center text-center">
-          <div className="w-32 h-32 bg-stone-50 rounded-lg border border-stone-100 flex items-center justify-center mb-4">
-            <QrCode className="w-16 h-16 text-stone-200" />
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2].map(i => <div key={i} className="h-20 bg-stone-100 rounded-xl animate-pulse" />)}
+        </div>
+      ) : codes.length === 0 ? (
+        <div className="bg-white p-12 rounded-xl border border-stone-200 shadow-sm text-center">
+          <div className="w-14 h-14 bg-stone-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <LinkIcon className="w-7 h-7 text-stone-300" />
           </div>
-          <h4 className="font-medium text-stone-900 mb-1">Download QR Code</h4>
-          <p className="text-xs text-stone-400 mb-4">Perfect for business cards or printed materials.</p>
-          <button className="w-full py-2 bg-stone-900 text-white rounded-lg text-xs font-medium hover:bg-stone-800 transition-colors">
-            Download PNG
+          <h4 className="text-lg font-serif italic text-stone-900 mb-2">No Codes Yet</h4>
+          <p className="text-sm text-stone-400 max-w-sm mx-auto mb-6">
+            Generate your first referral code to start tracking signups.
+          </p>
+          <button
+            onClick={handleGenerate}
+            disabled={generating}
+            className="px-5 py-2.5 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors disabled:opacity-50"
+          >
+            Generate Code
           </button>
         </div>
-
-        <div className="bg-stone-900 p-6 rounded-xl shadow-lg text-white">
-          <h4 className="font-serif italic text-lg mb-2">Marketing Assets</h4>
-          <p className="text-xs opacity-60 mb-6">Access our library of logos, banners, and social media templates.</p>
-          <button className="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-2">
-            <ExternalLink className="w-3 h-3" />
-            Open Asset Drive
-          </button>
+      ) : (
+        <div className="space-y-4">
+          {codes.map((rc: any) => (
+            <div key={rc.id} className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-stone-900 rounded-lg flex items-center justify-center">
+                  <LinkIcon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <code className="text-lg font-mono font-semibold text-stone-900">{rc.code}</code>
+                  <p className="text-xs text-stone-400 mt-0.5">
+                    Created {new Date(rc.created_at).toLocaleDateString()} · {rc.is_active ? 'Active' : 'Inactive'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleCopy(rc.code, rc.id)}
+                className="p-2.5 bg-stone-50 border border-stone-200 rounded-lg hover:bg-stone-100 transition-colors"
+              >
+                {copiedId === rc.id ? (
+                  <Check className="w-4 h-4 text-emerald-600" />
+                ) : (
+                  <Copy className="w-4 h-4 text-stone-500" />
+                )}
+              </button>
+            </div>
+          ))}
         </div>
-      </div>
+      )}
     </div>
   );
 };
