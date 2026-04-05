@@ -44,7 +44,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     description: 'Full access for a single user, billed monthly.',
     price: 4.99,
     interval: 'month',
-    stripePriceId: 'price_1TGdqLAkHewDWqI2usbeYZRV',
+    stripePriceId: 'price_1TIptdA0jdkSunBshrZtu3iG',
     features: [
       'All 14 Sections',
       'Secure File Uploads',
@@ -62,7 +62,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     description: 'Full access for a single user, billed annually.',
     price: 39,
     interval: 'year',
-    stripePriceId: 'price_1TGdr5AkHewDWqI2DxAFweTJ',
+    stripePriceId: 'price_1TIpteA0jdkSunBsmHnberoh',
     features: [
       'All 14 Sections',
       'Secure File Uploads',
@@ -81,7 +81,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     description: 'Full access for two users, billed monthly.',
     price: 7.99,
     interval: 'month',
-    stripePriceId: 'price_1TGdrcAkHewDWqI2YyTLdeQh',
+    stripePriceId: 'price_1TIptdA0jdkSunBsPjIHJxEV',
     features: [
       'Everything in Individual',
       'Invite Partner',
@@ -99,7 +99,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     description: 'Full access for two users, billed annually.',
     price: 59,
     interval: 'year',
-    stripePriceId: 'price_1TGdsAAkHewDWqI2Q82EVBBn',
+    stripePriceId: 'price_1TIptdA0jdkSunBsgyBKhEv7',
     features: [
       'Everything in Individual',
       'Invite Partner',
@@ -118,7 +118,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     description: 'One-time payment for permanent access.',
     price: 97,
     interval: 'one-time',
-    stripePriceId: 'price_1TGdupAkHewDWqI2QuNvzSeZ',
+    stripePriceId: 'price_1TIptfA0jdkSunBsZb8P9155',
     features: [
       'All 14 Sections',
       'Secure File Uploads',
