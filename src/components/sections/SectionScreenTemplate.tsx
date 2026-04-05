@@ -106,7 +106,7 @@ export const SectionScreenTemplate = ({
           try {
             // Find the record that matches this prefill and is marked as NA
             const { data: existing } = await sectionService.getRecords(currentPacket.id, activeTab, activeScope);
-            const record = existing?.find(r => 
+            const record = existing?.find((r: any) => 
               (r.is_na || r.status === 'not_applicable') && 
               (r.title === prefill.title || r.name === prefill.name || r.item_name === prefill.item_name || r.institution === prefill.institution)
             );
