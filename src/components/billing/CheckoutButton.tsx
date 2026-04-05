@@ -39,10 +39,12 @@ export const CheckoutButton = ({
         return;
       }
 
-      const response = await fetch('https://bfvtfenrkomhbzctljyt.supabase.co/functions/v1/create-checkout', {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
         },
         body: JSON.stringify({
           priceId: stripePriceId,
