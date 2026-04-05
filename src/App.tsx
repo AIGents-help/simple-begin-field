@@ -86,9 +86,8 @@ export default function App() {
           <Route path="/dashboard/*" element={<DashboardRoutes />} />
 
           {/* Billing Routes */}
-          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/checkout/success" element={<CheckoutSuccess />} />
-          <Route path="/checkout/cancel" element={<Navigate to="/pricing" replace />} />
+          <Route path="/checkout/cancel" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AppProvider>
