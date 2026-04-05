@@ -47,7 +47,7 @@ export const documentService = {
     const { error: uploadError } = await uploadService.uploadFile(bucket, filePath, file);
     if (uploadError) {
       console.error("Storage upload error:", uploadError);
-      return { data: null, error: { message: `Storage upload failed: ${uploadError.message || JSON.stringify(uploadError)}`, ...uploadError } };
+      return { data: null, error: new Error(`Storage upload failed: ${uploadError.message || JSON.stringify(uploadError)}`) };
     }
     
     console.log("File uploaded successfully to storage");
@@ -77,7 +77,7 @@ export const documentService = {
     
     if (dbError) {
       console.error("Database insert error:", dbError);
-      return { data: null, error: { message: `Database record creation failed: ${dbError.message || JSON.stringify(dbError)}`, ...dbError } };
+      return { data: null, error: new Error(`Database record creation failed: ${dbError.message || JSON.stringify(dbError)}`) };
     } else {
       console.log("Document metadata inserted successfully:", data);
     }
