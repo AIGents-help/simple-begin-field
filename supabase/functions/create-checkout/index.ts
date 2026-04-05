@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,7 +16,7 @@ serve(async (req) => {
   try {
     const authHeader = req.headers.get('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders })
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     const supabaseClient = createClient(
@@ -25,10 +25,9 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     )
 
-    const token = authHeader.replace('Bearer ', '')
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token)
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders })
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
@@ -45,7 +44,6 @@ serve(async (req) => {
 
     if (!priceId) throw new Error('priceId is required')
     if (!planKey) throw new Error('planKey is required')
-    if (!userId) throw new Error('userId is required')
 
     const mode = planKey === 'lifetime' ? 'payment' : 'subscription'
 
@@ -55,8 +53,8 @@ serve(async (req) => {
       mode: mode,
       success_url: successUrl,
       cancel_url: cancelUrl,
-      client_reference_id: userId,
-      metadata: { userId, packetId: packetId || '', planKey },
+      client_reference_id: user.id,
+      metadata: { userId: user.id, packetId: packetId || '', planKey },
       allow_promotion_codes: true,
     })
 
