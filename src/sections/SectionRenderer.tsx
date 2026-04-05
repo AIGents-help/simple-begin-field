@@ -60,7 +60,7 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
           </PrivateLockGate>
         );
       case 'affiliate':
-        return <AffiliateSection onAddClick={onAddClick} onRefresh={onRefresh} />;
+        return <AffiliateSection />;
       default:
         return <GenericSection onAddClick={onAddClick} onRefresh={onRefresh} />;
     }
