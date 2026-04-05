@@ -159,7 +159,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
           {!isPaid && (
             <button
-              onClick={() => navigate('/pricing')}
+              onClick={() => { setView('pricing'); onClose(); }}
               className="mb-4 mx-2 p-3 bg-navy-muted text-white rounded-xl flex items-center justify-center gap-2 hover:bg-navy-muted/90 transition-all shadow-lg shadow-navy-muted/20 group"
             >
               <ArrowUpCircle size={18} className="group-hover:scale-110 transition-transform" />

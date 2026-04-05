@@ -35,7 +35,7 @@ export const CheckoutButton = ({
       if (sessionError) throw sessionError;
       
       if (!session) {
-        window.location.href = '/?redirect=/pricing';
+        window.location.href = '/';
         return;
       }
 
@@ -46,7 +46,7 @@ export const CheckoutButton = ({
           userId: session.user.id,
           packetId: currentPacket?.id,
           successUrl: window.location.origin + '/checkout/success',
-          cancelUrl: window.location.origin + '/pricing'
+          cancelUrl: window.location.origin + '/'
         }
       });
 
