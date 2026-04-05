@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import Stripe from "https://esm.sh/stripe?target=deno"
+import Stripe from "https://esm.sh/stripe@14.21.0?target=deno"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -9,28 +9,26 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Initialize Supabase client with the user's auth token
-    // This allows Supabase to handle the JWT verification automatically
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders })
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization') ?? '' }
-        }
-      }
+      { global: { headers: { Authorization: authHeader } } }
     )
 
-    // Verify the user is actually logged in by getting the user from the token
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
-    if (userError || !user) {
-      throw new Error('Unauthorized: Invalid or missing authentication token')
+    const token = authHeader.replace('Bearer ', '')
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token)
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders })
     }
 
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
@@ -39,7 +37,7 @@ serve(async (req) => {
     }
 
     const stripe = new Stripe(stripeKey, {
-      apiVersion: '2022-11-15',
+      apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     })
 
@@ -49,44 +47,28 @@ serve(async (req) => {
     if (!planKey) throw new Error('planKey is required')
     if (!userId) throw new Error('userId is required')
 
-    // Determine mode based on planKey
     const mode = planKey === 'lifetime' ? 'payment' : 'subscription'
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       mode: mode,
       success_url: successUrl,
       cancel_url: cancelUrl,
-      client_reference_id: userId, // Use userId from request body
-      metadata: {
-        userId,
-        packetId: packetId || '',
-        planKey,
-      },
+      client_reference_id: userId,
+      metadata: { userId, packetId: packetId || '', planKey },
       allow_promotion_codes: true,
     })
 
     return new Response(
       JSON.stringify({ url: session.url }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
     console.error('Checkout Error:', error.message)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     )
   }
 })
