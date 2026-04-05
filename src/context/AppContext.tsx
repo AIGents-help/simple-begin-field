@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useRef } from 'react';
 import { AppState, UserScope, UserMode, SectionId, View } from '../config/types';
 import { supabase } from '@/integrations/supabase/client';
-import { authService } from '../services/authService';
 import { packetService } from '../services/packetService';
 import { User } from '@supabase/supabase-js';
 import { useBilling } from '../hooks/useBilling';
@@ -13,7 +12,7 @@ interface AppContextType extends AppState {
   userDisplayName: string;
   userInitials: string;
   currentPacket: any | null;
-  packet: any | null; // Alias for currentPacket
+  packet: any | null;
   packets: any[];
   loading: boolean;
   billingLoading: boolean;
@@ -31,7 +30,7 @@ interface AppContextType extends AppState {
   togglePrivateLock: () => void;
   setCurrentPacket: (packet: any) => void;
   refreshPackets: () => Promise<void>;
-  refreshPacketData: () => Promise<void>; // Alias for refreshPackets
+  refreshPacketData: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -55,6 +54,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [packets, setPackets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<AppState>(defaultState);
+  const hydrationRef = useRef(false);
 
   const {
     loading: billingLoading,
@@ -78,62 +78,95 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return userDisplayName.substring(0, 2).toUpperCase();
   })();
 
-  // Auth listener
-  useEffect(() => {
-    const { data: { subscription } } = authService.onAuthStateChange(async (user) => {
-      setUser(user);
-      if (!user) {
-        setProfile(null);
-        setPackets([]);
-        setCurrentPacket(null);
-        setLoading(false);
+  // Hydrate user state: fetch profile + packets
+  const hydrateUserState = useCallback(async (authUser: User) => {
+    try {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authUser.id)
+        .single();
+      setProfile(profileData);
+
+      const { data: memberships } = await packetService.getPacketsForUser(authUser.id);
+      if (memberships && memberships.length > 0) {
+        const userPackets = memberships.map((m: any) => ({
+          ...m.packets,
+          userRole: m.role,
+          userScope: m.household_scope
+        }));
+        setPackets(userPackets);
+
+        const firstPacket = userPackets[0];
+        if (!currentPacket) {
+          setCurrentPacket(firstPacket);
+        }
+        const activePacket = currentPacket || firstPacket;
+
+        setState(prev => ({
+          ...prev,
+          onboarded: true,
+          userMode: activePacket.household_mode,
+          personA: activePacket.person_a_name || 'Person A',
+          personB: activePacket.person_b_name || 'Person B',
+        }));
       } else {
-        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        setProfile(profileData);
-        fetchPackets(user.id);
+        setState(prev => ({ ...prev, onboarded: false }));
+      }
+    } catch (err) {
+      console.error('Failed to hydrate user state:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPacket]);
+
+  // Auth initialization: restore session first, then listen for changes
+  useEffect(() => {
+    let mounted = true;
+
+    // 1. Restore existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      const sessionUser = session?.user ?? null;
+      setUser(sessionUser);
+      if (sessionUser) {
+        hydrateUserState(sessionUser);
+      } else {
+        setLoading(false);
       }
     });
 
+    // 2. Listen for future auth changes (sign-in, sign-out, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (!mounted) return;
+        const newUser = session?.user ?? null;
+        setUser(newUser);
+
+        if (!newUser) {
+          // Signed out — clear everything
+          setProfile(null);
+          setPackets([]);
+          setCurrentPacket(null);
+          setState(prev => ({ ...prev, onboarded: false }));
+          setLoading(false);
+        } else if (_event === 'SIGNED_IN') {
+          // Fresh sign-in — hydrate
+          hydrateUserState(newUser);
+        }
+        // TOKEN_REFRESHED and INITIAL_SESSION are handled by getSession above
+      }
+    );
+
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [hydrateUserState]);
 
-  const fetchPackets = async (userId: string) => {
-    setLoading(true);
-    const { data, error } = await packetService.getPacketsForUser(userId);
-    if (data && data.length > 0) {
-      const userPackets = data.map((m: any) => ({
-        ...m.packets,
-        userRole: m.role,
-        userScope: m.household_scope
-      }));
-      setPackets(userPackets);
-      
-      const firstPacket = userPackets[0];
-      const activePacket = currentPacket || firstPacket;
-      
-      if (!currentPacket) {
-        setCurrentPacket(firstPacket);
-      }
-      
-      setState(prev => ({
-        ...prev,
-        onboarded: true,
-        userMode: activePacket.household_mode,
-        personA: activePacket.person_a_name || 'Person A',
-        personB: activePacket.person_b_name || 'Person B',
-      }));
-    } else {
-      // No packets found, user might need to onboard
-      setState(prev => ({ ...prev, onboarded: false }));
-    }
-    setLoading(false);
-  };
-
-  const refreshPackets = async () => {
-    if (user) await fetchPackets(user.id);
-  };
+  const refreshPackets = useCallback(async () => {
+    if (user) await hydrateUserState(user);
+  }, [user, hydrateUserState]);
 
   const setScope = (scope: UserScope) => setState(prev => ({ ...prev, activeScope: scope }));
   const setTab = (tab: SectionId) => setState(prev => ({ ...prev, activeTab: tab }));
@@ -141,7 +174,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const togglePrivateLock = () => setState(prev => ({ ...prev, isPrivateLocked: !prev.isPrivateLocked }));
 
   const signOut = async () => {
-    await authService.signOut();
+    await supabase.auth.signOut();
   };
 
   const contextValue = React.useMemo(() => ({ 
@@ -187,7 +220,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     isCouple,
     isLifetime,
     currentPlan,
-    refreshBilling
+    refreshBilling,
+    refreshPackets
   ]);
 
   return (
