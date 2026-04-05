@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { AppProvider } from './context/AppContext';
 import { AppShell } from './components/layout/AppShell';
@@ -8,6 +8,11 @@ import { AdminOverview, ProfessionalOverview } from './components/dashboard/Over
 import { AdminCustomers, AdminPackets, AdminBilling } from './components/dashboard/AdminScreens';
 import { AdminAffiliates, AdminInvites } from './components/dashboard/AdminAffiliates';
 import { MyReferrals, MyLinks, MyPayouts } from './components/dashboard/ProfessionalScreens';
+import { TermsOfService } from './pages/legal/TermsOfService';
+import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
+import { DataUsageSummary } from './pages/legal/DataUsageSummary';
+import { PricingPage } from './components/billing/PricingPage';
+import { CheckoutSuccess } from './components/billing/CheckoutSuccess';
 import { useAppContext } from './context/AppContext';
 
 const DashboardRoutes = () => {
@@ -60,12 +65,6 @@ const DashboardRoutes = () => {
   );
 };
 
-import { TermsOfService } from './pages/legal/TermsOfService';
-import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
-import { DataUsageSummary } from './pages/legal/DataUsageSummary';
-import { PricingPage } from './components/billing/PricingPage';
-import { CheckoutSuccess } from './components/billing/CheckoutSuccess';
-import { Navigate } from 'react-router-dom';
 
 export default function App() {
   return (
