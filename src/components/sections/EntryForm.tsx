@@ -205,7 +205,7 @@ export const EntryForm = ({ isOpen, onClose, entryLabel, onSuccess }: EntryFormP
                     <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
                       {field.label} {field.required && <span className="text-red-500">*</span>}
                     </label>
-                    {field.type === 'textarea' ? (
+                    {(field as any).type === 'textarea' ? (
                       <textarea
                         rows={4}
                         placeholder={`Enter ${field.label.toLowerCase()}...`}
@@ -216,8 +216,8 @@ export const EntryForm = ({ isOpen, onClose, entryLabel, onSuccess }: EntryFormP
                       />
                     ) : (
                       <input 
-                        type={field.type || 'text'}
-                        placeholder={field.defaultValue || `Enter ${field.label.toLowerCase()}...`}
+                        type={(field as any).type || 'text'}
+                        placeholder={(field as any).defaultValue || `Enter ${field.label.toLowerCase()}...`}
                         className={`w-full p-4 bg-white rounded-2xl border ${errors[field.name] ? 'border-red-500' : 'border-stone-200'} focus:border-navy-muted outline-none shadow-sm font-medium`}
                         value={formData[field.name] || ''}
                         onChange={(e) => handleInputChange(field.name, e.target.value)}
