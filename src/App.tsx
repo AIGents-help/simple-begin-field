@@ -11,7 +11,7 @@ import { MyReferrals, MyLinks, MyPayouts } from './components/dashboard/Professi
 import { TermsOfService } from './pages/legal/TermsOfService';
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
 import { DataUsageSummary } from './pages/legal/DataUsageSummary';
-import { PricingPage } from './components/billing/PricingPage';
+import { CheckoutSuccess } from './components/billing/CheckoutSuccess';
 import { CheckoutSuccess } from './components/billing/CheckoutSuccess';
 import { useAppContext } from './context/AppContext';
 

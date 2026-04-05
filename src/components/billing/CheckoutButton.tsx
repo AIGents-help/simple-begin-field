@@ -35,7 +35,7 @@ export const CheckoutButton = ({
       if (sessionError) throw sessionError;
       
       if (!session) {
-        window.location.href = '/?redirect=/pricing';
+        window.location.href = '/';
         return;
       }
 
