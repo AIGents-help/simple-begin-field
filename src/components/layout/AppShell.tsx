@@ -22,7 +22,7 @@ import { CategoryOption } from '../upload/types';
 import { SectionId } from '../../config/types';
 
 export const AppShell = () => {
-  const { onboarded, view, setView, loading, user, profile, setTab } = useAppContext();
+  const { onboarded, view, setView, loading, authReady, user, profile, setTab } = useAppContext();
   const [isAdding, setIsAdding] = useState(false);
   const [isQuickAdding, setIsQuickAdding] = useState(false);
   const [initialFile, setInitialFile] = useState<File | null>(null);
@@ -70,7 +70,7 @@ export const AppShell = () => {
     setRefreshFn(() => fn);
   }, []);
 
-  if (loading) {
+  if (loading || !authReady) {
     return (
       <div className="min-h-screen bg-[#fdfaf3] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -146,7 +146,7 @@ export const AppShell = () => {
         
         <main className="flex-1 overflow-y-auto no-scrollbar">
           <div className="max-w-[1280px] mx-auto w-full">
-            {profile?.role && profile.role !== 'user' && (
+            {(profile?.role === 'admin' || profile?.role === 'professional') && (
               <div className="px-4 py-2 bg-stone-900 text-white flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Shield className="w-3 h-3" />
