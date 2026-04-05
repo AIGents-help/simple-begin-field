@@ -23,7 +23,7 @@ export const sectionService = {
     const tableName = this.tableMap[sectionKey];
     if (!tableName) return { data: [], error: new Error(`No table mapped for section: ${sectionKey}`) };
 
-    let query = supabase
+    let query = (supabase as any)
       .from(tableName)
       .select('*')
       .eq('packet_id', packetId);
@@ -41,7 +41,7 @@ export const sectionService = {
     console.log(`Creating record in ${tableName}:`, record);
     if (!tableName) return { data: null, error: new Error(`No table mapped for section: ${sectionKey}`) };
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from(tableName)
       .insert(record)
       .select()
@@ -61,7 +61,7 @@ export const sectionService = {
     console.log(`Updating record ${recordId} in ${tableName}:`, updates);
     if (!tableName) return { data: null, error: new Error(`No table mapped for section: ${sectionKey}`) };
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from(tableName)
       .update(updates)
       .eq('id', recordId)
@@ -81,7 +81,7 @@ export const sectionService = {
     const tableName = this.tableMap[sectionKey];
     if (!tableName) return { data: null, error: new Error(`No table mapped for section: ${sectionKey}`) };
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from(tableName)
       .delete()
       .eq('id', recordId);
