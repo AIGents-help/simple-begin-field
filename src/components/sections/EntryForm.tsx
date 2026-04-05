@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '../../context/AppContext';
 import { sectionService } from '../../services/sectionService';
@@ -79,12 +80,12 @@ export const EntryForm = ({ isOpen, onClose, entryLabel, onSuccess }: EntryFormP
       const { error } = await sectionService.createRecord('info', recordToSave);
       if (error) throw error;
 
-      alert("Information saved successfully!");
+      toast.success("Saved successfully");
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
       console.error("Error saving entry:", err);
-      alert(`Failed to save entry: ${err.message}`);
+      toast.error(`Failed to save entry: ${err.message}`);
     } finally {
       setLoading(false);
     }

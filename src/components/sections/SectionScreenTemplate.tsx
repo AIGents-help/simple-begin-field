@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Upload, ChevronRight, Loader2, Clock, UserPlus, FileText } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { ScopeToggle } from '../layout/ScopeToggle';
@@ -98,7 +99,7 @@ export const SectionScreenTemplate = ({
             fetchData();
           } catch (err) {
             console.error("Error marking as N/A:", err);
-            alert("Failed to mark as N/A");
+            toast.error("Failed to mark as N/A");
           }
         }}
         onRestoreNA={async (prefill) => {
@@ -118,7 +119,7 @@ export const SectionScreenTemplate = ({
             }
           } catch (err) {
             console.error("Error restoring N/A item:", err);
-            alert("Failed to restore item");
+            toast.error("Failed to restore item");
           }
         }}
       />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { Toaster } from '@/components/ui/sonner';
 import { AppProvider } from './context/AppContext';
 import { AppShell } from './components/layout/AppShell';
 import { DashboardShell } from './components/dashboard/DashboardShell';
@@ -58,6 +59,7 @@ import { Navigate } from 'react-router-dom';
 export default function App() {
   return (
     <AppProvider>
+      <Toaster />
       <Router>
         <Routes>
           {/* Main App Routes */}
