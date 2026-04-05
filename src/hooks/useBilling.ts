@@ -37,7 +37,7 @@ export const useBilling = (user: User | null) => {
         .maybeSingle();
 
       if (data && !error) {
-        const plan = PRICING_PLANS.find(p => p.id === data.plan_id);
+        const plan = PRICING_PLANS.find(p => p.id === (data as any).plan_id || p.id === data.pricing_plan_id);
         if (plan) {
           setPlanId(plan.id);
           setIsPaid(plan.price > 0);
