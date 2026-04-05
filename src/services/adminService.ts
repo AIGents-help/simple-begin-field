@@ -1,11 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
-type Packet = Database['public']['Tables']['packets']['Row'];
-type Purchase = Database['public']['Tables']['purchases']['Row'];
-type AffiliateReferral = Database['public']['Tables']['affiliate_referrals']['Row'];
-type PacketInvite = Database['public']['Tables']['packet_invites']['Row'];
+// Use 'partner_invites' which is the actual table name in the DB
 
 export const adminService = {
   async getStats() {
@@ -25,8 +20,8 @@ export const adminService = {
       supabase.from('packets').select('*', { count: 'exact', head: true }).eq('household_mode', 'single'),
       supabase.from('packets').select('*', { count: 'exact', head: true }).eq('household_mode', 'couple'),
       supabase.from('purchases').select('*', { count: 'exact', head: true }).in('status', ['active', 'one_time_paid']),
-      supabase.from('packet_invites').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-      supabase.from('packet_invites').select('*', { count: 'exact', head: true }).eq('status', 'accepted'),
+      supabase.from('partner_invites').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('partner_invites').select('*', { count: 'exact', head: true }).eq('status', 'accepted'),
       supabase.from('affiliate_referrals').select('*', { count: 'exact', head: true }).eq('is_active', true),
       supabase.from('affiliate_conversions').select('*', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
     ]);
@@ -102,7 +97,7 @@ export const adminService = {
   },
 
   async getInvites() {
-    const { data, error } = await supabase.from('packet_invites').select(`
+    const { data, error } = await supabase.from('partner_invites').select(`
       *,
       packets (
         title
