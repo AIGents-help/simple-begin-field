@@ -105,16 +105,36 @@ export const OnboardingFlow = () => {
         legal_version_accepted: '2026-03-26'
       });
 
-      const { data, error } = await packetService.createPacket({
-        household_mode: userMode,
-        person_a_name: personA || 'Person A',
-        person_b_name: userMode === 'couple' ? (personB || 'Person B') : null,
-      });
+      // The trigger already created a packet on signup. Fetch it.
+      const { data: memberships, error: fetchError } = await packetService.getPacketsForUser(user.id);
+      
+      let packet = null;
+      if (memberships && memberships.length > 0) {
+        // Use the existing trigger-created packet and update it
+        const existingPacket = (memberships[0] as any).packets;
+        if (existingPacket) {
+          const { data: updated } = await packetService.updatePacket(existingPacket.id, {
+            household_mode: userMode,
+            person_a_name: personA || 'Person A',
+            person_b_name: userMode === 'couple' ? (personB || 'Person B') : null,
+          });
+          packet = updated || existingPacket;
+        }
+      }
+      
+      // Fallback: create a new packet if none exists
+      if (!packet) {
+        const { data, error } = await packetService.createPacket({
+          household_mode: userMode,
+          person_a_name: personA || 'Person A',
+          person_b_name: userMode === 'couple' ? (personB || 'Person B') : null,
+        });
+        if (error) throw error;
+        packet = data;
+      }
 
-      if (error) throw error;
-
-      if (data) {
-        setCurrentPacket(data);
+      if (packet) {
+        setCurrentPacket(packet);
         setState(prev => ({
           ...prev,
           onboarded: true,
