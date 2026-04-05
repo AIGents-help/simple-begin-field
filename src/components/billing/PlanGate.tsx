@@ -25,6 +25,9 @@ export const PlanGate = ({ children, feature, fallback }: PlanGateProps) => {
     if (feature === 'pdf') return currentPlan.canExportPDF;
     if (feature === 'partner') return currentPlan.canInvitePartner;
     
+    // Referral code entry is always free
+    if (feature === 'affiliate') return true;
+    
     // Check section access
     if (currentPlan.allowedSections === 'all') return true;
     return currentPlan.allowedSections.includes(feature as SectionId);
