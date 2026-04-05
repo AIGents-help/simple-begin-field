@@ -1,8 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 import { documentService } from './documentService';
-
-type Tables = Database['public']['Tables'];
 
 export const sectionService = {
   // Mapping SectionId to table names
@@ -20,7 +17,7 @@ export const sectionService = {
     'funeral': 'funeral_records',
     'private': 'private_items',
     'medical': 'medical_records'
-  } as Record<string, keyof Tables>,
+  } as Record<string, string>,
 
   async getRecords(packetId: string, sectionKey: string, scope?: 'personA' | 'personB' | 'shared') {
     const tableName = this.tableMap[sectionKey];
