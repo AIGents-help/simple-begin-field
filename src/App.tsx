@@ -11,11 +11,23 @@ import { MyReferrals, MyLinks, MyPayouts } from './components/dashboard/Professi
 import { useAppContext } from './context/AppContext';
 
 const DashboardRoutes = () => {
-  const { profile } = useAppContext();
+  const { user, profile, loading, authReady, profileLoading } = useAppContext();
+
+  if (!authReady || loading || profileLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50 p-6">
+        <div className="w-10 h-10 border-4 border-stone-300 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
   const isAdmin = profile?.role === 'admin';
   const isProfessional = profile?.role === 'professional';
 
-  return (
     <DashboardShell>
       <Routes>
         <Route index element={isAdmin ? <AdminOverview /> : <ProfessionalOverview />} />

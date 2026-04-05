@@ -48,15 +48,22 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, profile, signOut } = useAppContext();
+  const { user, profile, signOut, loading, authReady, profileLoading } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
 
   const userRole = profile?.role as 'admin' | 'professional' | 'user';
   const filteredNav = NAV_ITEMS.filter(item => item.roles.includes(userRole as any));
 
-  // Wait for profile to load before restricting access
-  if (!profile) {
+  if (!authReady || loading || profileLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <div className="w-10 h-10 border-4 border-stone-300 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50">
         <div className="w-10 h-10 border-4 border-stone-300 border-t-transparent rounded-full animate-spin" />
