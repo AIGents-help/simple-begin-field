@@ -28,11 +28,11 @@ const DashboardRoutes = () => {
   const isAdmin = profile?.role === 'admin';
   const isProfessional = profile?.role === 'professional';
 
+  return (
     <DashboardShell>
       <Routes>
         <Route index element={isAdmin ? <AdminOverview /> : <ProfessionalOverview />} />
         
-        {/* Admin Only */}
         {isAdmin && (
           <>
             <Route path="customers" element={<AdminCustomers />} />
@@ -46,7 +46,6 @@ const DashboardRoutes = () => {
           </>
         )}
 
-        {/* Professional Only */}
         {isProfessional && (
           <>
             <Route path="referrals" element={<MyReferrals />} />
