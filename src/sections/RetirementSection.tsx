@@ -15,6 +15,8 @@ export const RetirementSection = ({ onAddClick, onRefresh }: { onAddClick: (file
               title={record.institution || record.account_type}
               subtitle={record.beneficiary_notes || record.account_number_masked || '****'}
               icon={Briefcase}
+              data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
           <div className="space-y-3">

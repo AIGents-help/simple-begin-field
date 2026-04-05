@@ -16,6 +16,7 @@ export const MedicalSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
               icon={Activity}
               badge={record.scope === 'shared' ? 'Shared' : undefined}
               data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
         </div>

@@ -16,6 +16,8 @@ export const PetsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
               subtitle={`${record.species} • ${record.breed || ''}`}
               icon={Heart}
               badge={record.species}
+              data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
         </div>

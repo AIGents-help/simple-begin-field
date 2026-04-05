@@ -17,6 +17,7 @@ export const RealEstateSection = ({ onAddClick, onRefresh }: { onAddClick: (file
               icon={HomeIcon}
               badge={record.scope === 'shared' ? 'Shared' : undefined}
               data={record}
+              onClick={() => onAddClick(undefined, record)}
             />
           ))}
           <div className="space-y-3">
