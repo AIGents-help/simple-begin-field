@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
@@ -197,13 +198,13 @@ export const AddEditSheet = ({
       }
       
       console.log("Final save success");
-      alert("Information saved successfully!");
+      toast.success("Saved successfully");
       if (onSuccess) onSuccess();
       handleClose();
     } catch (err: any) {
       console.error("Error saving record:", err);
       const errorMessage = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
-      alert(`Failed to save record: ${errorMessage}`);
+      toast.error(`Failed to save record: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

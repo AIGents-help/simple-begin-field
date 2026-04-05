@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate } from '../components/sections/SectionScreenTemplate';
 import { InfoRecordCard } from '../components/sections/InfoRecordCard';
@@ -70,7 +71,7 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
         refresh();
       } catch (err) {
         console.error("Error deleting record:", err);
-        alert("Failed to delete record.");
+        toast.error("Failed to delete record.");
       } finally {
         setIsDeleting(false);
       }
