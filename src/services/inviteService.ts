@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '../types/database';
+import { Database } from '@/integrations/supabase/types';
 
 type Tables = Database['public']['Tables'];
 
