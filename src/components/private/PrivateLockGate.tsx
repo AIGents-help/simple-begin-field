@@ -16,10 +16,10 @@ export const PrivateLockGate = ({ children }: { children: React.ReactNode }) => 
     setError('');
 
     try {
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await (supabase as any)
         .from('profiles')
         .select('private_pin')
-        .eq('id', user?.id)
+        .eq('id', user?.id ?? '')
         .single();
 
       if (profileError) throw profileError;
