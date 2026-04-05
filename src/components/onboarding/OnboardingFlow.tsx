@@ -66,9 +66,12 @@ export const OnboardingFlow = () => {
     setAuthLoading(true);
     try {
       if (isSignUp) {
-        const { error } = await authService.signUp(email, password);
+        const { data, error } = await authService.signUp(email, password);
         if (error) throw error;
-        alert("Check your email for a confirmation link!");
+        // With auto-confirm, user is immediately logged in
+        if (!data?.user) {
+          alert("Check your email for a confirmation link!");
+        }
       } else {
         const { error } = await authService.signIn(email, password);
         if (error) throw error;
