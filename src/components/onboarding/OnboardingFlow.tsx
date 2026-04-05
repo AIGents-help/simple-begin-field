@@ -69,15 +69,16 @@ export const OnboardingFlow = () => {
       if (isSignUp) {
         const { data, error } = await authService.signUp(email, password);
         if (error) throw error;
-        // With auto-confirm, user is immediately logged in
-        if (!data?.user) {
-          toast.info("Check your email for a confirmation link!");
+
+        if (!data?.session) {
+          toast.info("Check your email to confirm your account before signing in.");
+          setIsSignUp(false);
+          return;
         }
       } else {
         const { error } = await authService.signIn(email, password);
         if (error) throw error;
         
-        // Check for redirect param
         const searchParams = new URLSearchParams(location.search);
         const redirect = searchParams.get('redirect');
         if (redirect) {
@@ -94,6 +95,7 @@ export const OnboardingFlow = () => {
 
   const handleFinish = async () => {
     if (!user) {
+      setIsSignUp(true);
       setStep('auth');
       return;
     }
@@ -225,7 +227,10 @@ export const OnboardingFlow = () => {
             
             <div className="w-full space-y-4">
               <button 
-                onClick={() => setStep('setup')}
+                onClick={() => {
+                  setStep('auth');
+                  setIsSignUp(true);
+                }}
                 className="w-full py-4 bg-navy-muted text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
               >
                 Create Account

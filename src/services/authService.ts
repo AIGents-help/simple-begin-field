@@ -3,7 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 export const authService = {
   async signUp(email: string, password?: string) {
     if (password) {
-      return await supabase.auth.signUp({ email, password });
+      return await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+        },
+      });
     } else {
       return await supabase.auth.signInWithOtp({ email });
     }
