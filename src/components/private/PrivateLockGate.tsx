@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, ShieldCheck, X } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const PrivateLockGate = ({ children }: { children: React.ReactNode }) => {

@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { Database } from '../types/database';
 
 type Tables = Database['public']['Tables'];

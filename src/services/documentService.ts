@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { uploadService } from './uploadService';
 import { FileMetadata } from '../components/upload/types';
 
