@@ -118,7 +118,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     description: 'One-time payment for permanent access.',
     price: 97,
     interval: 'one-time',
-    stripePriceId: 'price_1TGdupAkHewDWqI2QuNvzSeZ',
+    stripePriceId: 'price_1TIptfA0jdkSunBsZb8P9155',
     features: [
       'All 14 Sections',
       'Secure File Uploads',
