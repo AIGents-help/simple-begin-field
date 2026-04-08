@@ -29,7 +29,6 @@ export const CheckoutButton = ({
     setError(null);
     
     try {
-      // Get session directly for access token and user ID
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) throw sessionError;
@@ -39,10 +38,15 @@ export const CheckoutButton = ({
         return;
       }
 
-      const response = await fetch('https://bfvtfenrkomhbzctljyt.supabase.co/functions/v1/create-checkout', {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/create-checkout`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': supabaseAnonKey,
         },
         body: JSON.stringify({
           priceId: stripePriceId,
