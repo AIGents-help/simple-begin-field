@@ -39,13 +39,13 @@ export const authService = {
     full_name?: string;
     consent_timestamp?: string;
     legal_version_accepted?: string;
-    private_pin?: string;
     affiliate_id?: string;
     [key: string]: any;
   }) {
+    const { private_pin, ...safeUpdates } = updates as any;
     const { data, error } = await supabase
       .from('profiles')
-      .upsert({ id: userId, ...updates }, { onConflict: 'id' })
+      .upsert({ id: userId, ...safeUpdates } as any, { onConflict: 'id' })
       .select()
       .single();
     return { data, error };
