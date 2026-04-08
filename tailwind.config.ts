@@ -13,6 +13,11 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,6 +62,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        manila: '#f3e5ab',
+        'manila-dark': '#e6d590',
+        parchment: '#fcf5e5',
+        'folder-edge': '#c4b47d',
+        'navy-muted': '#2c3e50',
+        charcoal: '#333333',
+        'olive-deep': '#3d4035',
+        paper: '#ffffff',
       },
       borderRadius: {
         lg: "var(--radius)",
