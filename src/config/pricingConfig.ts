@@ -81,7 +81,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     description: 'Full access for two users, billed monthly.',
     price: 7.99,
     interval: 'month',
-    stripePriceId: 'price_1TGdrcAkHewDWqI2YyTLdeQh',
+    stripePriceId: 'price_1TIptdA0jdkSunBsPjIHJxEV',
     features: [
       'Everything in Individual',
       'Invite Partner',
