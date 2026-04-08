@@ -10,12 +10,12 @@ export const inviteService = {
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     const { data, error } = await supabase
-      .from('packet_invites')
+      .from('partner_invites')
       .insert({
         packet_id: packetId,
         invited_email: email,
         invited_name: name,
-        invited_by_user_id: invitedBy,
+        invited_by: invitedBy,
         token: token,
         expires_at: expiresAt.toISOString(),
         role: 'partner',
@@ -30,7 +30,7 @@ export const inviteService = {
 
   async getInviteByToken(token: string) {
     const { data, error } = await supabase
-      .from('packet_invites')
+      .from('partner_invites')
       .select('*, packets(title, person_a_name)')
       .eq('token', token)
       .single();
@@ -55,8 +55,8 @@ export const inviteService = {
     if (memberError) return { error: memberError };
 
     const { error: updateError } = await supabase
-      .from('packet_invites')
-      .update({ status: 'accepted', accepted_at: new Date().toISOString() })
+      .from('partner_invites')
+      .update({ status: 'accepted', created_at: new Date().toISOString() })
       .eq('id', invite.id);
 
     await supabase
@@ -69,7 +69,7 @@ export const inviteService = {
 
   async revokeInvite(inviteId: string) {
     const { error } = await supabase
-      .from('packet_invites')
+      .from('partner_invites')
       .update({ status: 'revoked' })
       .eq('id', inviteId);
     return { error };
@@ -77,7 +77,7 @@ export const inviteService = {
 
   async getPacketInvites(packetId: string) {
     const { data, error } = await supabase
-      .from('packet_invites')
+      .from('partner_invites')
       .select('*')
       .eq('packet_id', packetId)
       .order('created_at', { ascending: false });
