@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Loader2 } from 'lucide-react';
+import { X, Save, Loader2, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '@/lib/supabase';
 import { useAppContext } from '../../context/AppContext';
@@ -197,7 +198,7 @@ export const AddEditSheet = ({
       }
       
       console.log("Final save success");
-      alert("Information saved successfully!");
+      toast.success("Information saved successfully!", { icon: <CheckCircle size={18} className="text-emerald-500" />, duration: 3000, position: "bottom-center" });
       if (onSuccess) onSuccess();
       handleClose();
     } catch (err: any) {
