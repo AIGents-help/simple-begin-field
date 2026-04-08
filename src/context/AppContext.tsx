@@ -46,7 +46,16 @@ const defaultState: AppState = {
   view: 'dashboard',
 };
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
+type GlobalAppContext = typeof globalThis & {
+  __survivorPacketAppContext__?: React.Context<AppContextType | undefined>;
+};
+
+const globalAppContext = globalThis as GlobalAppContext;
+const AppContext =
+  globalAppContext.__survivorPacketAppContext__ ??
+  (globalAppContext.__survivorPacketAppContext__ = createContext<AppContextType | undefined>(undefined));
+
+AppContext.displayName = 'AppContext';
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
