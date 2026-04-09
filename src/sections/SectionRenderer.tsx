@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate } from '../components/sections/SectionScreenTemplate';
-import { InfoSection } from '../sections/InfoSection';
+import { InfoSection } from '../components/info/InfoSection';
 import { FamilySection } from '../sections/FamilySection';
 import { RealEstateSection } from '../sections/RealEstateSection';
 import { BankingSection } from '../sections/BankingSection';
