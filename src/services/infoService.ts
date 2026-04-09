@@ -9,7 +9,6 @@ export interface InfoRecord {
   category: string
   title: string
   notes: string | null
-  description: string | null
   status: string
   created_by: string
   created_at: string
