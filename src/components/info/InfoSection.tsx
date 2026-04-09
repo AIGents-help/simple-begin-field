@@ -122,7 +122,7 @@ export function InfoSection({ packetId, scope }: InfoSectionProps) {
                     {record.category}
                   </span>
                   <h4 style={{ margin: '4px 0' }}>{record.title}</h4>
-                  {record.notes && (
+                  {record.notes && !record.notes.startsWith('{') && (
                     <p style={{ margin: 0, fontSize: 14, color: '#555' }}>{record.notes}</p>
                   )}
                   <p style={{ margin: '4px 0 0', fontSize: 11, color: '#aaa' }}>
