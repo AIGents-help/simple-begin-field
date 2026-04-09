@@ -114,7 +114,6 @@ export function InfoSection({ packetId, scope }: InfoSectionProps) {
                   <span
                     style={{
                       fontSize: 11,
-                      textTransform: 'uppercase',
                       color: '#888',
                       letterSpacing: 0.5,
                     }}
