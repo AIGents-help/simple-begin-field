@@ -25,12 +25,12 @@ export const GenericSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
 };
 
 export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh: (fn: () => void) => void }) => {
-  const { activeTab } = useAppContext();
+  const { activeTab, activeScope, currentPacket } = useAppContext();
 
   const renderSection = () => {
     switch (activeTab) {
       case 'info':
-        return <InfoSection onAddClick={onAddClick} onRefresh={onRefresh} />;
+        return currentPacket ? <InfoSection packetId={currentPacket.id} scope={activeScope} /> : null;
       case 'family':
         return <FamilySection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'real-estate':
