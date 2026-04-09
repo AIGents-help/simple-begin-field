@@ -130,20 +130,22 @@ export function AddInfoForm({ saving, onSave }: AddInfoFormProps) {
       </div>
 
       {/* File */}
-      <div>
+      <div style={{ display: 'block', marginTop: 8 }}>
         <label htmlFor="info-file">Attach Document (optional, max 20MB)</label>
-        <input
-          id="info-file"
-          ref={fileInputRef}
-          type="file"
-          onChange={handleFileChange}
-          disabled={saving}
-          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
-        />
+        <div>
+          <input
+            id="info-file"
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileChange}
+            disabled={saving}
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.txt"
+          />
+        </div>
         {file && (
-          <span style={{ fontSize: 12 }}>
+          <div style={{ fontSize: 12, marginTop: 4 }}>
             {file.name} ({(file.size / 1024).toFixed(1)} KB)
-          </span>
+          </div>
         )}
       </div>
 
