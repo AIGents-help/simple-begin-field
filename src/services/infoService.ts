@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase'
 export interface InfoRecord {
   id: string
   packet_id: string
-  scope: 'personA' | 'personB' | 'shared'
+  scope: string
   category: string
   title: string
   notes: string | null
