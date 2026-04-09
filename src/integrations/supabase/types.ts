@@ -1437,9 +1437,23 @@ export type Database = {
       }
     }
     Functions: {
+      current_user_role: { Args: never; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      is_member_of_packet_in_path: {
+        Args: { file_path: string }
+        Returns: boolean
+      }
       is_packet_member: { Args: { p_id: string }; Returns: boolean }
       is_professional: { Args: never; Returns: boolean }
+      validate_referral_code: {
+        Args: { code_input: string }
+        Returns: {
+          brand_color: string
+          is_valid: boolean
+          logo_url: string
+          professional_name: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
