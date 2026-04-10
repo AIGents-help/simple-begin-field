@@ -8,6 +8,7 @@ interface FileUploadAreaProps {
   maxFileSize?: number; // in bytes
   label?: string;
   description?: string;
+  selectedFile?: File | null;
 }
 
 export const FileUploadArea = ({
