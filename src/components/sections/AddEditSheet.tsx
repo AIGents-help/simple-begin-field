@@ -125,7 +125,7 @@ export const AddEditSheet = ({
       case 'banking':
         return [
           { name: 'institution', label: 'Institution', required: true, placeholder: 'e.g. Chase, Wells Fargo' },
-          { name: 'account_type', label: 'Account Type', placeholder: 'e.g. Checking, Savings, CD' },
+          { name: 'account_type', label: 'Account Type', type: 'select', options: ['Checking', 'Savings', 'CD', 'Money Market', 'Joint', 'Business', 'Other'] },
           { name: 'account_number_masked', label: 'Account Number (last 4)', placeholder: '****1234' },
           { name: 'routing_number_masked', label: 'Routing Number (last 4)', placeholder: '****5678' },
           { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address or phone' },
