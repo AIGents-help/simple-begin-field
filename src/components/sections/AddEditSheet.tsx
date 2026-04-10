@@ -400,7 +400,7 @@ export const AddEditSheet = ({
                   'passwords': 'Add Password / Access',
                   'property': 'Add Personal Property',
                   'pets': 'Add Pet',
-                  'funeral': 'Add Funeral Arrangement',
+                  'funeral': 'Add Funeral Wishes',
                   'private': 'Add Private Item',
                   'family': 'Add Family Member',
                 };
