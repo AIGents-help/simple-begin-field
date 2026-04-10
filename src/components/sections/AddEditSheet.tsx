@@ -93,7 +93,7 @@ export const AddEditSheet = ({
   const config = SECTIONS_CONFIG.find(s => s.id === activeTab);
 
   // Section-specific field definitions
-  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string; options?: string[] }[] | null => {
+  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string; options?: string[]; rows?: number }[] | null => {
     switch (activeTab) {
       case 'family':
         return [
@@ -101,7 +101,7 @@ export const AddEditSheet = ({
           { name: 'relationship', label: 'Relationship', required: true, type: 'select', options: ['Spouse', 'Partner', 'Child', 'Parent', 'Sibling', 'Grandparent', 'Grandchild', 'Friend', 'Other'] },
           { name: 'phone', label: 'Phone Number', type: 'tel', placeholder: '(555) 123-4567' },
           { name: 'email', label: 'Email Address', type: 'email', placeholder: 'jane@example.com' },
-          { name: 'address', label: 'Address', placeholder: '123 Main St, City, State' },
+          { name: 'address', label: 'Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
           { name: 'birthday', label: 'Birthday', type: 'date' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
@@ -423,7 +423,7 @@ export const AddEditSheet = ({
                         </label>
                         {field.type === 'textarea' ? (
                           <textarea
-                            rows={3}
+                            rows={field.rows || 3}
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm resize-none font-medium"
                             value={formData[field.name] || ''}
