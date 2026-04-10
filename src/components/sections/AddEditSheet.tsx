@@ -420,9 +420,16 @@ export const AddEditSheet = ({
 
                 {!isNA && hasSectionFields && sectionFields && (
                   <>
+                    {/* Show read-only label for pre-filled relationship */}
+                    {activeTab === 'family' && initialData?.relationship && formData.relationship && (
+                      <div className="p-4 bg-manila/30 border border-manila rounded-2xl flex items-center gap-3">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Adding:</span>
+                        <span className="text-sm font-bold text-navy-muted">{formData.relationship}</span>
+                      </div>
+                    )}
+
                     {sectionFields
                       .filter((field) => {
-                        // Hide select fields that were pre-filled from recommendations
                         if (field.type === 'select' && initialData?.[field.name] && formData[field.name]) return false;
                         return true;
                       })
