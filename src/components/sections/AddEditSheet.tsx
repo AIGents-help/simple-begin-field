@@ -421,9 +421,8 @@ export const AddEditSheet = ({
                         <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
                           {field.label} {field.required && <span className="text-red-500">*</span>}
                         </label>
-                        {field.type === 'textarea' ? (
                           <textarea
-                            rows={3}
+                            rows={field.rows || 3}
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm resize-none font-medium"
                             value={formData[field.name] || ''}
