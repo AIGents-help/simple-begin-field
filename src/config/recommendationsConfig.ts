@@ -362,11 +362,10 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
   },
   funeral: {
     entries: [
-      { label: 'Funeral Preferences', prefill: { burial_or_cremation: 'Other' } },
       { label: 'Burial', prefill: { burial_or_cremation: 'Burial' } },
       { label: 'Cremation', prefill: { burial_or_cremation: 'Cremation' } },
-      { label: 'Green Burial', prefill: { burial_or_cremation: 'Green Burial' } },
-      { label: 'Donation to Science', prefill: { burial_or_cremation: 'Donation to Science' } },
+      { label: 'No Preference', prefill: { burial_or_cremation: 'No Preference' } },
+      { label: 'Pre-arranged', prefill: { burial_or_cremation: 'Pre-arranged' } },
       { label: 'Funeral Home', prefill: { funeral_home: 'Funeral Home' } },
       { label: 'Obituary Wishes', prefill: { obituary_notes: 'Obituary Wishes' } },
     ],
