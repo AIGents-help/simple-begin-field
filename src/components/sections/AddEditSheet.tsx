@@ -246,7 +246,10 @@ export const AddEditSheet = ({
   };
 
   const handleSave = async () => {
-    if (!currentPacket || !activeTab) return;
+    if (!currentPacket || !activeTab) {
+      toast.error("Unable to save: missing packet or section context.", { duration: 5000, position: "bottom-center" });
+      return;
+    }
     
     // Validation for section-specific fields
     if (!isNA && hasSectionFields && sectionFields) {
