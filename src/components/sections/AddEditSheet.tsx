@@ -92,7 +92,135 @@ export const AddEditSheet = ({
 
   const config = SECTIONS_CONFIG.find(s => s.id === activeTab);
 
+  // Section-specific field definitions
+  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string }[] | null => {
+    switch (activeTab) {
+      case 'family':
+        return [
+          { name: 'name', label: 'Full Name', required: true, placeholder: 'e.g. Jane Doe' },
+          { name: 'relationship', label: 'Relationship', required: true, placeholder: 'e.g. Daughter, Brother, Aunt' },
+          { name: 'phone', label: 'Phone Number', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'email', label: 'Email Address', type: 'email', placeholder: 'jane@example.com' },
+          { name: 'address', label: 'Address', placeholder: '123 Main St, City, State' },
+          { name: 'birthday', label: 'Birthday', type: 'date' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'medical':
+        return [
+          { name: 'provider_name', label: 'Provider Name', required: true, placeholder: 'e.g. Dr. Smith' },
+          { name: 'specialty', label: 'Specialty', placeholder: 'e.g. Cardiologist' },
+          { name: 'phone', label: 'Phone', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'advisors':
+        return [
+          { name: 'name', label: 'Advisor Name', required: true, placeholder: 'e.g. John Smith' },
+          { name: 'advisor_type', label: 'Type', required: true, placeholder: 'e.g. Attorney, CPA, Financial Advisor' },
+          { name: 'firm', label: 'Firm / Company', placeholder: 'e.g. Smith & Associates' },
+          { name: 'phone', label: 'Phone', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'email', label: 'Email', type: 'email', placeholder: 'advisor@firm.com' },
+          { name: 'address', label: 'Address', placeholder: '123 Main St, City, State' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'banking':
+        return [
+          { name: 'institution', label: 'Institution', required: true, placeholder: 'e.g. Chase, Wells Fargo' },
+          { name: 'account_type', label: 'Account Type', placeholder: 'e.g. Checking, Savings, CD' },
+          { name: 'account_number_masked', label: 'Account Number (last 4)', placeholder: '****1234' },
+          { name: 'routing_number_masked', label: 'Routing Number (last 4)', placeholder: '****5678' },
+          { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address or phone' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'retirement':
+        return [
+          { name: 'institution', label: 'Institution', required: true, placeholder: 'e.g. Fidelity, Vanguard' },
+          { name: 'account_type', label: 'Account Type', placeholder: 'e.g. 401(k), IRA, Roth IRA' },
+          { name: 'account_number_masked', label: 'Account Number (last 4)', placeholder: '****1234' },
+          { name: 'beneficiary_notes', label: 'Beneficiary Notes', placeholder: 'Who is the beneficiary?' },
+          { name: 'contact_info', label: 'Contact Info', placeholder: 'Advisor or institution contact' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'vehicles':
+        return [
+          { name: 'year', label: 'Year', placeholder: 'e.g. 2022' },
+          { name: 'make', label: 'Make', placeholder: 'e.g. Toyota' },
+          { name: 'model', label: 'Model', placeholder: 'e.g. Camry' },
+          { name: 'license_plate', label: 'License Plate', placeholder: 'ABC-1234' },
+          { name: 'vin', label: 'VIN', placeholder: '17-character VIN' },
+          { name: 'insurance', label: 'Insurance Info', placeholder: 'Carrier and policy number' },
+          { name: 'lien_info', label: 'Lien Info', placeholder: 'Lien holder if any' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'real-estate':
+        return [
+          { name: 'property_label', label: 'Property Name', required: true, placeholder: 'e.g. Primary Residence' },
+          { name: 'address', label: 'Address', placeholder: '123 Main St, City, State' },
+          { name: 'insurance_details', label: 'Insurance Details', placeholder: 'Carrier and policy number' },
+          { name: 'security_system_details', label: 'Security System', placeholder: 'Alarm code, provider, etc.' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'passwords':
+        return [
+          { name: 'service_name', label: 'Service / Website', required: true, placeholder: 'e.g. Gmail, Netflix' },
+          { name: 'username', label: 'Username / Email', placeholder: 'Login username or email' },
+          { name: 'recovery_email', label: 'Recovery Email', type: 'email', placeholder: 'Recovery email address' },
+          { name: 'two_fa_notes', label: '2FA Notes', placeholder: 'How to access two-factor auth' },
+          { name: 'access_instructions', label: 'Access Instructions', type: 'textarea', placeholder: 'How to access this account...' },
+          { name: 'who_should_access', label: 'Who Should Access', placeholder: 'Who needs this after you?' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'property':
+        return [
+          { name: 'item_name', label: 'Item Name', required: true, placeholder: 'e.g. Grandmother\'s Ring' },
+          { name: 'description', label: 'Description', placeholder: 'Brief description' },
+          { name: 'location', label: 'Location', placeholder: 'Where is it stored?' },
+          { name: 'estimated_value', label: 'Estimated Value', placeholder: '$0.00' },
+          { name: 'beneficiary', label: 'Intended Recipient', placeholder: 'Who should receive this?' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+      case 'pets':
+        return [
+          { name: 'pet_name', label: 'Pet Name', required: true, placeholder: 'e.g. Buddy' },
+          { name: 'species_breed', label: 'Species / Breed', placeholder: 'e.g. Golden Retriever' },
+          { name: 'age', label: 'Age', placeholder: 'e.g. 5 years' },
+          { name: 'veterinarian_contact', label: 'Veterinarian Contact', placeholder: 'Vet name and phone' },
+          { name: 'medications', label: 'Medications', placeholder: 'Current medications' },
+          { name: 'feeding_instructions', label: 'Feeding Instructions', type: 'textarea', placeholder: 'Diet and feeding schedule' },
+          { name: 'care_instructions', label: 'Care Instructions', type: 'textarea', placeholder: 'Daily care routine' },
+          { name: 'emergency_notes', label: 'Emergency Notes', type: 'textarea', placeholder: 'Emergency care info' },
+          { name: 'microchip_info', label: 'Microchip Info', placeholder: 'Microchip number and registry' },
+        ];
+      case 'funeral':
+        return [
+          { name: 'burial_or_cremation', label: 'Burial or Cremation', placeholder: 'Preference' },
+          { name: 'funeral_home', label: 'Funeral Home', placeholder: 'Name of funeral home' },
+          { name: 'funeral_director', label: 'Funeral Director', placeholder: 'Contact person' },
+          { name: 'service_preferences', label: 'Service Preferences', type: 'textarea', placeholder: 'Type of service desired' },
+          { name: 'cemetery_plot_details', label: 'Cemetery / Plot Details', placeholder: 'Location and plot info' },
+          { name: 'prepaid_arrangements', label: 'Prepaid Arrangements', placeholder: 'Details of prepaid plans' },
+          { name: 'religious_cultural_preferences', label: 'Religious / Cultural Preferences', type: 'textarea', placeholder: 'Any traditions or customs' },
+          { name: 'obituary_notes', label: 'Obituary Notes', type: 'textarea', placeholder: 'Key points for obituary' },
+          { name: 'additional_instructions', label: 'Additional Instructions', type: 'textarea', placeholder: 'Anything else...' },
+        ];
+      case 'private':
+        return [
+          { name: 'title', label: 'Title', required: true, placeholder: 'e.g. Safe combination' },
+          { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Details about this private item' },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional notes...' },
+        ];
+      default:
+        return null; // Use generic form
+    }
+  };
+
+  const sectionFields = getSectionFields();
+  const hasSectionFields = sectionFields !== null && !isEntryOnly;
+
   const getDisplayTitle = (data: any) => {
+    if (sectionFields) {
+      const primaryField = sectionFields[0];
+      return data[primaryField.name] || '';
+    }
     return data.title || data.name || data.item_name || data.institution || 
            data.service_name || data.property_label || data.model || 
            data.service_preferences || data.burial_or_cremation || 
@@ -100,6 +228,11 @@ export const AddEditSheet = ({
   };
 
   const setDisplayTitle = (val: string) => {
+    if (sectionFields) {
+      const primaryField = sectionFields[0];
+      setFormData({ ...formData, [primaryField.name]: val });
+      return;
+    }
     const field = activeTab === 'family' || activeTab === 'advisors' || activeTab === 'pets' ? 'name' : 
                  activeTab === 'real-estate' ? 'property_label' :
                  activeTab === 'banking' || activeTab === 'retirement' ? 'institution' :
