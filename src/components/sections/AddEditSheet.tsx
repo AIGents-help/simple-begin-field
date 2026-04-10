@@ -249,6 +249,20 @@ export const AddEditSheet = ({
   const handleSave = async () => {
     if (!currentPacket || !activeTab) return;
     
+    // Validation for section-specific fields
+    if (!isNA && hasSectionFields && sectionFields) {
+      const newErrors: Record<string, string> = {};
+      sectionFields.forEach(field => {
+        if (field.required && !formData[field.name]) {
+          newErrors[field.name] = `${field.label} is required`;
+        }
+      });
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+    }
+
     // Validation for Info section
     if (activeTab === 'info' && !formData.category && !isNA && !isEntryOnly) {
       setErrors({ category: "Please select a category." });
