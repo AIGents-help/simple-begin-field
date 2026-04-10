@@ -388,7 +388,11 @@ export const AddEditSheet = ({
             className="fixed inset-0 md:inset-auto md:top-10 md:bottom-10 md:left-1/2 md:-translate-x-1/2 z-50 bg-white flex flex-col w-full md:max-w-[640px] md:rounded-3xl md:shadow-2xl overflow-hidden"
           >
             <div className="p-6 border-b border-stone-100 flex justify-between items-center bg-[#fdfaf3]/80 backdrop-blur-md sticky top-0 z-10">
-            <h2 className="text-xl font-serif font-bold text-navy-muted">{title || `Add ${config?.label}`}</h2>
+            <h2 className="text-xl font-serif font-bold text-navy-muted">
+              {title || (activeTab === 'family' && initialData?.relationship 
+                ? `Add ${initialData.relationship}` 
+                : `Add ${config?.label}`)}
+            </h2>
             <button 
               onClick={handleClose}
               disabled={loading}
