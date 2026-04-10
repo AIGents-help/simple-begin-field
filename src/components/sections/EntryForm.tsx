@@ -85,7 +85,7 @@ export const EntryForm = ({ isOpen, onClose, entryLabel, onSuccess }: EntryFormP
       onClose();
     } catch (err: any) {
       console.error("Error saving entry:", err);
-      alert(`Failed to save entry: ${err.message}`);
+      toast.error(`Failed to save entry: ${err.message}`, { duration: 5000, position: "bottom-center" });
     } finally {
       setLoading(false);
     }

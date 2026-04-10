@@ -351,7 +351,7 @@ export const AddEditSheet = ({
     } catch (err: any) {
       console.error("Error saving record:", err);
       const errorMessage = err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
-      alert(`Failed to save record: ${errorMessage}`);
+      toast.error(`Failed to save record: ${errorMessage}`, { duration: 5000, position: "bottom-center" });
     } finally {
       setLoading(false);
     }

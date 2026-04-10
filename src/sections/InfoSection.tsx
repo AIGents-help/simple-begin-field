@@ -69,7 +69,7 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
         refresh();
       } catch (err) {
         console.error("Error deleting record:", err);
-        alert("Failed to delete record.");
+        toast.error("Failed to delete record.", { duration: 4000, position: "bottom-center" });
       } finally {
         setIsDeleting(false);
       }
