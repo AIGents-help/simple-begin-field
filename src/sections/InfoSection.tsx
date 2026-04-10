@@ -108,7 +108,7 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
         return (
           <div className="space-y-6">
             {/* Section Header Explanation */}
-            <div className="bg-white p-4 rounded-2xl border border-stone-100 shadow-sm flex gap-3 items-start">
+            <div className="paper-sheet p-4 flex gap-3 items-start">
               <div className="w-8 h-8 bg-manila rounded-lg flex items-center justify-center text-navy-muted shrink-0">
                 <Info size={18} />
               </div>
@@ -121,14 +121,14 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
             <div className="grid grid-cols-2 gap-3">
               <button 
                 onClick={() => onAddClick(undefined, undefined, INFO_CATEGORY_OPTIONS)}
-                className="flex items-center justify-center gap-2 p-4 bg-navy-muted text-white rounded-2xl font-bold text-sm shadow-md active:scale-95 transition-all"
+                className="flex items-center justify-center gap-2 p-4 bg-navy-muted text-primary-foreground rounded-xl font-bold text-sm shadow-sm active:scale-95 transition-all"
               >
                 <Plus size={18} />
                 Add Info
               </button>
               <button 
                 onClick={handleQuickUploadClick}
-                className="flex items-center justify-center gap-2 p-4 bg-white text-navy-muted border border-stone-200 rounded-2xl font-bold text-sm shadow-sm active:scale-95 transition-all"
+                className="flex items-center justify-center gap-2 p-4 bg-paper text-navy-muted border border-stone-200 rounded-xl font-bold text-sm shadow-sm active:scale-95 transition-all"
               >
                 <Upload size={18} />
                 Quick Upload
@@ -144,8 +144,8 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
                     onClick={() => setActiveFilter(filter)}
                     className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                       activeFilter === filter 
-                        ? 'bg-navy-muted text-white shadow-md' 
-                        : 'bg-white text-stone-500 border border-stone-200 hover:border-stone-300'
+                        ? 'bg-navy-muted text-primary-foreground shadow-sm' 
+                        : 'bg-paper text-stone-500 border border-stone-200 hover:border-stone-300'
                     }`}
                   >
                     {filter}
@@ -180,7 +180,7 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
                   );
                 })
               ) : (
-                <div className="py-12 text-center bg-white/50 rounded-3xl border border-dashed border-stone-200">
+                <div className="py-12 text-center bg-parchment rounded-xl border border-dashed border-stone-200">
                   <p className="text-stone-400 text-sm font-medium">No information records added yet.</p>
                   <div className="mt-4 flex justify-center gap-3">
                     <button onClick={() => onAddClick(undefined, undefined, INFO_CATEGORY_OPTIONS)} className="text-xs font-bold text-navy-muted hover:underline">Add Info</button>
