@@ -101,7 +101,7 @@ export const AddEditSheet = ({
           { name: 'relationship', label: 'Relationship', required: true, type: 'select', options: ['Spouse', 'Partner', 'Child', 'Parent', 'Sibling', 'Grandparent', 'Grandchild', 'Friend', 'Other'] },
           { name: 'phone', label: 'Phone Number', type: 'tel', placeholder: '(555) 123-4567' },
           { name: 'email', label: 'Email Address', type: 'email', placeholder: 'jane@example.com' },
-          { name: 'address', label: 'Address', placeholder: '123 Main St, City, State' },
+          { name: 'address', label: 'Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
           { name: 'birthday', label: 'Birthday', type: 'date' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
