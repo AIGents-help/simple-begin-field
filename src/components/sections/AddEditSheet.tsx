@@ -125,7 +125,7 @@ export const AddEditSheet = ({
       case 'banking':
         return [
           { name: 'institution', label: 'Institution', required: true, placeholder: 'e.g. Chase, Wells Fargo' },
-          { name: 'account_type', label: 'Account Type', placeholder: 'e.g. Checking, Savings, CD' },
+          { name: 'account_type', label: 'Account Type', type: 'select', options: ['Checking', 'Savings', 'CD', 'Money Market', 'Joint', 'Business', 'Other'] },
           { name: 'account_number_masked', label: 'Account Number (last 4)', placeholder: '****1234' },
           { name: 'routing_number_masked', label: 'Routing Number (last 4)', placeholder: '****5678' },
           { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address or phone' },
@@ -134,7 +134,7 @@ export const AddEditSheet = ({
       case 'retirement':
         return [
           { name: 'institution', label: 'Institution', required: true, placeholder: 'e.g. Fidelity, Vanguard' },
-          { name: 'account_type', label: 'Account Type', placeholder: 'e.g. 401(k), IRA, Roth IRA' },
+          { name: 'account_type', label: 'Account Type', type: 'select', options: ['401(k)', '403(b)', 'IRA', 'Roth IRA', 'Pension', 'Annuity', 'SEP IRA', 'Other'] },
           { name: 'account_number_masked', label: 'Account Number (last 4)', placeholder: '****1234' },
           { name: 'beneficiary_notes', label: 'Beneficiary Notes', placeholder: 'Who is the beneficiary?' },
           { name: 'contact_info', label: 'Contact Info', placeholder: 'Advisor or institution contact' },
@@ -192,7 +192,7 @@ export const AddEditSheet = ({
         ];
       case 'funeral':
         return [
-          { name: 'burial_or_cremation', label: 'Burial or Cremation', placeholder: 'Preference' },
+          { name: 'burial_or_cremation', label: 'Burial or Cremation', type: 'select', options: ['Burial', 'Cremation', 'Green Burial', 'Donation to Science', 'Undecided', 'Other'] },
           { name: 'funeral_home', label: 'Funeral Home', placeholder: 'Name of funeral home' },
           { name: 'funeral_director', label: 'Funeral Director', placeholder: 'Contact person' },
           { name: 'service_preferences', label: 'Service Preferences', type: 'textarea', placeholder: 'Type of service desired' },
