@@ -430,6 +430,18 @@ export const AddEditSheet = ({
                             onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                             disabled={loading}
                           />
+                        ) : field.type === 'select' && field.options ? (
+                          <select
+                            className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium appearance-none"
+                            value={formData[field.name] || ''}
+                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            disabled={loading}
+                          >
+                            <option value="">Select {field.label.toLowerCase()}...</option>
+                            {field.options.map((opt) => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
                         ) : (
                           <input
                             type={field.type || 'text'}
