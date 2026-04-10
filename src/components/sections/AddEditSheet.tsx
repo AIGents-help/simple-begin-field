@@ -93,7 +93,7 @@ export const AddEditSheet = ({
   const config = SECTIONS_CONFIG.find(s => s.id === activeTab);
 
   // Section-specific field definitions
-  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string; options?: string[] }[] | null => {
+  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string; options?: string[]; rows?: number }[] | null => {
     switch (activeTab) {
       case 'family':
         return [
