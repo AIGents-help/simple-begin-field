@@ -15,6 +15,7 @@ import { HouseholdSettings } from '../settings/HouseholdSettings';
 import { SecuritySettings } from '../settings/SecuritySettings';
 import { TrustScreen } from '../trust/TrustScreen';
 import { InviteAcceptanceScreen } from '../auth/InviteAcceptanceScreen';
+import { AffiliatePage } from '../../pages/AffiliatePage';
 import { PricingPage } from '../billing/PricingPage';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';
@@ -129,6 +130,8 @@ export const AppShell = () => {
         return <SearchScreen />;
       case 'household':
         return <HouseholdSettings onBack={() => setView('profile')} />;
+      case 'affiliate':
+        return <AffiliatePage />;
       case 'pricing':
         return <PricingPage />;
       default:
