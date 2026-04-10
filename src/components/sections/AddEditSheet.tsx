@@ -114,12 +114,12 @@ export const AddEditSheet = ({
         ];
       case 'advisors':
         return [
-          { name: 'name', label: 'Advisor Name', required: true, placeholder: 'e.g. John Smith' },
-          { name: 'advisor_type', label: 'Type', required: true, type: 'select', options: ['Attorney', 'Accountant', 'Financial Advisor', 'Insurance Agent', 'Estate Planner', 'Funeral Planner', 'Other'] },
+          { name: 'advisor_type', label: 'Advisor Type', required: true, type: 'select', options: ['Attorney', 'Financial Advisor', 'CPA/Accountant', 'Insurance Agent', 'Doctor', 'Other'] },
+          { name: 'name', label: 'Name', required: true, placeholder: 'e.g. John Smith' },
           { name: 'firm', label: 'Firm / Company', placeholder: 'e.g. Smith & Associates' },
+          { name: 'address', label: 'Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
           { name: 'phone', label: 'Phone', type: 'tel', placeholder: '(555) 123-4567' },
           { name: 'email', label: 'Email', type: 'email', placeholder: 'advisor@firm.com' },
-          { name: 'address', label: 'Address', placeholder: '123 Main St, City, State' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'banking':
@@ -133,21 +133,21 @@ export const AddEditSheet = ({
         ];
       case 'retirement':
         return [
+          { name: 'account_type', label: 'Account Type', type: 'select', options: ['401(k)', 'IRA', 'Roth IRA', 'Pension', '403(b)', 'Other'] },
           { name: 'institution', label: 'Institution', required: true, placeholder: 'e.g. Fidelity, Vanguard' },
-          { name: 'account_type', label: 'Account Type', type: 'select', options: ['401(k)', '403(b)', 'IRA', 'Roth IRA', 'Pension', 'Annuity', 'SEP IRA', 'Other'] },
-          { name: 'account_number_masked', label: 'Account Number (last 4)', placeholder: '****1234' },
-          { name: 'beneficiary_notes', label: 'Beneficiary Notes', placeholder: 'Who is the beneficiary?' },
+          { name: 'account_number_masked', label: 'Account Number', placeholder: 'Last 4 digits only' },
+          { name: 'beneficiary_notes', label: 'Beneficiary Notes', type: 'textarea', placeholder: 'Who is the beneficiary?' },
           { name: 'contact_info', label: 'Contact Info', placeholder: 'Advisor or institution contact' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'vehicles':
         return [
-          { name: 'year', label: 'Year', placeholder: 'e.g. 2022' },
+          { name: 'year', label: 'Year', placeholder: '4-digit year, e.g. 2022' },
           { name: 'make', label: 'Make', placeholder: 'e.g. Toyota' },
           { name: 'model', label: 'Model', placeholder: 'e.g. Camry' },
-          { name: 'license_plate', label: 'License Plate', placeholder: 'ABC-1234' },
           { name: 'vin', label: 'VIN', placeholder: '17-character VIN' },
-          { name: 'insurance', label: 'Insurance Info', placeholder: 'Carrier and policy number' },
+          { name: 'license_plate', label: 'License Plate', placeholder: 'ABC-1234' },
+          { name: 'insurance', label: 'Insurance', placeholder: 'Carrier and policy number' },
           { name: 'lien_info', label: 'Lien Info', placeholder: 'Lien holder if any' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
@@ -161,11 +161,11 @@ export const AddEditSheet = ({
         ];
       case 'passwords':
         return [
-          { name: 'service_name', label: 'Service / Website', required: true, placeholder: 'e.g. Gmail, Netflix' },
-          { name: 'username', label: 'Username / Email', placeholder: 'Login username or email' },
+          { name: 'service_name', label: 'Service Name', required: true, placeholder: 'e.g. Gmail, Netflix' },
+          { name: 'username', label: 'Username', placeholder: 'Login username or email' },
+          { name: 'access_instructions', label: 'Access Instructions', type: 'textarea', placeholder: 'How to access this account — write for a survivor to read' },
           { name: 'recovery_email', label: 'Recovery Email', type: 'email', placeholder: 'Recovery email address' },
-          { name: 'two_fa_notes', label: '2FA Notes', placeholder: 'How to access two-factor auth' },
-          { name: 'access_instructions', label: 'Access Instructions', type: 'textarea', placeholder: 'How to access this account...' },
+          { name: 'two_fa_notes', label: 'Two-Factor Auth Notes', placeholder: 'How to access 2FA codes' },
           { name: 'who_should_access', label: 'Who Should Access', placeholder: 'Who needs this after you?' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
@@ -181,24 +181,23 @@ export const AddEditSheet = ({
       case 'pets':
         return [
           { name: 'pet_name', label: 'Pet Name', required: true, placeholder: 'e.g. Buddy' },
-          { name: 'species_breed', label: 'Species / Breed', placeholder: 'e.g. Golden Retriever' },
+          { name: 'species_breed', label: 'Species & Breed', placeholder: 'e.g. Golden Retriever' },
           { name: 'age', label: 'Age', placeholder: 'e.g. 5 years' },
           { name: 'veterinarian_contact', label: 'Veterinarian Contact', placeholder: 'Vet name and phone' },
-          { name: 'medications', label: 'Medications', placeholder: 'Current medications' },
+          { name: 'medications', label: 'Medications', type: 'textarea', placeholder: 'Current medications' },
           { name: 'feeding_instructions', label: 'Feeding Instructions', type: 'textarea', placeholder: 'Diet and feeding schedule' },
           { name: 'care_instructions', label: 'Care Instructions', type: 'textarea', placeholder: 'Daily care routine' },
           { name: 'emergency_notes', label: 'Emergency Notes', type: 'textarea', placeholder: 'Emergency care info' },
-          { name: 'microchip_info', label: 'Microchip Info', placeholder: 'Microchip number and registry' },
         ];
       case 'funeral':
         return [
-          { name: 'burial_or_cremation', label: 'Burial or Cremation', type: 'select', options: ['Burial', 'Cremation', 'Green Burial', 'Donation to Science', 'Undecided', 'Other'] },
           { name: 'funeral_home', label: 'Funeral Home', placeholder: 'Name of funeral home' },
           { name: 'funeral_director', label: 'Funeral Director', placeholder: 'Contact person' },
+          { name: 'burial_or_cremation', label: 'Burial or Cremation', type: 'select', options: ['Burial', 'Cremation', 'No Preference', 'Pre-arranged'] },
           { name: 'service_preferences', label: 'Service Preferences', type: 'textarea', placeholder: 'Type of service desired' },
+          { name: 'religious_cultural_preferences', label: 'Religious / Cultural Preferences', placeholder: 'Any traditions or customs' },
           { name: 'cemetery_plot_details', label: 'Cemetery / Plot Details', placeholder: 'Location and plot info' },
           { name: 'prepaid_arrangements', label: 'Prepaid Arrangements', placeholder: 'Details of prepaid plans' },
-          { name: 'religious_cultural_preferences', label: 'Religious / Cultural Preferences', type: 'textarea', placeholder: 'Any traditions or customs' },
           { name: 'obituary_notes', label: 'Obituary Notes', type: 'textarea', placeholder: 'Key points for obituary' },
           { name: 'additional_instructions', label: 'Additional Instructions', type: 'textarea', placeholder: 'Anything else...' },
         ];
@@ -401,7 +400,7 @@ export const AddEditSheet = ({
                   'passwords': 'Add Password / Access',
                   'property': 'Add Personal Property',
                   'pets': 'Add Pet',
-                  'funeral': 'Add Funeral Arrangement',
+                  'funeral': 'Add Funeral Wishes',
                   'private': 'Add Private Item',
                   'family': 'Add Family Member',
                 };

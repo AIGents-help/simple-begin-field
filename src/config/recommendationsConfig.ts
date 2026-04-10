@@ -243,12 +243,11 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
   },
   advisors: {
     entries: [
-      { label: 'Lawyer', prefill: { advisor_type: 'Attorney' } },
-      { label: 'Accountant', prefill: { advisor_type: 'Accountant' } },
+      { label: 'Attorney', prefill: { advisor_type: 'Attorney' } },
       { label: 'Financial Advisor', prefill: { advisor_type: 'Financial Advisor' } },
+      { label: 'CPA / Accountant', prefill: { advisor_type: 'CPA/Accountant' } },
       { label: 'Insurance Agent', prefill: { advisor_type: 'Insurance Agent' } },
-      { label: 'Funeral Planner', prefill: { advisor_type: 'Funeral Planner' } },
-      { label: 'Estate Planner', prefill: { advisor_type: 'Estate Planner' } },
+      { label: 'Doctor', prefill: { advisor_type: 'Doctor' } },
     ],
     documents: [
       { label: 'Engagement Letters', prefill: { title: 'Engagement Letter' } },
@@ -363,11 +362,10 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
   },
   funeral: {
     entries: [
-      { label: 'Funeral Preferences', prefill: { burial_or_cremation: 'Other' } },
       { label: 'Burial', prefill: { burial_or_cremation: 'Burial' } },
       { label: 'Cremation', prefill: { burial_or_cremation: 'Cremation' } },
-      { label: 'Green Burial', prefill: { burial_or_cremation: 'Green Burial' } },
-      { label: 'Donation to Science', prefill: { burial_or_cremation: 'Donation to Science' } },
+      { label: 'No Preference', prefill: { burial_or_cremation: 'No Preference' } },
+      { label: 'Pre-arranged', prefill: { burial_or_cremation: 'Pre-arranged' } },
       { label: 'Funeral Home', prefill: { funeral_home: 'Funeral Home' } },
       { label: 'Obituary Wishes', prefill: { obituary_notes: 'Obituary Wishes' } },
     ],
