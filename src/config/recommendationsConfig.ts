@@ -54,13 +54,13 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
   },
   family: {
     entries: [
-      { label: 'Spouse / Partner', prefill: { name: 'Spouse / Partner' } },
-      { label: 'Children', prefill: { name: 'Child' } },
-      { label: 'Parents', prefill: { name: 'Parent' } },
-      { label: 'Siblings', prefill: { name: 'Sibling' } },
-      { label: 'Dependents', prefill: { name: 'Dependent' } },
-      { label: 'Caregiving Relationships', prefill: { name: 'Caregiving Relationship' } },
-      { label: 'Emergency Family Contacts', prefill: { name: 'Emergency Family Contact' } },
+      { label: 'Spouse / Partner', prefill: { relationship: 'Spouse' } },
+      { label: 'Child', prefill: { relationship: 'Child' } },
+      { label: 'Parent', prefill: { relationship: 'Parent' } },
+      { label: 'Sibling', prefill: { relationship: 'Sibling' } },
+      { label: 'Grandparent', prefill: { relationship: 'Grandparent' } },
+      { label: 'Grandchild', prefill: { relationship: 'Grandchild' } },
+      { label: 'Friend', prefill: { relationship: 'Friend' } },
     ],
     documents: [
       { label: 'Guardianship Papers', prefill: { name: 'Guardianship Papers' } },
