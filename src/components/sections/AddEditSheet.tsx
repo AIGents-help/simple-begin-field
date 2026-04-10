@@ -125,9 +125,9 @@ export const AddEditSheet = ({
       case 'banking':
         return [
           { name: 'institution', label: 'Institution', required: true, placeholder: 'e.g. Chase, Wells Fargo' },
-          { name: 'account_type', label: 'Account Type', type: 'select', options: ['Checking', 'Savings', 'CD', 'Money Market', 'Joint', 'Business', 'Other'] },
-          { name: 'account_number_masked', label: 'Account Number (last 4)', placeholder: '****1234' },
-          { name: 'routing_number_masked', label: 'Routing Number (last 4)', placeholder: '****5678' },
+          { name: 'account_type', label: 'Account Type', type: 'select', options: ['Checking', 'Savings', 'Money Market', 'CD', 'Other'] },
+          { name: 'account_number_masked', label: 'Account Number', placeholder: 'Last 4 digits only for security' },
+          { name: 'routing_number_masked', label: 'Routing Number', placeholder: 'Last 4 digits only' },
           { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address or phone' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
@@ -153,10 +153,10 @@ export const AddEditSheet = ({
         ];
       case 'real-estate':
         return [
-          { name: 'property_label', label: 'Property Name', required: true, placeholder: 'e.g. Primary Residence' },
-          { name: 'address', label: 'Address', placeholder: '123 Main St, City, State' },
-          { name: 'insurance_details', label: 'Insurance Details', placeholder: 'Carrier and policy number' },
-          { name: 'security_system_details', label: 'Security System', placeholder: 'Alarm code, provider, etc.' },
+          { name: 'property_label', label: 'Property Label', required: true, placeholder: 'e.g. Primary Home' },
+          { name: 'address', label: 'Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
+          { name: 'insurance_details', label: 'Insurance Details', type: 'textarea', placeholder: 'Carrier and policy number', rows: 2 },
+          { name: 'security_system_details', label: 'Security System Details', placeholder: 'Alarm code, provider, etc.' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'passwords':
@@ -390,12 +390,27 @@ export const AddEditSheet = ({
             <div className="p-6 border-b border-stone-100 flex justify-between items-center bg-[#fdfaf3]/80 backdrop-blur-md sticky top-0 z-10">
             <h2 className="text-xl font-serif font-bold text-navy-muted">
               {title || (() => {
+                // Section-specific default modal titles
+                const sectionTitles: Record<string, string> = {
+                  'medical': 'Add Medical Provider',
+                  'banking': 'Add Bank Account',
+                  'real-estate': 'Add Property',
+                  'retirement': 'Add Retirement Account',
+                  'vehicles': 'Add Vehicle',
+                  'advisors': 'Add Advisor',
+                  'passwords': 'Add Password / Access',
+                  'property': 'Add Personal Property',
+                  'pets': 'Add Pet',
+                  'funeral': 'Add Funeral Arrangement',
+                  'private': 'Add Private Item',
+                  'family': 'Add Family Member',
+                };
                 // Dynamic title based on prefilled select field
                 if (sectionFields && initialData) {
                   const prefilledSelect = sectionFields.find(f => f.type === 'select' && initialData[f.name]);
                   if (prefilledSelect) return `Add ${initialData[prefilledSelect.name]}`;
                 }
-                return `Add ${config?.label}`;
+                return (activeTab && sectionTitles[activeTab]) || `Add ${config?.label}`;
               })()}
             </h2>
             <button 
