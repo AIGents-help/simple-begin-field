@@ -244,12 +244,12 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
   },
   advisors: {
     entries: [
-      { label: 'Lawyer', prefill: { name: 'Lawyer' } },
-      { label: 'Accountant', prefill: { name: 'Accountant' } },
-      { label: 'Financial Advisor', prefill: { name: 'Financial Advisor' } },
-      { label: 'Insurance Agent', prefill: { name: 'Insurance Agent' } },
-      { label: 'Funeral Planner', prefill: { name: 'Funeral Planner' } },
-      { label: 'Estate Planner', prefill: { name: 'Estate Planner' } },
+      { label: 'Lawyer', prefill: { advisor_type: 'Attorney' } },
+      { label: 'Accountant', prefill: { advisor_type: 'Accountant' } },
+      { label: 'Financial Advisor', prefill: { advisor_type: 'Financial Advisor' } },
+      { label: 'Insurance Agent', prefill: { advisor_type: 'Insurance Agent' } },
+      { label: 'Funeral Planner', prefill: { advisor_type: 'Funeral Planner' } },
+      { label: 'Estate Planner', prefill: { advisor_type: 'Estate Planner' } },
     ],
     documents: [
       { label: 'Engagement Letters', prefill: { title: 'Engagement Letter' } },

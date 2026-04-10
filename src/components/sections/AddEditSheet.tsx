@@ -115,7 +115,7 @@ export const AddEditSheet = ({
       case 'advisors':
         return [
           { name: 'name', label: 'Advisor Name', required: true, placeholder: 'e.g. John Smith' },
-          { name: 'advisor_type', label: 'Type', required: true, placeholder: 'e.g. Attorney, CPA, Financial Advisor' },
+          { name: 'advisor_type', label: 'Type', required: true, type: 'select', options: ['Attorney', 'Accountant', 'Financial Advisor', 'Insurance Agent', 'Estate Planner', 'Funeral Planner', 'Other'] },
           { name: 'firm', label: 'Firm / Company', placeholder: 'e.g. Smith & Associates' },
           { name: 'phone', label: 'Phone', type: 'tel', placeholder: '(555) 123-4567' },
           { name: 'email', label: 'Email', type: 'email', placeholder: 'advisor@firm.com' },
@@ -389,9 +389,14 @@ export const AddEditSheet = ({
           >
             <div className="p-6 border-b border-stone-100 flex justify-between items-center bg-[#fdfaf3]/80 backdrop-blur-md sticky top-0 z-10">
             <h2 className="text-xl font-serif font-bold text-navy-muted">
-              {title || (activeTab === 'family' && initialData?.relationship 
-                ? `Add ${initialData.relationship}` 
-                : `Add ${config?.label}`)}
+              {title || (() => {
+                // Dynamic title based on prefilled select field
+                if (sectionFields && initialData) {
+                  const prefilledSelect = sectionFields.find(f => f.type === 'select' && initialData[f.name]);
+                  if (prefilledSelect) return `Add ${initialData[prefilledSelect.name]}`;
+                }
+                return `Add ${config?.label}`;
+              })()}
             </h2>
             <button 
               onClick={handleClose}
@@ -420,13 +425,17 @@ export const AddEditSheet = ({
 
                 {!isNA && hasSectionFields && sectionFields && (
                   <>
-                    {/* Show read-only label for pre-filled relationship */}
-                    {activeTab === 'family' && initialData?.relationship && formData.relationship && (
-                      <div className="p-4 bg-manila/30 border border-manila rounded-2xl flex items-center gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Adding:</span>
-                        <span className="text-sm font-bold text-navy-muted">{formData.relationship}</span>
-                      </div>
-                    )}
+                    {/* Show read-only label for pre-filled select fields */}
+                    {sectionFields && initialData && (() => {
+                      const prefilledSelect = sectionFields.find(f => f.type === 'select' && initialData[f.name] && formData[f.name]);
+                      if (!prefilledSelect) return null;
+                      return (
+                        <div className="p-4 bg-manila/30 border border-manila rounded-2xl flex items-center gap-3">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Adding:</span>
+                          <span className="text-sm font-bold text-navy-muted">{formData[prefilledSelect.name]}</span>
+                        </div>
+                      );
+                    })()}
 
                     {sectionFields
                       .filter((field) => {
