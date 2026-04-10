@@ -93,12 +93,12 @@ export const AddEditSheet = ({
   const config = SECTIONS_CONFIG.find(s => s.id === activeTab);
 
   // Section-specific field definitions
-  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string }[] | null => {
+  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string; options?: string[] }[] | null => {
     switch (activeTab) {
       case 'family':
         return [
           { name: 'name', label: 'Full Name', required: true, placeholder: 'e.g. Jane Doe' },
-          { name: 'relationship', label: 'Relationship', required: true, placeholder: 'e.g. Daughter, Brother, Aunt' },
+          { name: 'relationship', label: 'Relationship', required: true, type: 'select', options: ['Spouse', 'Partner', 'Child', 'Parent', 'Sibling', 'Grandparent', 'Grandchild', 'Friend', 'Other'] },
           { name: 'phone', label: 'Phone Number', type: 'tel', placeholder: '(555) 123-4567' },
           { name: 'email', label: 'Email Address', type: 'email', placeholder: 'jane@example.com' },
           { name: 'address', label: 'Address', placeholder: '123 Main St, City, State' },
@@ -430,6 +430,18 @@ export const AddEditSheet = ({
                             onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                             disabled={loading}
                           />
+                        ) : field.type === 'select' && field.options ? (
+                          <select
+                            className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium appearance-none"
+                            value={formData[field.name] || ''}
+                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            disabled={loading}
+                          >
+                            <option value="">Select {field.label.toLowerCase()}...</option>
+                            {field.options.map((opt) => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
                         ) : (
                           <input
                             type={field.type || 'text'}
