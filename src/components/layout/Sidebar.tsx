@@ -11,7 +11,8 @@ import {
   ChevronRight,
   CreditCard,
   Zap,
-  ArrowUpCircle
+  ArrowUpCircle,
+  Share2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
@@ -119,6 +120,12 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               label="Pricing" 
               active={isActive('pricing', 'view')} 
               onClick={() => handleNavClick('pricing', 'view')} 
+            />
+            <NavItem 
+              icon={Share2} 
+              label="Affiliate" 
+              active={isActive('affiliate', 'view')} 
+              onClick={() => handleNavClick('affiliate', 'view')} 
             />
           </div>
 

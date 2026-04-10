@@ -23,6 +23,15 @@ export const OnboardingFlow = () => {
   const [consent, setConsent] = useState(false);
   const [consentError, setConsentError] = useState('');
 
+  // Capture ?ref=CODE on load
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      localStorage.setItem('affiliate_code', refCode);
+    }
+  }, []);
+
   // Handle redirect from pricing or other pages
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -67,9 +76,28 @@ export const OnboardingFlow = () => {
     setAuthLoading(true);
     try {
       if (isSignUp) {
-        const { error } = await authService.signUp(email, password);
+        const { data: signUpData, error } = await authService.signUp(email, password);
         if (error) throw error;
         toast.success("Check your email for a confirmation link!", { duration: 5000, position: "bottom-center" });
+
+        // Track affiliate signup
+        const affiliateCode = localStorage.getItem('affiliate_code');
+        if (affiliateCode && signUpData?.user?.id) {
+          try {
+            await fetch('https://bfvtfenrkomhbzctljyt.supabase.co/functions/v1/track-affiliate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'record_signup',
+                affiliate_code: affiliateCode,
+                user_id: signUpData.user.id,
+              }),
+            });
+            localStorage.removeItem('affiliate_code');
+          } catch (e) {
+            console.error('Affiliate tracking failed:', e);
+          }
+        }
       } else {
         const { error } = await authService.signIn(email, password);
         if (error) throw error;
