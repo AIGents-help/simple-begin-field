@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'sonner';
 import { Shield, Lock, Eye, LogOut, FileText, Trash2, Download, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
@@ -13,14 +14,14 @@ export const SecuritySettings: React.FC = () => {
       label: 'Change Password',
       description: 'Update your login credentials',
       icon: <Lock className="w-5 h-5" />,
-      action: () => alert('Password change would be handled via Supabase Auth UI or a dedicated form.')
+      action: () => toast.info('Password change coming soon.', { duration: 3000, position: "bottom-center" })
     },
     {
       id: 'sessions',
       label: 'Active Sessions',
       description: 'Log out of all other devices',
       icon: <LogOut className="w-5 h-5" />,
-      action: () => alert('Placeholder for managing active sessions.')
+      action: () => toast.info('Session management coming soon.', { duration: 3000, position: "bottom-center" })
     },
     {
       id: 'policy',
@@ -34,14 +35,14 @@ export const SecuritySettings: React.FC = () => {
       label: 'Download My Data',
       description: 'Get a copy of all your stored records',
       icon: <Download className="w-5 h-5" />,
-      action: () => alert('Placeholder for data export feature.')
+      action: () => toast.info('Data export coming soon.', { duration: 3000, position: "bottom-center" })
     },
     {
       id: 'delete',
       label: 'Delete Account',
       description: 'Permanently remove all your data',
       icon: <Trash2 className="w-5 h-5" />,
-      action: () => alert('Placeholder for account deletion flow.'),
+      action: () => toast.error('Account deletion coming soon.', { duration: 3000, position: "bottom-center" }),
       danger: true
     }
   ];

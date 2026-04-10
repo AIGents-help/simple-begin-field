@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
@@ -77,7 +78,8 @@ export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) 
       // For this demo, we'll just show the link.
       const inviteLink = `${window.location.origin}/invite/${token}`;
       console.log('Invite Link:', inviteLink);
-      alert(`Invite sent! (Demo Link: ${inviteLink})`);
+      toast.success("Invite sent! Link copied to clipboard.", { duration: 4000, position: "bottom-center" });
+      navigator.clipboard.writeText(inviteLink).catch(() => {});
       
       setInviteEmail('');
       setInviteName('');
