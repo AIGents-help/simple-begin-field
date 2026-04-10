@@ -115,7 +115,7 @@ export const AddEditSheet = ({
       case 'advisors':
         return [
           { name: 'name', label: 'Advisor Name', required: true, placeholder: 'e.g. John Smith' },
-          { name: 'advisor_type', label: 'Type', required: true, placeholder: 'e.g. Attorney, CPA, Financial Advisor' },
+          { name: 'advisor_type', label: 'Type', required: true, type: 'select', options: ['Attorney', 'Accountant', 'Financial Advisor', 'Insurance Agent', 'Estate Planner', 'Funeral Planner', 'Other'] },
           { name: 'firm', label: 'Firm / Company', placeholder: 'e.g. Smith & Associates' },
           { name: 'phone', label: 'Phone', type: 'tel', placeholder: '(555) 123-4567' },
           { name: 'email', label: 'Email', type: 'email', placeholder: 'advisor@firm.com' },
