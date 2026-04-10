@@ -416,7 +416,13 @@ export const AddEditSheet = ({
 
                 {!isNA && hasSectionFields && sectionFields && (
                   <>
-                    {sectionFields.map((field) => (
+                    {sectionFields
+                      .filter((field) => {
+                        // Hide select fields that were pre-filled from recommendations
+                        if (field.type === 'select' && initialData?.[field.name] && formData[field.name]) return false;
+                        return true;
+                      })
+                      .map((field) => (
                       <div key={field.name} className="space-y-2">
                         <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
                           {field.label} {field.required && <span className="text-red-500">*</span>}
