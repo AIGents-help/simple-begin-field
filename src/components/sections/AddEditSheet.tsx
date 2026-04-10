@@ -400,7 +400,53 @@ export const AddEditSheet = ({
                   </button>
                 </div>
 
-                {!isNA && (
+                {!isNA && hasSectionFields && sectionFields && (
+                  <>
+                    {sectionFields.map((field) => (
+                      <div key={field.name} className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
+                          {field.label} {field.required && <span className="text-red-500">*</span>}
+                        </label>
+                        {field.type === 'textarea' ? (
+                          <textarea
+                            rows={3}
+                            placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
+                            className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm resize-none font-medium"
+                            value={formData[field.name] || ''}
+                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            disabled={loading}
+                          />
+                        ) : (
+                          <input
+                            type={field.type || 'text'}
+                            placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
+                            className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium"
+                            value={formData[field.name] || ''}
+                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            disabled={loading}
+                          />
+                        )}
+                        {errors[field.name] && (
+                          <p className="text-xs font-bold text-red-500 mt-1">{errors[field.name]}</p>
+                        )}
+                      </div>
+                    ))}
+
+                    <FileAttachmentField
+                      sectionKey={activeTab || ''}
+                      packetId={currentPacket?.id || ''}
+                      recordId={initialData?.id}
+                      scope={activeScope}
+                      initialAttachment={initialAttachment}
+                      onFileSelected={setSelectedFile}
+                      onFileRemoved={() => setSelectedFile(null)}
+                      disabled={loading}
+                      isPrivate={activeTab === 'private'}
+                    />
+                  </>
+                )}
+
+                {!isNA && !hasSectionFields && (
                   <>
                     {activeTab === 'info' && !isEntryOnly && effectiveCategoryOptions.length > 0 && (
                       <div className="space-y-1">
