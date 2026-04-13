@@ -13,15 +13,15 @@ import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { sectionService } from '../../services/sectionService';
 
 export const DashboardScreen = () => {
-  const { setView, setTab, currentPacket, userDisplayName } = useAppContext();
+  const { setView, setTab, currentPacket, userDisplayName, view } = useAppContext();
   const [stats, setStats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (currentPacket) {
+    if (currentPacket && view === 'dashboard') {
       fetchStats();
     }
-  }, [currentPacket]);
+  }, [currentPacket, view]);
 
   const fetchStats = async () => {
     if (!currentPacket) return;
