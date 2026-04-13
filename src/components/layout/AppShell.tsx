@@ -30,7 +30,7 @@ export const AppShell = () => {
   const [initialData, setInitialData] = useState<any>(null);
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [refreshFn, setRefreshFn] = useState<(() => void) | null>(null);
+  const [refreshFn, setRefreshFn] = useState<((newRecord?: any) => void) | null>(null);
 
   const handleAddClick = (file?: File, data?: any, options?: CategoryOption[], isEntryOnly?: boolean) => {
     if (file) setInitialFile(file);
@@ -67,7 +67,7 @@ export const AppShell = () => {
     }
   }, [location.pathname]);
 
-  const handleRefreshRegister = React.useCallback((fn: () => void) => {
+  const handleRefreshRegister = React.useCallback((fn: (newRecord?: any) => void) => {
     setRefreshFn(() => fn);
   }, []);
 
@@ -184,8 +184,8 @@ export const AppShell = () => {
         initialFile={initialFile}
         initialData={initialData}
         categoryOptions={categoryOptions}
-        onSuccess={() => {
-          if (refreshFn) refreshFn();
+        onSuccess={(newRecord) => {
+          if (refreshFn) refreshFn(newRecord);
         }}
       />
     </div>

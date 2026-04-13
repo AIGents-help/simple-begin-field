@@ -26,7 +26,7 @@ export const AddEditSheet = ({
   onClose: () => void; 
   children?: React.ReactNode;
   title?: string;
-  onSuccess?: () => void;
+  onSuccess?: (newRecord?: any) => void;
   initialFile?: File | null;
   initialData?: any;
   categoryOptions?: CategoryOption[];
@@ -307,12 +307,14 @@ export const AddEditSheet = ({
       console.log(`${activeTab} insert payload:`, JSON.stringify(recordToSave, null, 2));
 
       let recordId = initialData?.id;
+      let savedRecord: any = null;
       if (recordId) {
         const { data: updatedRecord, error: recordError } = await sectionService.updateRecord(activeTab, recordId, recordToSave);
         if (recordError) {
           console.error(`${activeTab} update error response:`, JSON.stringify(recordError, null, 2));
           throw recordError;
         }
+        savedRecord = updatedRecord;
         console.log(`${activeTab} update result: Success`, updatedRecord);
       } else {
         const { data: newRecord, error: recordError } = await sectionService.createRecord(activeTab, recordToSave);
@@ -321,6 +323,7 @@ export const AddEditSheet = ({
           throw recordError;
         }
         recordId = newRecord?.id;
+        savedRecord = newRecord;
         console.log(`${activeTab} insert result:`, newRecord);
       }
 
@@ -348,7 +351,7 @@ export const AddEditSheet = ({
       
       console.log("Final save success");
       toast.success("Information saved successfully!", { icon: <CheckCircle size={18} className="text-emerald-500" />, duration: 3000, position: "bottom-center" });
-      if (onSuccess) onSuccess();
+      if (onSuccess) onSuccess(savedRecord);
       handleClose();
     } catch (err: any) {
       console.error("Error saving record:", err);
