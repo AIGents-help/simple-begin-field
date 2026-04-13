@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate } from '../components/sections/SectionScreenTemplate';
-import { InfoSection } from '../components/info/InfoSection';
+import { InfoSection } from '../sections/InfoSection';
 import { FamilySection } from '../sections/FamilySection';
 import { RealEstateSection } from '../sections/RealEstateSection';
 import { BankingSection } from '../sections/BankingSection';
@@ -30,7 +30,7 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
   const renderSection = () => {
     switch (activeTab) {
       case 'info':
-        return currentPacket ? <InfoSection packetId={currentPacket.id} scope={activeScope} /> : null;
+        return <InfoSection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'family':
         return <FamilySection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'real-estate':
