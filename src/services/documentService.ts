@@ -56,6 +56,7 @@ export const documentService = {
     const docData = {
       packet_id: metadata.packetId,
       section_key: metadata.sectionKey,
+      related_table: metadata.sectionKey === 'info' ? 'info_records' : metadata.sectionKey,
       related_record_id: metadata.recordId,
       category: metadata.category,
       scope: metadata.scope,
