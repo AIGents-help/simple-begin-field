@@ -45,7 +45,7 @@ export const CheckoutButton = ({
           planKey,
           packetId: currentPacket?.id,
           successUrl: 'https://app.survivorpacket.com/dashboard?checkout=success',
-          cancelUrl: window.location.origin + '/pricing',
+          cancelUrl: 'https://app.survivorpacket.com/pricing',
         },
       });
 
