@@ -16,7 +16,7 @@ interface SectionScreenTemplateProps {
   onAddClick?: (file?: File, data?: any, options?: CategoryOption[], entryOnly?: boolean) => void;
   onEntryClick?: (label: string) => void;
   emptyState?: React.ReactNode;
-  onRefresh?: (refreshFn: () => void) => void;
+  onRefresh?: (refreshFn: (newRecord?: any) => void) => void;
 }
 
 export const SectionScreenTemplate = ({ 
