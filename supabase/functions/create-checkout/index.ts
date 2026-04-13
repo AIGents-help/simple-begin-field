@@ -9,29 +9,30 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Initialize Supabase client with the user's auth token
-    // This allows Supabase to handle the JWT verification automatically
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new Error('Unauthorized: Missing or invalid Authorization header')
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization') ?? '' }
-        }
-      }
+      { global: { headers: { Authorization: authHeader } } }
     )
 
-    // Verify the user is actually logged in by getting the user from the token
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
-    if (userError || !user) {
-      throw new Error('Unauthorized: Invalid or missing authentication token')
+    const token = authHeader.replace('Bearer ', '')
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token)
+    if (claimsError || !claimsData?.claims) {
+      console.error('Claims error:', claimsError)
+      throw new Error('Unauthorized: Invalid token')
     }
+
+    const userId = claimsData.claims.sub
 
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
     if (!stripeKey) {
@@ -43,27 +44,20 @@ serve(async (req) => {
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    const { priceId, planKey, userId, packetId, successUrl, cancelUrl } = await req.json()
+    const { priceId, planKey, packetId, successUrl, cancelUrl } = await req.json()
 
     if (!priceId) throw new Error('priceId is required')
     if (!planKey) throw new Error('planKey is required')
-    if (!userId) throw new Error('userId is required')
 
-    // Determine mode based on planKey
     const mode = planKey === 'lifetime' ? 'payment' : 'subscription'
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: mode,
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode,
       success_url: successUrl,
       cancel_url: cancelUrl,
-      client_reference_id: userId, // Use userId from request body
+      client_reference_id: userId,
       metadata: {
         userId,
         packetId: packetId || '',
@@ -74,19 +68,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ url: session.url }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
     console.error('Checkout Error:', error.message)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     )
   }
 })
