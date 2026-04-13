@@ -30,7 +30,7 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
   const renderSection = () => {
     switch (activeTab) {
       case 'info':
-        return currentPacket ? <InfoSection packetId={currentPacket.id} scope={activeScope} /> : null;
+        return <InfoSection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'family':
         return <FamilySection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'real-estate':
