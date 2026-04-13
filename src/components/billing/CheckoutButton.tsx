@@ -38,38 +38,25 @@ export const CheckoutButton = ({
         return;
       }
 
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-      const response = await fetch(`${supabaseUrl}/functions/v1/create-checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': supabaseAnonKey,
-        },
-        body: JSON.stringify({
+      const { data, error: fnError } = await supabase.functions.invoke('create-checkout', {
+        body: {
           priceId: stripePriceId,
-          planKey: planKey,
-          userId: session.user.id,
+          planKey,
           packetId: currentPacket?.id,
           successUrl: window.location.origin + '/checkout/success',
-          cancelUrl: window.location.origin + '/pricing'
-        })
+          cancelUrl: window.location.origin + '/pricing',
+        },
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || result.message || 'Failed to create checkout session');
+      if (fnError) {
+        throw new Error(fnError.message || 'Failed to create checkout session');
       }
 
-      if (!result.url) {
+      if (!data?.url) {
         throw new Error('No checkout URL returned');
       }
 
-      // Redirect to Stripe
-      window.location.href = result.url;
+      window.location.href = data.url;
     } catch (err: any) {
       console.error('Checkout Error:', err);
       setError(err.message || 'Failed to initiate checkout. Please try again.');
@@ -88,7 +75,7 @@ export const CheckoutButton = ({
         <span>{children}</span>
       </button>
       {error && (
-        <div className="mt-2 flex items-center gap-2 text-xs text-red-500 bg-red-50 p-2 rounded-lg">
+        <div className="mt-2 flex items-center gap-2 text-xs text-destructive bg-destructive/10 p-2 rounded-lg">
           <AlertCircle size={14} />
           <span>{error}</span>
         </div>
