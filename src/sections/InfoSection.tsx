@@ -22,7 +22,7 @@ const CATEGORY_GROUPS: Record<string, string[]> = {
 
 const FILTERS = ['All', 'Legal', 'Identity', 'Medical', 'Financial', 'Insurance', 'Other'];
 
-export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
+export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: (newRecord?: any) => void) => void }) => {
   const { activeScope, currentPacket } = useAppContext();
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
