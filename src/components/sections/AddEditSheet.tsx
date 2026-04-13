@@ -103,7 +103,7 @@ export const AddEditSheet = ({
           { name: 'email', label: 'Email Address', type: 'email', placeholder: 'jane@example.com' },
           { name: 'address', label: 'Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
           { name: 'birthday', label: 'Birthday', type: 'date' },
-          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+          { name: 'reminder_notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'medical':
         return [
