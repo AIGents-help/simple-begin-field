@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Loader2, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '../../context/AppContext';
 
@@ -58,8 +59,10 @@ export const CheckoutButton = ({
 
       window.location.href = data.url;
     } catch (err: any) {
+      const msg = err.message || 'Failed to initiate checkout. Please try again.';
       console.error('Checkout Error:', err);
-      setError(err.message || 'Failed to initiate checkout. Please try again.');
+      toast.error(msg, { duration: 5000, position: 'bottom-center' });
+      setError(msg);
       setLoading(false);
     }
   };
