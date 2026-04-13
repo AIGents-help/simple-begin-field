@@ -108,7 +108,7 @@ export const AppShell = () => {
           <>
             <FolderTabNav />
             <SectionRenderer 
-              onAddClick={() => handleAddClick()} 
+              onAddClick={handleAddClick} 
               onRefresh={handleRefreshRegister}
             />
           </>

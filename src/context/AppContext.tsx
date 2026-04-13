@@ -87,45 +87,32 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return userDisplayName.substring(0, 2).toUpperCase();
   })();
 
-  // Auth listener
-  useEffect(() => {
-    const { data: { subscription } } = authService.onAuthStateChange(async (user) => {
-      setUser(user);
-      if (!user) {
-        setProfile(null);
-        setPackets([]);
-        setCurrentPacket(null);
-        setLoading(false);
-      } else {
-        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        setProfile(profileData);
-        fetchPackets(user.id);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const fetchPackets = async (userId: string) => {
-    setLoading(true);
+  const fetchPackets = React.useCallback(async (userId: string) => {
     const { data, error } = await packetService.getPacketsForUser(userId);
+
+    if (error) {
+      console.error('Failed to load packets:', error);
+      setPackets([]);
+      setCurrentPacket(null);
+      setState(prev => ({ ...prev, onboarded: false }));
+      return;
+    }
+
     if (data && data.length > 0) {
       const userPackets = data.map((m: any) => ({
         ...m.packets,
         userRole: m.role,
         userScope: m.household_scope
       }));
+
       setPackets(userPackets);
-      
+
       const firstPacket = userPackets[0];
-      const activePacket = currentPacket || firstPacket;
-      
-      if (!currentPacket) {
-        setCurrentPacket(firstPacket);
-      }
-      
+      const activePacket = currentPacket
+        ? userPackets.find((packet: any) => packet.id === currentPacket.id) || firstPacket
+        : firstPacket;
+
+      setCurrentPacket(activePacket);
       setState(prev => ({
         ...prev,
         onboarded: true,
@@ -133,15 +120,74 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         personA: activePacket.person_a_name || 'Person A',
         personB: activePacket.person_b_name || 'Person B',
       }));
-    } else {
-      // No packets found, user might need to onboard
-      setState(prev => ({ ...prev, onboarded: false }));
+      return;
     }
+
+    setPackets([]);
+    setCurrentPacket(null);
+    setState(prev => ({ ...prev, onboarded: false }));
+  }, [currentPacket]);
+
+  const hydrateUserState = React.useCallback(async (authUser: User | null) => {
+    setUser(authUser);
+
+    if (!authUser) {
+      setProfile(null);
+      setPackets([]);
+      setCurrentPacket(null);
+      setState(prev => ({ ...prev, onboarded: false }));
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authUser.id)
+      .single();
+
+    if (profileError) {
+      console.error('Failed to load profile:', profileError);
+    }
+
+    setProfile(profileData ?? null);
+    await fetchPackets(authUser.id);
     setLoading(false);
-  };
+  }, [fetchPackets]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializeAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error('Failed to restore session:', error);
+      }
+
+      if (!isMounted) return;
+      await hydrateUserState(data.session?.user ?? null);
+    };
+
+    void initializeAuth();
+
+    const { data: { subscription } } = authService.onAuthStateChange((nextUser) => {
+      void hydrateUserState(nextUser);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, [hydrateUserState]);
 
   const refreshPackets = async () => {
-    if (user) await fetchPackets(user.id);
+    if (!user) return;
+    setLoading(true);
+    await fetchPackets(user.id);
+    setLoading(false);
   };
 
   const setScope = (scope: UserScope) => setState(prev => ({ ...prev, activeScope: scope }));
