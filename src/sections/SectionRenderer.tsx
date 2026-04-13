@@ -24,7 +24,7 @@ export const GenericSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
   return <SectionScreenTemplate onAddClick={onAddClick} onRefresh={onRefresh} />;
 };
 
-export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh: (fn: () => void) => void }) => {
+export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh: (fn: (newRecord?: any) => void) => void }) => {
   const { activeTab, activeScope, currentPacket } = useAppContext();
 
   const renderSection = () => {
