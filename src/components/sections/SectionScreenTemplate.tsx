@@ -53,6 +53,15 @@ export const SectionScreenTemplate = ({
     }
   }, [currentPacket, activeTab, activeScope]);
 
+  // Optimistic prepend: add a new record to the top of the list immediately
+  const addRecordOptimistic = React.useCallback((newRecord: any) => {
+    if (newRecord) {
+      setRecords(prev => [newRecord, ...prev.filter(r => r.id !== newRecord.id)]);
+    }
+    // Also do a background refetch to ensure consistency
+    fetchData();
+  }, [fetchData]);
+
   useEffect(() => {
     if (currentPacket && activeTab) {
       fetchData();
@@ -61,9 +70,9 @@ export const SectionScreenTemplate = ({
 
   useEffect(() => {
     if (onRefresh) {
-      onRefresh(fetchData);
+      onRefresh(addRecordOptimistic);
     }
-  }, [onRefresh, fetchData]);
+  }, [onRefresh, addRecordOptimistic]);
 
   if (!config) return null;
 
