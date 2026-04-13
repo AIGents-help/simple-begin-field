@@ -1,11 +1,11 @@
 import React from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert } from 'lucide-react';
+import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 
 export const ProfileScreen = () => {
-  const { personA, personB, userMode, setState, setView, user, currentPacket, profile, userDisplayName, userInitials } = useAppContext();
+  const { personA, personB, userMode, setState, setView, user, currentPacket, profile, userDisplayName, userInitials, planKey, planName, isPaid } = useAppContext();
   const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
 
@@ -117,6 +117,38 @@ export const ProfileScreen = () => {
               <span className="text-xs font-bold text-navy-muted">Trust Info</span>
             </button>
           </div>
+        </div>
+
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Subscription</h3>
+          <Card>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm font-bold text-navy-muted">Current Plan</p>
+                <p className="text-xs text-stone-500">{planName || 'Free'}</p>
+              </div>
+              <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isPaid ? 'bg-emerald-50 text-emerald-700' : 'bg-stone-100 text-stone-500'}`}>
+                {isPaid ? 'Active' : 'Free'}
+              </div>
+            </div>
+            {!isPaid && (
+              <button
+                onClick={() => navigate('/pricing')}
+                className="w-full py-3 bg-navy-muted text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-navy-muted/90 transition-colors"
+              >
+                <CreditCard size={16} />
+                Upgrade Plan
+              </button>
+            )}
+            {isPaid && (
+              <button
+                onClick={() => navigate('/pricing')}
+                className="w-full py-2 border border-stone-200 rounded-lg text-xs font-bold text-stone-600 hover:bg-stone-50 transition-colors"
+              >
+                Manage Plan
+              </button>
+            )}
+          </Card>
         </div>
 
         <div>
