@@ -334,9 +334,9 @@ export const AddEditSheet = ({
           sectionKey: activeTab,
           recordId: recordId,
           category: formData.category,
-          fileName: recordTitle || selectedFile.name,
+          fileName: selectedFile.name,
           scope: activeScope || 'personA',
-          isPrivate: true // Use packet-private-documents bucket as requested
+          isPrivate: activeTab === 'private'
         });
         
         if (uploadError) {
