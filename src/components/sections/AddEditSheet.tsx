@@ -26,7 +26,7 @@ export const AddEditSheet = ({
   onClose: () => void; 
   children?: React.ReactNode;
   title?: string;
-  onSuccess?: () => void;
+  onSuccess?: (newRecord?: any) => void;
   initialFile?: File | null;
   initialData?: any;
   categoryOptions?: CategoryOption[];
