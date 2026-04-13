@@ -61,7 +61,8 @@ export const OnboardingFlow = () => {
       const name = user.user_metadata?.full_name;
       if (name) setPersonA(name);
     }
-  }, [user, personA]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Handle automatic step transition when user logs in
   useEffect(() => {
@@ -69,7 +70,8 @@ export const OnboardingFlow = () => {
       console.log("User detected, moving to setup");
       setStep('setup');
     }
-  }, [user, step]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
