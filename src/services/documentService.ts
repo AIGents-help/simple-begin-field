@@ -29,9 +29,9 @@ export const documentService = {
   async uploadAndCreate(file: File, metadata: DocumentMetadata) {
     console.log("Starting upload for file:", file.name, "size:", file.size);
     
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `${metadata.packetId}/${metadata.sectionKey}/${metadata.recordId || 'general'}/${fileName}`;
+    const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const timestamp = Date.now();
+    const filePath = `${metadata.packetId}/${metadata.sectionKey}/${metadata.recordId || 'general'}/${timestamp}_${safeFileName}`;
     const bucket = metadata.isPrivate ? 'packet-private-documents' : 'packet-documents';
 
     console.log("Upload path:", filePath, "Bucket:", bucket);
