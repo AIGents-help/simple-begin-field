@@ -85,7 +85,7 @@ export const AffiliatePage = () => {
         status: 'pending',
       } as any);
       if (error) throw error;
-      toast.success('Application submitted! You'll be notified when approved.');
+      toast.success('Application submitted! You will be notified when approved.');
       loadAffiliateData();
     } catch (err: any) {
       toast.error(err.message || 'Failed to submit application');
@@ -244,7 +244,7 @@ export const AffiliatePage = () => {
             </p>
             <p className={`text-xs mt-1 ${monthlyReferrals >= MIN_MONTHLY_REFERRALS ? 'text-emerald-600' : 'text-amber-600'}`}>
               {monthlyReferrals >= MIN_MONTHLY_REFERRALS
-                ? '✓ You're on track! Your free Individual plan is secure.'
+                ? 'You are on track! Your free Individual plan is secure.'
                 : `You need ${MIN_MONTHLY_REFERRALS - monthlyReferrals} more active referral${MIN_MONTHLY_REFERRALS - monthlyReferrals === 1 ? '' : 's'} this month to keep your free Individual plan.`}
             </p>
           </div>
