@@ -147,6 +147,22 @@ export const AdminAffiliates: React.FC = () => {
         }
       }
 
+      // Send affiliate approved email via Loops
+      if (affiliate.affiliate_email) {
+        try {
+          await supabase.functions.invoke('loops-sync', {
+            body: {
+              action: 'affiliate_approved',
+              email: affiliate.affiliate_email,
+              firstName: affiliate.affiliate_name?.split(' ')[0] || '',
+              affiliateCode: affiliate.affiliate_code,
+            },
+          });
+        } catch (e) {
+          console.error('Loops affiliate approved email failed:', e);
+        }
+      }
+
       toast.success(`${affiliate.affiliate_name} approved`);
       loadAffiliates();
     } catch (err: any) {
