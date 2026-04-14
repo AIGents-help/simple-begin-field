@@ -66,6 +66,15 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
     }
   };
 
+  // Affiliate section is accessible to all logged-in users regardless of plan
+  if (activeTab === 'affiliate') {
+    return (
+      <div className="p-4 sm:p-6 lg:p-8">
+        {renderSection()}
+      </div>
+    );
+  }
+
   return (
     <PlanGate feature={activeTab}>
       <div className="p-4 sm:p-6 lg:p-8">
