@@ -17,6 +17,7 @@ import { TrustScreen } from '../trust/TrustScreen';
 import { InviteAcceptanceScreen } from '../auth/InviteAcceptanceScreen';
 import { AffiliatePage } from '../../pages/AffiliatePage';
 import { PricingPage } from '../billing/PricingPage';
+import { FindProfessionalScreen } from '../directory/FindProfessionalScreen';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import { CategoryOption } from '../upload/types';
@@ -134,6 +135,8 @@ export const AppShell = () => {
         return <AffiliatePage />;
       case 'pricing':
         return <PricingPage />;
+      case 'directory':
+        return <FindProfessionalScreen />;
       default:
         return <DashboardScreen />;
     }
