@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  Search, 
-  Filter, 
   MoreVertical, 
   Share2, 
   Copy, 
   CheckCircle2, 
   XCircle, 
-  RefreshCw,
-  Mail,
-  Package,
-  User,
-  ExternalLink,
   Loader2,
   X
 } from 'lucide-react';
@@ -47,7 +40,8 @@ const NewAffiliateModal = ({ onClose, onCreated }: { onClose: () => void; onCrea
         payout_type: 'percent',
         payout_value: parseFloat(payoutValue) || 10,
         is_active: true,
-      });
+        status: 'approved',
+      } as any);
       if (error) throw error;
       toast.success('Affiliate created successfully');
       onCreated();
@@ -107,6 +101,7 @@ export const AdminAffiliates: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedAffiliate, setSelectedAffiliate] = useState<any | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const loadAffiliates = () => {
     setLoading(true);
@@ -120,9 +115,72 @@ export const AdminAffiliates: React.FC = () => {
     loadAffiliates();
   }, []);
 
+  const handleApprove = async (affiliate: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActionLoading(affiliate.id);
+    try {
+      // Approve the affiliate
+      const { error } = await supabase
+        .from('affiliate_referrals')
+        .update({ status: 'approved', is_active: true } as any)
+        .eq('id', affiliate.id);
+      if (error) throw error;
+
+      // If the affiliate has an owner_id, grant them individual plan access
+      if (affiliate.owner_id) {
+        // Find the individual_monthly plan
+        const { data: plans } = await supabase
+          .from('pricing_plans')
+          .select('id')
+          .eq('plan_key', 'individual_monthly')
+          .eq('is_active', true)
+          .limit(1);
+
+        if (plans && plans.length > 0) {
+          // Insert a purchase record for free individual access
+          await supabase.from('purchases').insert({
+            user_id: affiliate.owner_id,
+            pricing_plan_id: plans[0].id,
+            status: 'active',
+            billing_type: 'affiliate_comp',
+          } as any);
+        }
+      }
+
+      toast.success(`${affiliate.affiliate_name} approved`);
+      loadAffiliates();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to approve');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (affiliate: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActionLoading(affiliate.id);
+    try {
+      const { error } = await supabase
+        .from('affiliate_referrals')
+        .update({ status: 'rejected', is_active: false } as any)
+        .eq('id', affiliate.id);
+      if (error) throw error;
+      toast.success(`${affiliate.affiliate_name} rejected`);
+      loadAffiliates();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reject');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (selectedAffiliate) {
     return <AffiliateDetail affiliate={selectedAffiliate} onClose={() => setSelectedAffiliate(null)} />;
   }
+
+  // Separate pending from rest
+  const pendingAffiliates = affiliates.filter((a: any) => a.status === 'pending');
+  const otherAffiliates = affiliates.filter((a: any) => a.status !== 'pending');
 
   const columns = [
     {
@@ -160,21 +218,21 @@ export const AdminAffiliates: React.FC = () => {
       header: 'Conversions',
       accessorKey: 'conversions',
       cell: (row: any) => (
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-stone-900">{row.affiliate_conversions?.length || 0}</span>
-          <span className="text-[10px] text-stone-400 uppercase tracking-wider">Total</span>
-        </div>
+        <span className="text-xs font-medium text-stone-900">{row.affiliate_conversions?.length || 0}</span>
       )
     },
     {
       header: 'Status',
-      accessorKey: 'is_active',
-      cell: (row: any) => (
-        <StatusPill 
-          status={row.is_active ? 'Active' : 'Inactive'} 
-          type={row.is_active ? 'success' : 'error'} 
-        />
-      )
+      accessorKey: 'status',
+      cell: (row: any) => {
+        const statusMap: Record<string, any> = {
+          approved: { label: 'Approved', type: 'success' },
+          pending: { label: 'Pending', type: 'warning' },
+          rejected: { label: 'Rejected', type: 'error' },
+        };
+        const s = statusMap[row.status] || { label: row.status || 'Unknown', type: 'info' };
+        return <StatusPill status={s.label} type={s.type} />;
+      }
     },
     {
       header: 'Actions',
@@ -192,82 +250,28 @@ export const AdminAffiliates: React.FC = () => {
     }
   ];
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-serif italic text-stone-900">Affiliate Management</h3>
-        <button onClick={() => setShowNewModal(true)} className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors">
-          <Share2 className="w-4 h-4" />
-          New Affiliate
-        </button>
-      </div>
-      <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
-        <DataTable 
-          columns={columns} 
-          data={affiliates} 
-          isLoading={loading} 
-          onRowClick={(row) => setSelectedAffiliate(row)}
-        />
-      </div>
-      {showNewModal && <NewAffiliateModal onClose={() => setShowNewModal(false)} onCreated={loadAffiliates} />}
-    </div>
-  );
-};
-
-export const AdminInvites: React.FC = () => {
-  const [invites, setInvites] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    adminService.getInvites().then(data => {
-      setInvites(data);
-      setLoading(false);
-    });
-  }, []);
-
-  const columns = [
+  const pendingColumns = [
     {
-      header: 'Invited Name',
-      accessorKey: 'invited_name',
+      header: 'Applicant',
+      accessorKey: 'affiliate_name',
       cell: (row: any) => (
         <div className="text-sm">
-          <p className="font-medium text-stone-900">{row.invited_name}</p>
-          <p className="text-xs text-stone-400">{row.invited_email}</p>
+          <p className="font-medium text-stone-900">{row.affiliate_name || 'Unnamed'}</p>
+          <p className="text-xs text-stone-400">{row.affiliate_email}</p>
         </div>
       )
     },
     {
-      header: 'Packet',
-      accessorKey: 'packet',
+      header: 'Code',
+      accessorKey: 'affiliate_code',
       cell: (row: any) => (
-        <div className="flex items-center gap-2">
-          <Package className="w-3 h-3 text-stone-400" />
-          <span className="text-xs text-stone-600">{row.packets?.title}</span>
-        </div>
+        <code className="px-1.5 py-0.5 bg-stone-100 rounded text-xs font-mono text-stone-600">
+          {row.affiliate_code}
+        </code>
       )
     },
     {
-      header: 'Invited By',
-      accessorKey: 'invited_by',
-      cell: (row: any) => (
-        <span className="text-xs text-stone-600">{row.profiles?.full_name}</span>
-      )
-    },
-    {
-      header: 'Status',
-      accessorKey: 'status',
-      cell: (row: any) => {
-        const typeMap: Record<string, any> = {
-          pending: 'warning',
-          accepted: 'success',
-          declined: 'error',
-          expired: 'info',
-        };
-        return <StatusPill status={row.status} type={typeMap[row.status] || 'info'} />;
-      }
-    },
-    {
-      header: 'Created',
+      header: 'Applied',
       accessorKey: 'created_at',
       cell: (row: any) => (
         <span className="text-xs text-stone-400">
@@ -280,12 +284,26 @@ export const AdminInvites: React.FC = () => {
       accessorKey: 'actions',
       cell: (row: any) => (
         <div className="flex items-center gap-2">
-          <button className="p-1 hover:bg-stone-100 rounded-lg transition-colors">
-            <RefreshCw className="w-4 h-4 text-stone-400" />
-          </button>
-          <button className="p-1 hover:bg-rose-50 rounded-lg transition-colors">
-            <XCircle className="w-4 h-4 text-rose-400" />
-          </button>
+          {actionLoading === row.id ? (
+            <Loader2 className="w-4 h-4 animate-spin text-stone-400" />
+          ) : (
+            <>
+              <button
+                onClick={(e) => handleApprove(row, e)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-100 transition-colors"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Approve
+              </button>
+              <button
+                onClick={(e) => handleReject(row, e)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 text-rose-700 rounded-lg text-xs font-medium hover:bg-rose-100 transition-colors"
+              >
+                <XCircle className="w-3.5 h-3.5" />
+                Reject
+              </button>
+            </>
+          )}
         </div>
       )
     }
@@ -294,16 +312,38 @@ export const AdminInvites: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-serif italic text-stone-900">Partner Invites</h3>
-        <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-white border border-stone-200 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-50 transition-colors">
-            Clean Expired
-          </button>
+        <h3 className="text-lg font-serif italic text-stone-900">Affiliate Management</h3>
+        <button onClick={() => setShowNewModal(true)} className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors">
+          <Share2 className="w-4 h-4" />
+          New Affiliate
+        </button>
+      </div>
+
+      {/* Pending Applications */}
+      {pendingAffiliates.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-sm font-bold text-amber-700 uppercase tracking-wider flex items-center gap-2">
+            <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+            Pending Applications ({pendingAffiliates.length})
+          </h4>
+          <div className="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden">
+            <DataTable columns={pendingColumns} data={pendingAffiliates} isLoading={loading} />
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* All Affiliates */}
       <div className="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
-        <DataTable columns={columns} data={invites} isLoading={loading} />
+        <DataTable 
+          columns={columns} 
+          data={otherAffiliates} 
+          isLoading={loading} 
+          onRowClick={(row) => setSelectedAffiliate(row)}
+        />
       </div>
+      {showNewModal && <NewAffiliateModal onClose={() => setShowNewModal(false)} onCreated={loadAffiliates} />}
     </div>
   );
 };
+
+export { AdminInvites } from './AdminInvites';

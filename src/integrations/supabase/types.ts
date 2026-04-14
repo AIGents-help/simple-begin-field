@@ -143,6 +143,7 @@ export type Database = {
           owner_id: string | null
           payout_type: string | null
           payout_value: number | null
+          status: string
         }
         Insert: {
           affiliate_code: string
@@ -155,6 +156,7 @@ export type Database = {
           owner_id?: string | null
           payout_type?: string | null
           payout_value?: number | null
+          status?: string
         }
         Update: {
           affiliate_code?: string
@@ -167,6 +169,7 @@ export type Database = {
           owner_id?: string | null
           payout_type?: string | null
           payout_value?: number | null
+          status?: string
         }
         Relationships: [
           {
