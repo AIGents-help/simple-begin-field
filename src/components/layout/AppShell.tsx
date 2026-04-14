@@ -192,6 +192,8 @@ export const AppShell = () => {
           if (refreshFn) refreshFn(newRecord);
         }}
       />
+
+      <HavenAssistant />
     </div>
   );
 };
