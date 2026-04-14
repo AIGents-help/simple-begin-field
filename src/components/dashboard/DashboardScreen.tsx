@@ -6,8 +6,12 @@ import {
   Lock,
   Loader2,
   ChevronRight,
-  FileText
+  FileText,
+  Download,
+  ShieldCheck
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { sectionService } from '../../services/sectionService';
@@ -191,6 +195,20 @@ export const DashboardScreen = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Download My Packet Banner */}
+      <div className="bg-gradient-to-br from-teal-50 to-emerald-50/60 border border-teal-200/60 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          <ShieldCheck size={24} className="text-teal-700" />
+        </div>
+        <div className="flex-1 space-y-1">
+          <h3 className="text-base font-serif font-bold text-navy-muted">Your Data, Always Yours</h3>
+          <p className="text-sm text-stone-500 leading-relaxed">
+            Download a complete copy of your Survivor Packet anytime &mdash; all your information and documents in one ZIP file.
+          </p>
+        </div>
+        <DownloadPacketButton />
       </div>
 
       {/* Footer / Connection Status */}
