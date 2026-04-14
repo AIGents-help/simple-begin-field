@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { supabase } from '@/lib/supabase';
-import { Share2, Copy, Check, TrendingUp, Users, DollarSign, AlertTriangle, Loader2 } from 'lucide-react';
+import { Share2, Copy, Check, TrendingUp, Users, DollarSign, AlertTriangle, Loader2, Info, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const generateCode = () => {
@@ -9,6 +9,100 @@ const generateCode = () => {
   let code = 'SP-';
   for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
   return code;
+};
+
+const GUIDELINES_DISMISSED_KEY = 'sp_affiliate_guidelines_dismissed';
+
+const AffiliateGuidelines = () => {
+  const [dismissed, setDismissed] = useState(() => localStorage.getItem(GUIDELINES_DISMISSED_KEY) === 'true');
+  const [expanded, setExpanded] = useState(!dismissed);
+
+  const handleAcknowledge = () => {
+    localStorage.setItem(GUIDELINES_DISMISSED_KEY, 'true');
+    setDismissed(true);
+    setExpanded(false);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+      <button
+        onClick={() => setExpanded(prev => !prev)}
+        className="w-full flex items-center justify-between p-5 text-left hover:bg-stone-50/50 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          {dismissed ? (
+            <CheckCircle2 size={20} className="text-emerald-500 flex-shrink-0" />
+          ) : (
+            <Info size={20} className="text-navy-muted flex-shrink-0" />
+          )}
+          <div>
+            <h3 className="text-sm font-bold text-stone-900">Affiliate Program Guidelines</h3>
+            {dismissed && !expanded && (
+              <p className="text-[10px] text-stone-400 mt-0.5">Tap to review program rules</p>
+            )}
+          </div>
+        </div>
+        {expanded ? <ChevronUp size={18} className="text-stone-400" /> : <ChevronDown size={18} className="text-stone-400" />}
+      </button>
+
+      {expanded && (
+        <div className="px-5 pb-5 space-y-5 border-t border-stone-100 pt-4">
+          {/* Eligibility */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-navy-muted">Eligibility</h4>
+            <ul className="space-y-1.5 text-sm text-stone-600">
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Must be an approved affiliate with an active account in good standing.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Affiliates receive a complimentary Individual plan as long as they maintain the minimum referral activity.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Minimum activity requirement: 3 active referrals per month to retain the free plan benefit.</li>
+            </ul>
+          </div>
+
+          {/* Referral Rules */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-navy-muted">Referral Rules</h4>
+            <ul className="space-y-1.5 text-sm text-stone-600">
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Share your unique referral link or code with potential users.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>A referral is counted when a new user signs up using your link and creates an account.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>A conversion is counted when a referred user purchases a paid plan.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Self-referrals and duplicate accounts are not permitted and will be disqualified.</li>
+            </ul>
+          </div>
+
+          {/* Commission */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-navy-muted">Commission</h4>
+            <ul className="space-y-1.5 text-sm text-stone-600">
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Commission is earned on each paid conversion attributed to your referral code.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Commission rates are set at the time of approval and displayed on your dashboard.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Payouts are processed monthly for commissions exceeding the minimum threshold.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>The Survivor Packet reserves the right to adjust commission rates with 30 days notice.</li>
+            </ul>
+          </div>
+
+          {/* Code of Conduct */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-navy-muted">Code of Conduct</h4>
+            <ul className="space-y-1.5 text-sm text-stone-600">
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Represent The Survivor Packet honestly and accurately in all communications.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Do not use spam, misleading advertising, or deceptive practices to generate referrals.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Do not bid on branded keywords or create ads that could be confused with official materials.</li>
+              <li className="flex gap-2"><span className="text-stone-400 flex-shrink-0">&#8226;</span>Violation of these guidelines may result in immediate removal from the program and forfeiture of unpaid commissions.</li>
+            </ul>
+          </div>
+
+          {!dismissed && (
+            <button
+              onClick={handleAcknowledge}
+              className="w-full py-3 bg-navy-muted text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-navy-muted/90 transition-colors"
+            >
+              <CheckCircle2 size={16} />
+              I understand the terms
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export const AffiliatePage = () => {
@@ -29,7 +123,6 @@ export const AffiliatePage = () => {
   const loadAffiliateData = async () => {
     setLoading(true);
     try {
-      // Get affiliate record for this user
       const { data: referrals } = await supabase
         .from('affiliate_referrals')
         .select('*')
@@ -43,7 +136,6 @@ export const AffiliatePage = () => {
         if ((aff as any).status === 'approved') {
           setReferralLink(`${window.location.origin}?ref=${aff.affiliate_code}`);
 
-          // Get conversions
           const { data: convData } = await supabase
             .from('affiliate_conversions')
             .select('*')
@@ -51,7 +143,6 @@ export const AffiliatePage = () => {
             .order('created_at', { ascending: false });
           if (convData) setConversions(convData);
 
-          // Monthly referrals
           const startOfMonth = new Date();
           startOfMonth.setDate(1);
           startOfMonth.setHours(0, 0, 0, 0);
@@ -144,7 +235,7 @@ export const AffiliatePage = () => {
         <div>
           <h1 className="text-2xl font-serif font-bold text-navy-muted mb-2">Application Pending</h1>
           <p className="text-sm text-stone-500 max-w-sm mx-auto">
-            Your affiliate application is being reviewed. You'll receive access once approved by our team.
+            Your affiliate application is being reviewed. You will receive access once approved by our team.
           </p>
         </div>
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-700">
@@ -172,6 +263,7 @@ export const AffiliatePage = () => {
   }
 
   // Approved — full dashboard
+  const isAffiliate = profile?.role === 'affiliate' || profile?.role === 'admin';
   const totalReferrals = conversions.length;
   const MIN_MONTHLY_REFERRALS = 3;
 
@@ -187,6 +279,9 @@ export const AffiliatePage = () => {
           <p className="text-xs text-stone-400 font-medium">Your referral performance</p>
         </div>
       </div>
+
+      {/* Guidelines — shown to approved affiliates and admins */}
+      {isAffiliate && <AffiliateGuidelines />}
 
       {/* Referral Link */}
       <div className="bg-white p-5 rounded-2xl border border-stone-100 shadow-sm space-y-3">
