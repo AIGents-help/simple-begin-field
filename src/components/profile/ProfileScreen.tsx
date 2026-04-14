@@ -1,8 +1,9 @@
 import React from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard } from 'lucide-react';
+import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
+import { DownloadPacketButton } from '../download/DownloadPacketButton';
 
 export const ProfileScreen = () => {
   const { personA, personB, userMode, setState, setView, user, currentPacket, profile, userDisplayName, userInitials, planKey, planName, isPaid } = useAppContext();
@@ -148,6 +149,26 @@ export const ProfileScreen = () => {
                 Manage Plan
               </button>
             )}
+          </Card>
+        </div>
+
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Data Export</h3>
+          <Card>
+            <div className="space-y-3 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Download size={20} className="text-teal-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-navy-muted">Your Data, Always Yours</p>
+                  <p className="text-xs text-stone-500 leading-relaxed">
+                    Download a complete copy of your Survivor Packet anytime &mdash; all your information and documents in one ZIP file.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <DownloadPacketButton variant="settings" />
           </Card>
         </div>
 
