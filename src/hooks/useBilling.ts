@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { PRICING_PLANS, PlanId } from '../config/pricingConfig';
 import { User } from '@supabase/supabase-js';
@@ -9,43 +9,67 @@ export const useBilling = (user: User | null) => {
   const [isPaid, setIsPaid] = useState(false);
   const [isCouple, setIsCouple] = useState(false);
   const [isLifetime, setIsLifetime] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      fetchBillingStatus();
-    } else {
-      setPlanId('free');
-      setIsPaid(false);
-      setIsCouple(false);
-      setIsLifetime(false);
-      setLoading(false);
-    }
-  }, [user]);
-
-  const fetchBillingStatus = async () => {
+  const fetchBillingStatus = useCallback(async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('purchases')
-        .select('*')
-        .eq('user_id', user.id)
-        .in('status', ['active', 'one_time_paid'])
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      // Fetch profile role and active purchase in parallel
+      const [profileRes, purchaseRes] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('purchases')
+          .select('status, billing_type, pricing_plan_id, pricing_plans(plan_key)')
+          .eq('user_id', user.id)
+          .in('status', ['active', 'one_time_paid'])
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
 
-      if (data && !error) {
-        const plan = PRICING_PLANS.find(p => p.id === data.pricing_plan_id);
-        if (plan) {
-          setPlanId(plan.id);
-          setIsPaid(plan.price > 0);
-          setIsCouple(plan.canInvitePartner);
-          setIsLifetime(plan.interval === 'one-time');
+      const role = profileRes.data?.role;
+
+      // Admin users are always treated as paid/lifetime
+      if (role === 'admin') {
+        setIsAdmin(true);
+        setPlanId('lifetime');
+        setIsPaid(true);
+        setIsCouple(true);
+        setIsLifetime(true);
+        setLoading(false);
+        return;
+      }
+
+      setIsAdmin(false);
+
+      const purchase = purchaseRes.data;
+      if (purchase && !purchaseRes.error) {
+        // Get plan_key from the joined pricing_plans row
+        const planKey = (purchase as any).pricing_plans?.plan_key as string | undefined;
+        const matchedPlan = planKey
+          ? PRICING_PLANS.find(p => p.id === planKey)
+          : null;
+
+        if (matchedPlan) {
+          setPlanId(matchedPlan.id);
+          setIsPaid(matchedPlan.price > 0);
+          setIsCouple(matchedPlan.canInvitePartner);
+          setIsLifetime(matchedPlan.interval === 'one-time');
+        } else {
+          // Fallback: active purchase exists but plan_key doesn't match local config
+          // Still treat as paid
+          setPlanId('individual_monthly');
+          setIsPaid(true);
+          setIsCouple(false);
+          setIsLifetime(purchase.billing_type === 'one_time');
         }
       } else {
-        // Default to free
         setPlanId('free');
         setIsPaid(false);
         setIsCouple(false);
@@ -56,17 +80,31 @@ export const useBilling = (user: User | null) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchBillingStatus();
+    } else {
+      setPlanId('free');
+      setIsPaid(false);
+      setIsCouple(false);
+      setIsLifetime(false);
+      setIsAdmin(false);
+      setLoading(false);
+    }
+  }, [user, fetchBillingStatus]);
 
   const currentPlan = PRICING_PLANS.find(p => p.id === planId) || PRICING_PLANS[0];
 
   return {
     loading,
     planKey: planId,
-    planName: currentPlan.name,
+    planName: isAdmin ? 'Admin' : currentPlan.name,
     isPaid,
     isCouple,
     isLifetime,
+    isAdmin,
     currentPlan,
     refreshBilling: fetchBillingStatus
   };
