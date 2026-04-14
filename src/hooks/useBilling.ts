@@ -15,25 +15,14 @@ export const useBilling = (user: User | null) => {
 
     setLoading(true);
     try {
-      const [profileRes, purchaseRes] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle(),
-        supabase
-          .from('purchases')
-          .select('status, billing_type, pricing_plan_id, pricing_plans(plan_key)')
-          .eq('user_id', user.id)
-          .in('status', ['active', 'one_time_paid'])
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle(),
-      ]);
+      // Check profile role first — admins skip purchase lookup entirely
+      const profileRes = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
 
-      const role = profileRes.data?.role;
-
-      if (role === 'admin') {
+      if (profileRes.data?.role === 'admin') {
         setPlanId('lifetime');
         setIsPaid(true);
         setIsCouple(true);
@@ -41,6 +30,16 @@ export const useBilling = (user: User | null) => {
         setLoading(false);
         return;
       }
+
+      // Non-admin: check purchases
+      const purchaseRes = await supabase
+        .from('purchases')
+        .select('status, billing_type, pricing_plan_id, pricing_plans(plan_key)')
+        .eq('user_id', user.id)
+        .in('status', ['active', 'one_time_paid'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
       const purchase = purchaseRes.data;
       if (purchase && !purchaseRes.error) {
