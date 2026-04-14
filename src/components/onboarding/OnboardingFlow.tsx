@@ -5,6 +5,7 @@ import { ArrowRight, Users, User, CheckCircle2, Package, ShieldCheck, Lock, Eye 
 import { useAppContext } from '../../context/AppContext';
 import { OnboardingStep } from '../../config/types';
 import { authService } from '../../services/authService';
+import { supabase } from '@/integrations/supabase/client';
 import { packetService } from '../../services/packetService';
 import { ConsentCheckbox } from '../trust/TrustComponents';
 import { useLocation, Link } from 'react-router-dom';
@@ -70,6 +71,22 @@ const OnboardingFlowComponent = () => {
         const { data: signUpData, error } = await authService.signUp(email, password);
         if (error) throw error;
         toast.success("Check your email for a confirmation link!", { duration: 5000, position: "bottom-center" });
+
+        // Send welcome email + sync contact to Loops
+        if (signUpData?.user?.id) {
+          try {
+            await supabase.functions.invoke('loops-sync', {
+              body: {
+                action: 'welcome_email',
+                email,
+                firstName: email.split('@')[0],
+                userId: signUpData.user.id,
+              },
+            });
+          } catch (e) {
+            console.error('Loops welcome email failed:', e);
+          }
+        }
 
         // Track affiliate signup
         const affiliateCode = localStorage.getItem('affiliate_code');

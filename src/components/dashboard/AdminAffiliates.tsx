@@ -11,7 +11,7 @@ import {
 import { DataTable, StatusPill } from './DashboardComponents';
 import { adminService } from '../../services/adminService';
 import { AffiliateDetail } from './AdminDetailScreens';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const generateCode = () => {
@@ -144,6 +144,22 @@ export const AdminAffiliates: React.FC = () => {
             status: 'active',
             billing_type: 'affiliate_comp',
           } as any);
+        }
+      }
+
+      // Send affiliate approved email via Loops
+      if (affiliate.affiliate_email) {
+        try {
+          await supabase.functions.invoke('loops-sync', {
+            body: {
+              action: 'affiliate_approved',
+              email: affiliate.affiliate_email,
+              firstName: affiliate.affiliate_name?.split(' ')[0] || '',
+              affiliateCode: affiliate.affiliate_code,
+            },
+          });
+        } catch (e) {
+          console.error('Loops affiliate approved email failed:', e);
         }
       }
 

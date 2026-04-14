@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import Stripe from "https://esm.sh/stripe?target=deno"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { syncLoopsContact, sendLoopsTransactional } from "../_shared/loops.ts"
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2022-11-15',
@@ -10,6 +11,27 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+// Loops transactional IDs — must match loops-sync/index.ts
+const TRANSACTIONAL_IDS = {
+  paymentFailedDay1: 'YOUR_PAYMENT_FAILED_DAY1_ID',
+  paymentFailedDay4: 'YOUR_PAYMENT_FAILED_DAY4_ID',
+  paymentFailedDay7: 'YOUR_PAYMENT_FAILED_DAY7_ID',
+  subscriptionCanceled: 'YOUR_SUBSCRIPTION_CANCELED_ID',
+}
+
+async function getCustomerEmail(customerId: string): Promise<{ email: string; name: string }> {
+  try {
+    const customer = await stripe.customers.retrieve(customerId)
+    if (customer.deleted) return { email: '', name: '' }
+    return {
+      email: (customer as Stripe.Customer).email || '',
+      name: (customer as Stripe.Customer).name || '',
+    }
+  } catch {
+    return { email: '', name: '' }
+  }
+}
 
 serve(async (req) => {
   const signature = req.headers.get('stripe-signature')
@@ -60,6 +82,51 @@ serve(async (req) => {
 
         if (profileError) throw profileError
 
+        // 3. Sync plan to Loops
+        if (stripeCustomerId) {
+          const { email, name } = await getCustomerEmail(stripeCustomerId)
+          if (email) {
+            await syncLoopsContact({ email, firstName: name?.split(' ')[0], plan: planKey || 'paid' })
+          }
+        }
+
+        break
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId = invoice.customer as string
+        const subscriptionId = invoice.subscription as string
+
+        if (!customerId) break
+
+        const { email, name } = await getCustomerEmail(customerId)
+        if (!email) break
+
+        // Determine which day of failure this is based on attempt count
+        const attemptCount = invoice.attempt_count || 1
+        let day = 1
+        let transactionalId = TRANSACTIONAL_IDS.paymentFailedDay1
+        if (attemptCount === 2) {
+          day = 4
+          transactionalId = TRANSACTIONAL_IDS.paymentFailedDay4
+        } else if (attemptCount >= 3) {
+          day = 7
+          transactionalId = TRANSACTIONAL_IDS.paymentFailedDay7
+        }
+
+        console.log(`Payment failed for ${email}, attempt ${attemptCount} (day ${day})`)
+
+        await sendLoopsTransactional({
+          transactionalId,
+          email,
+          dataVariables: {
+            firstName: name?.split(' ')[0] || 'there',
+            billingUrl: 'https://app.survivorpacket.com/pricing',
+            downloadUrl: 'https://app.survivorpacket.com/dashboard',
+          },
+        })
+
         break
       }
 
@@ -85,6 +152,24 @@ serve(async (req) => {
           .eq('stripe_subscription_id', subscription.id)
 
         if (error) throw error
+
+        // Send cancellation email via Loops
+        const customerId = subscription.customer as string
+        if (customerId) {
+          const { email, name } = await getCustomerEmail(customerId)
+          if (email) {
+            await sendLoopsTransactional({
+              transactionalId: TRANSACTIONAL_IDS.subscriptionCanceled,
+              email,
+              dataVariables: {
+                firstName: name?.split(' ')[0] || 'there',
+                downloadUrl: 'https://app.survivorpacket.com/dashboard',
+              },
+            })
+            await syncLoopsContact({ email, plan: 'canceled' })
+          }
+        }
+
         break
       }
     }
