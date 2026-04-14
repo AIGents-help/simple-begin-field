@@ -10,8 +10,6 @@ import {
   Download,
   ShieldCheck
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { supabase } from '@/lib/supabase';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { sectionService } from '../../services/sectionService';
