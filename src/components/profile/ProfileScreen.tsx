@@ -1,13 +1,99 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download } from 'lucide-react';
+import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+// ── Edit Profile Modal ──
+const EditProfileModal = ({ isOpen, onClose, userId, currentName, email }: {
+  isOpen: boolean;
+  onClose: () => void;
+  userId: string;
+  currentName: string;
+  email: string;
+}) => {
+  const [fullName, setFullName] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFullName(currentName || '');
+    }
+  }, [isOpen, currentName]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ full_name: fullName.trim() })
+        .eq('id', userId);
+      if (error) throw error;
+      toast.success('Profile updated', { duration: 3000, position: 'bottom-center' });
+      onClose();
+      // Reload to reflect changes in context
+      window.location.reload();
+    } catch (err: any) {
+      console.error('Profile update error:', err);
+      toast.error(err.message || 'Failed to update profile', { duration: 5000, position: 'bottom-center' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold text-stone-900">Edit Profile</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center hover:bg-stone-200">
+            <X size={16} className="text-stone-500" />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Full Name</label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={e => setFullName(e.target.value)}
+              placeholder="Your full name"
+              className="w-full p-3 bg-white rounded-xl border border-stone-200 focus:border-stone-400 outline-none text-sm"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Email</label>
+            <input
+              type="email"
+              value={email}
+              readOnly
+              className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 text-sm text-stone-400 cursor-not-allowed"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full py-3 bg-stone-900 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-stone-800 transition-colors disabled:opacity-50"
+        >
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : 'Save Changes'}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export const ProfileScreen = () => {
   const { personA, personB, userMode, setState, setView, user, currentPacket, profile, userDisplayName, userInitials, planKey, planName, isPaid } = useAppContext();
   const [loading, setLoading] = React.useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const navigate = useNavigate();
 
   const isAdmin = profile?.role === 'admin';
@@ -17,9 +103,7 @@ export const ProfileScreen = () => {
     setLoading(true);
     try {
       await authService.signOut();
-      // AppContext will handle the state update via onAuthStateChanged if implemented, 
-      // otherwise we need to manually clear it.
-      window.location.reload(); 
+      window.location.reload();
     } catch (err) {
       console.error("Error signing out:", err);
     } finally {
@@ -67,7 +151,10 @@ export const ProfileScreen = () => {
               <p className="text-sm text-stone-500">{user?.email}</p>
             </div>
           </div>
-          <button className="w-full py-2 border border-stone-200 rounded-lg text-xs font-bold text-stone-600">
+          <button 
+            onClick={() => setEditOpen(true)}
+            className="w-full py-2 border border-stone-200 rounded-lg text-xs font-bold text-stone-600 hover:bg-stone-50 transition-colors"
+          >
             Edit Profile
           </button>
         </Card>
@@ -201,6 +288,14 @@ export const ProfileScreen = () => {
           Sign Out
         </button>
       </div>
+
+      <EditProfileModal
+        isOpen={editOpen}
+        onClose={() => setEditOpen(false)}
+        userId={user?.id || ''}
+        currentName={profile?.full_name || ''}
+        email={user?.email || ''}
+      />
     </div>
   );
 };
