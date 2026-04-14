@@ -17,8 +17,6 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
-import { motion, AnimatePresence } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   isOpen: boolean;
