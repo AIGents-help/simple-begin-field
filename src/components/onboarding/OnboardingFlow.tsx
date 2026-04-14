@@ -71,6 +71,22 @@ const OnboardingFlowComponent = () => {
         if (error) throw error;
         toast.success("Check your email for a confirmation link!", { duration: 5000, position: "bottom-center" });
 
+        // Send welcome email + sync contact to Loops
+        if (signUpData?.user?.id) {
+          try {
+            await supabase.functions.invoke('loops-sync', {
+              body: {
+                action: 'welcome_email',
+                email,
+                firstName: email.split('@')[0],
+                userId: signUpData.user.id,
+              },
+            });
+          } catch (e) {
+            console.error('Loops welcome email failed:', e);
+          }
+        }
+
         // Track affiliate signup
         const affiliateCode = localStorage.getItem('affiliate_code');
         if (affiliateCode && signUpData?.user?.id) {
