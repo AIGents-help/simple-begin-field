@@ -16,6 +16,9 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
+import { DownloadPacketButton } from '../download/DownloadPacketButton';
+import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -173,6 +176,10 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               <span className="text-xs font-bold uppercase tracking-wider">Upgrade Plan</span>
             </button>
           )}
+
+          <div className="mx-2 mb-2">
+            <DownloadPacketButton variant="sidebar" />
+          </div>
 
           <button 
             onClick={() => signOut()}

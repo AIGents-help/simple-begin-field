@@ -15,6 +15,7 @@ import { supabase } from '@/lib/supabase';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { sectionService } from '../../services/sectionService';
+import { DownloadPacketButton } from '../download/DownloadPacketButton';
 
 export const DashboardScreen = () => {
   const { setView, setTab, currentPacket, userDisplayName, view } = useAppContext();
