@@ -22,6 +22,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import { CategoryOption } from '../upload/types';
 import { SectionId } from '../../config/types';
+import { HavenAssistant } from '../haven/HavenAssistant';
 
 export const AppShell = () => {
   const { onboarded, view, setView, loading, user, profile, setTab } = useAppContext();
@@ -191,6 +192,8 @@ export const AppShell = () => {
           if (refreshFn) refreshFn(newRecord);
         }}
       />
+
+      <HavenAssistant />
     </div>
   );
 };
