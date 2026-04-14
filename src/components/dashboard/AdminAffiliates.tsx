@@ -11,7 +11,7 @@ import {
 import { DataTable, StatusPill } from './DashboardComponents';
 import { adminService } from '../../services/adminService';
 import { AffiliateDetail } from './AdminDetailScreens';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const generateCode = () => {
