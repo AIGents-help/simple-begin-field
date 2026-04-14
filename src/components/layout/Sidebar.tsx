@@ -34,8 +34,11 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     userInitials,
     planName,
     isPaid,
+    profile,
     signOut 
   } = useAppContext();
+
+  const isAdmin = profile?.role === 'admin';
 
   const handleNavClick = (id: string, type: string) => {
     if (id === 'pricing') {
