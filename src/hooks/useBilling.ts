@@ -9,14 +9,12 @@ export const useBilling = (user: User | null) => {
   const [isPaid, setIsPaid] = useState(false);
   const [isCouple, setIsCouple] = useState(false);
   const [isLifetime, setIsLifetime] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchBillingStatus = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
     try {
-      // Fetch profile role and active purchase in parallel
       const [profileRes, purchaseRes] = await Promise.all([
         supabase
           .from('profiles')
@@ -35,9 +33,7 @@ export const useBilling = (user: User | null) => {
 
       const role = profileRes.data?.role;
 
-      // Admin users are always treated as paid/lifetime
       if (role === 'admin') {
-        setIsAdmin(true);
         setPlanId('lifetime');
         setIsPaid(true);
         setIsCouple(true);
@@ -46,11 +42,8 @@ export const useBilling = (user: User | null) => {
         return;
       }
 
-      setIsAdmin(false);
-
       const purchase = purchaseRes.data;
       if (purchase && !purchaseRes.error) {
-        // Get plan_key from the joined pricing_plans row
         const planKey = (purchase as any).pricing_plans?.plan_key as string | undefined;
         const matchedPlan = planKey
           ? PRICING_PLANS.find(p => p.id === planKey)
@@ -62,8 +55,6 @@ export const useBilling = (user: User | null) => {
           setIsCouple(matchedPlan.canInvitePartner);
           setIsLifetime(matchedPlan.interval === 'one-time');
         } else {
-          // Fallback: active purchase exists but plan_key doesn't match local config
-          // Still treat as paid
           setPlanId('individual_monthly');
           setIsPaid(true);
           setIsCouple(false);
@@ -90,7 +81,6 @@ export const useBilling = (user: User | null) => {
       setIsPaid(false);
       setIsCouple(false);
       setIsLifetime(false);
-      setIsAdmin(false);
       setLoading(false);
     }
   }, [user, fetchBillingStatus]);
@@ -100,11 +90,10 @@ export const useBilling = (user: User | null) => {
   return {
     loading,
     planKey: planId,
-    planName: isAdmin ? 'Admin' : currentPlan.name,
+    planName: currentPlan.name,
     isPaid,
     isCouple,
     isLifetime,
-    isAdmin,
     currentPlan,
     refreshBilling: fetchBillingStatus
   };
