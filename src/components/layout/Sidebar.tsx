@@ -157,8 +157,10 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-navy-muted truncate">{userDisplayName}</p>
               <div className="flex items-center gap-1.5">
-                <p className="text-[10px] text-stone-400 font-medium truncate">{planName}</p>
-                {!isPaid && (
+                <p className="text-[10px] text-stone-400 font-medium truncate">
+                  {isAdmin ? 'Admin' : planName}
+                </p>
+                {!isAdmin && !isPaid && (
                   <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold uppercase rounded-full flex items-center gap-0.5">
                     <Zap size={8} fill="currentColor" />
                     Free
@@ -168,7 +170,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             </div>
           </div>
 
-          {!isPaid && (
+          {!isAdmin && !isPaid && (
             <button
               onClick={() => navigate('/pricing')}
               className="mb-4 mx-2 p-3 bg-navy-muted text-white rounded-xl flex items-center justify-center gap-2 hover:bg-navy-muted/90 transition-all shadow-lg shadow-navy-muted/20 group"
