@@ -364,6 +364,7 @@ export type Database = {
           is_na: boolean | null
           name: string
           packet_id: string | null
+          parent_member_id: string | null
           phone: string | null
           relationship: string | null
           reminder_notes: string | null
@@ -381,6 +382,7 @@ export type Database = {
           is_na?: boolean | null
           name: string
           packet_id?: string | null
+          parent_member_id?: string | null
           phone?: string | null
           relationship?: string | null
           reminder_notes?: string | null
@@ -398,6 +400,7 @@ export type Database = {
           is_na?: boolean | null
           name?: string
           packet_id?: string | null
+          parent_member_id?: string | null
           phone?: string | null
           relationship?: string | null
           reminder_notes?: string | null
@@ -411,6 +414,13 @@ export type Database = {
             columns: ["packet_id"]
             isOneToOne: false
             referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_parent_member_id_fkey"
+            columns: ["parent_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
             referencedColumns: ["id"]
           },
         ]
