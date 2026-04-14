@@ -5,6 +5,7 @@ import { ArrowRight, Users, User, CheckCircle2, Package, ShieldCheck, Lock, Eye 
 import { useAppContext } from '../../context/AppContext';
 import { OnboardingStep } from '../../config/types';
 import { authService } from '../../services/authService';
+import { supabase } from '@/integrations/supabase/client';
 import { packetService } from '../../services/packetService';
 import { ConsentCheckbox } from '../trust/TrustComponents';
 import { useLocation, Link } from 'react-router-dom';
