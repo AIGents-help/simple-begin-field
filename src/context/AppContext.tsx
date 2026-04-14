@@ -64,6 +64,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [packets, setPackets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<AppState>(defaultState);
+  const currentPacketRef = React.useRef<any | null>(null);
 
   const {
     loading: billingLoading,
@@ -77,6 +78,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   } = useBilling(user);
 
   const userDisplayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || state.personA;
+
+  useEffect(() => {
+    currentPacketRef.current = currentPacket;
+  }, [currentPacket]);
   
   const userInitials = (() => {
     if (!userDisplayName) return '??';
@@ -108,8 +113,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setPackets(userPackets);
 
       const firstPacket = userPackets[0];
-      const activePacket = currentPacket
-        ? userPackets.find((packet: any) => packet.id === currentPacket.id) || firstPacket
+      const activePacket = currentPacketRef.current
+        ? userPackets.find((packet: any) => packet.id === currentPacketRef.current.id) || firstPacket
         : firstPacket;
 
       setCurrentPacket(activePacket);
@@ -126,7 +131,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setPackets([]);
     setCurrentPacket(null);
     setState(prev => ({ ...prev, onboarded: false }));
-  }, [currentPacket]);
+  }, []);
 
   const hydrateUserState = React.useCallback(async (authUser: User | null) => {
     setUser(authUser);

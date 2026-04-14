@@ -9,8 +9,8 @@ import { packetService } from '../../services/packetService';
 import { ConsentCheckbox } from '../trust/TrustComponents';
 import { useLocation, Link } from 'react-router-dom';
 
-export const OnboardingFlow = () => {
-  const { setState, user, setCurrentPacket, onboarded } = useAppContext();
+const OnboardingFlowComponent = () => {
+  const { setState, user, setCurrentPacket } = useAppContext();
   const location = useLocation();
   const [step, setStep] = useState<OnboardingStep | 'auth'>('welcome');
   const [email, setEmail] = useState('');
@@ -22,6 +22,10 @@ export const OnboardingFlow = () => {
   const [personB, setPersonB] = useState('');
   const [consent, setConsent] = useState(false);
   const [consentError, setConsentError] = useState('');
+  const userId = user?.id ?? '';
+  const userFullName = typeof user?.user_metadata?.full_name === 'string'
+    ? user.user_metadata.full_name
+    : '';
 
   // Capture ?ref=CODE on load
   useEffect(() => {
@@ -36,42 +40,27 @@ export const OnboardingFlow = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const redirect = searchParams.get('redirect');
-    if (redirect && !user) {
+    if (redirect && !userId) {
       setStep('auth');
       setIsSignUp(false);
     }
-  }, [location.search, user]);
-
-  // Debugging logs for onboarding state
-  useEffect(() => {
-    console.log("OnboardingFlow State Update:", {
-      step,
-      userMode,
-      personA,
-      personB,
-      userId: user?.id,
-      continueDisabled: !personA || (userMode === 'couple' && !personB),
-      disabledReason: !personA ? "Your name is missing" : (userMode === 'couple' && !personB) ? "Partner's name is missing" : "None"
-    });
-  }, [step, userMode, personA, personB, user]);
+  }, [location.search, userId]);
 
   // Sync personA with user metadata if available
   useEffect(() => {
-    if (user && !personA) {
-      const name = user.user_metadata?.full_name;
-      if (name) setPersonA(name);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+    if (!userId || !userFullName) return;
+
+    setPersonA((currentName) => currentName || userFullName);
+  }, [userId, userFullName]);
 
   // Handle automatic step transition when user logs in
   useEffect(() => {
-    if (user && (step === 'auth' || step === 'welcome')) {
-      console.log("User detected, moving to setup");
-      setStep('setup');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+    if (!userId) return;
+
+    setStep((currentStep) => (
+      currentStep === 'auth' || currentStep === 'welcome' ? 'setup' : currentStep
+    ));
+  }, [userId]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,7 +221,15 @@ export const OnboardingFlow = () => {
             
             <div className="w-full space-y-4">
               <button 
-                onClick={() => setStep('setup')}
+                onClick={() => {
+                  if (userId) {
+                    setStep('setup');
+                    return;
+                  }
+
+                  setIsSignUp(true);
+                  setStep('auth');
+                }}
                 className="w-full py-4 bg-navy-muted text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
               >
                 Create Account
@@ -461,3 +458,6 @@ export const OnboardingFlow = () => {
     </div>
   );
 };
+
+export const OnboardingFlow = React.memo(OnboardingFlowComponent);
+OnboardingFlow.displayName = 'OnboardingFlow';
