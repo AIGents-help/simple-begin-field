@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Layers, Plus, Search, User } from 'lucide-react';
+import { LayoutDashboard, Layers, Plus, Briefcase, User } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 
 export const BottomNav = ({ onAddClick }: { onAddClick: () => void }) => {
@@ -28,11 +28,11 @@ export const BottomNav = ({ onAddClick }: { onAddClick: () => void }) => {
         <Plus size={24} className="text-white" />
       </button>
       <button 
-        onClick={() => setView('search')}
-        className={`bottom-nav-item ${view === 'search' ? 'text-navy-muted' : 'text-stone-300'}`}
+        onClick={() => setView('directory')}
+        className={`bottom-nav-item ${view === 'directory' ? 'text-navy-muted' : 'text-stone-300'}`}
       >
-        <Search size={20} />
-        <span>Search</span>
+        <Briefcase size={20} />
+        <span>Find Pro</span>
       </button>
       <button 
         onClick={() => setView('profile')}
