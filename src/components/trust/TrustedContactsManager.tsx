@@ -288,6 +288,19 @@ export const TrustedContactsManager: React.FC = () => {
                       </span>
                     )}
                   </div>
+                  {/* Section pills */}
+                  {c.assigned_sections && c.assigned_sections.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {c.assigned_sections.map(s => {
+                        const label = SECTION_OPTIONS.find(o => o.key === s)?.label || s;
+                        return (
+                          <span key={s} className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-navy-muted/10 text-navy-muted">
+                            {label}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className="mt-2 space-y-1">
                     <p className="text-xs text-stone-500 flex items-center gap-1.5">
                       <Mail size={12} /> {c.contact_email}
