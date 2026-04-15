@@ -415,6 +415,52 @@ export const TrustedContactsManager: React.FC = () => {
                   </label>
                 </div>
               </div>
+              {/* Responsible Sections */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Responsible Sections</label>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto p-3 rounded-xl border border-stone-200 bg-stone-50/50">
+                  {SECTION_OPTIONS.map(opt => {
+                    const checked = form.assigned_sections.includes(opt.key);
+                    const allChecked = form.assigned_sections.includes('all');
+                    return (
+                      <label key={opt.key} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                        <input
+                          type="checkbox"
+                          checked={opt.key === 'all' ? allChecked : (allChecked || checked)}
+                          disabled={opt.key !== 'all' && allChecked}
+                          onChange={() => {
+                            setForm(f => {
+                              if (opt.key === 'all') {
+                                return { ...f, assigned_sections: checked ? [] : ['all'] };
+                              }
+                              const next = checked
+                                ? f.assigned_sections.filter(s => s !== opt.key)
+                                : [...f.assigned_sections.filter(s => s !== 'all'), opt.key];
+                              return { ...f, assigned_sections: next };
+                            });
+                          }}
+                          className="accent-navy-muted w-3.5 h-3.5"
+                        />
+                        <span className={`text-xs ${opt.key === 'all' ? 'font-bold text-navy-muted' : 'text-stone-600'}`}>{opt.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* Notify on updates toggle */}
+              <div className="flex items-center justify-between p-3 rounded-xl border border-stone-200">
+                <div>
+                  <p className="text-sm font-bold text-navy-muted">Notify when I update their sections</p>
+                  <p className="text-[10px] text-stone-400">Send an email when you update a section they're responsible for</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, notify_on_updates: !f.notify_on_updates }))}
+                  className={`relative w-10 h-6 rounded-full transition-colors ${form.notify_on_updates ? 'bg-navy-muted' : 'bg-stone-300'}`}
+                >
+                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.notify_on_updates ? 'left-[18px]' : 'left-0.5'}`} />
+                </button>
+              </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Notes</label>
                 <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
