@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AdminCheckIns } from './AdminCheckIns';
 import { 
   Users, 
   Package, 
@@ -104,6 +105,9 @@ export const AdminOverview: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Check-In Manager */}
+      <AdminCheckIns />
     </div>
   );
 };
