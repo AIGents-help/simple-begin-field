@@ -12,7 +12,8 @@ import {
   CreditCard,
   Zap,
   ArrowUpCircle,
-  Share2
+  Share2,
+  Settings
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
@@ -131,6 +132,14 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               active={isActive('affiliate', 'view')} 
               onClick={() => handleNavClick('affiliate', 'view')} 
             />
+            {isAdmin && (
+              <NavItem 
+                icon={Settings} 
+                label="Admin Panel" 
+                active={isActive('admin', 'view')} 
+                onClick={() => handleNavClick('admin', 'view')} 
+              />
+            )}
           </div>
 
           {/* Sections */}
