@@ -11,6 +11,7 @@ import { AdminOverview, ProfessionalOverview } from './components/dashboard/Over
 import { AdminCustomers, AdminPackets, AdminBilling } from './components/dashboard/AdminScreens';
 import { AdminAffiliates, AdminInvites } from './components/dashboard/AdminAffiliates';
 import { MyReferrals, MyLinks, MyPayouts } from './components/dashboard/ProfessionalScreens';
+import { AttorneyPortal } from './components/dashboard/AttorneyPortal';
 import { useAppContext } from './context/AppContext';
 import { TermsOfService } from './pages/legal/TermsOfService';
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
