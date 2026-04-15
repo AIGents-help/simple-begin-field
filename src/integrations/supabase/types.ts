@@ -1441,6 +1441,7 @@ export type Database = {
           access_granted: boolean | null
           access_granted_at: string | null
           access_level: string | null
+          assigned_sections: string[] | null
           contact_email: string
           contact_name: string
           contact_phone: string | null
@@ -1450,6 +1451,7 @@ export type Database = {
           invite_token: string | null
           notes: string | null
           notify_on: string | null
+          notify_on_updates: boolean | null
           packet_id: string
           relationship: string | null
           status: string | null
@@ -1460,6 +1462,7 @@ export type Database = {
           access_granted?: boolean | null
           access_granted_at?: string | null
           access_level?: string | null
+          assigned_sections?: string[] | null
           contact_email: string
           contact_name: string
           contact_phone?: string | null
@@ -1469,6 +1472,7 @@ export type Database = {
           invite_token?: string | null
           notes?: string | null
           notify_on?: string | null
+          notify_on_updates?: boolean | null
           packet_id: string
           relationship?: string | null
           status?: string | null
@@ -1479,6 +1483,7 @@ export type Database = {
           access_granted?: boolean | null
           access_granted_at?: string | null
           access_level?: string | null
+          assigned_sections?: string[] | null
           contact_email?: string
           contact_name?: string
           contact_phone?: string | null
@@ -1488,6 +1493,7 @@ export type Database = {
           invite_token?: string | null
           notes?: string | null
           notify_on?: string | null
+          notify_on_updates?: boolean | null
           packet_id?: string
           relationship?: string | null
           status?: string | null
