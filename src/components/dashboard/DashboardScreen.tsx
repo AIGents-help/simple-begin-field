@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PacketCompletionScore } from './PacketCompletionScore';
+import { CheckInBanner } from '../checkin/CheckInBanner';
 import { 
   CheckCircle2, 
   Clock, 
@@ -100,6 +101,9 @@ export const DashboardScreen = () => {
 
   return (
     <div className="p-6 pb-32 space-y-8 max-w-6xl mx-auto">
+      {/* Check-In Banner */}
+      <CheckInBanner />
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
