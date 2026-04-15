@@ -51,6 +51,7 @@ const DashboardRoutes = () => {
             <Route path="conversions" element={<MyReferrals />} />
             <Route path="payouts" element={<MyPayouts />} />
             <Route path="profile" element={<div className="p-8 text-stone-400 italic">Profile Settings Coming Soon</div>} />
+            <Route path="attorney-portal" element={<AttorneyPortal />} />
           </>
         )}
       </Routes>
