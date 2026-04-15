@@ -4,6 +4,7 @@ import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, Shie
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
+import { CheckInPreferences } from '../checkin/CheckInPreferences';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -238,6 +239,8 @@ export const ProfileScreen = () => {
             )}
           </Card>
         </div>
+
+        <CheckInPreferences />
 
         <div>
           <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Data Export</h3>
