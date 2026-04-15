@@ -1436,6 +1436,74 @@ export type Database = {
           },
         ]
       }
+      trusted_contacts: {
+        Row: {
+          access_granted: boolean | null
+          access_granted_at: string | null
+          access_level: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string | null
+          id: string
+          invite_sent_at: string | null
+          invite_token: string | null
+          notes: string | null
+          notify_on: string | null
+          packet_id: string
+          relationship: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_granted?: boolean | null
+          access_granted_at?: string | null
+          access_level?: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          notes?: string | null
+          notify_on?: string | null
+          packet_id: string
+          relationship?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_granted?: boolean | null
+          access_granted_at?: string | null
+          access_level?: string | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          notes?: string | null
+          notify_on?: string | null
+          packet_id?: string
+          relationship?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trusted_contacts_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_records: {
         Row: {
           category: string | null
