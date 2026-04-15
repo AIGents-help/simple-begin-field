@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Link as LinkIcon,
   DollarSign,
+  Scale,
   User
 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
