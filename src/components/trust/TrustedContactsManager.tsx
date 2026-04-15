@@ -22,7 +22,26 @@ interface TrustedContact {
   access_granted_at: string | null;
   notes: string | null;
   created_at: string;
+  assigned_sections: string[];
+  notify_on_updates: boolean;
 }
+
+const SECTION_OPTIONS = [
+  { key: 'all', label: 'All Sections' },
+  { key: 'info', label: 'Info & Identity' },
+  { key: 'family', label: 'Family & Contacts' },
+  { key: 'medical', label: 'Medical' },
+  { key: 'banking', label: 'Banking & Financial' },
+  { key: 'real_estate', label: 'Real Estate' },
+  { key: 'retirement', label: 'Retirement' },
+  { key: 'vehicles', label: 'Vehicles' },
+  { key: 'advisors', label: 'Advisors' },
+  { key: 'passwords', label: 'Passwords & Access' },
+  { key: 'property', label: 'Personal Property' },
+  { key: 'pets', label: 'Pets' },
+  { key: 'funeral', label: 'Funeral Wishes' },
+  { key: 'private', label: 'Private Items' },
+];
 
 const RELATIONSHIPS = [
   'Spouse/Partner', 'Adult Child', 'Sibling', 'Parent',
@@ -36,6 +55,8 @@ const emptyForm = {
   relationship: '',
   access_level: 'full',
   notes: '',
+  assigned_sections: [] as string[],
+  notify_on_updates: true,
 };
 
 export const TrustedContactsManager: React.FC = () => {
@@ -102,6 +123,8 @@ export const TrustedContactsManager: React.FC = () => {
             relationship: form.relationship || null,
             access_level: form.access_level,
             notes: form.notes.trim() || null,
+            assigned_sections: form.assigned_sections,
+            notify_on_updates: form.notify_on_updates,
             updated_at: new Date().toISOString(),
           })
           .eq('id', editingId);
@@ -121,6 +144,8 @@ export const TrustedContactsManager: React.FC = () => {
             relationship: form.relationship || null,
             access_level: form.access_level,
             notes: form.notes.trim() || null,
+            assigned_sections: form.assigned_sections,
+            notify_on_updates: form.notify_on_updates,
           });
         if (error) throw error;
         toast.success('Trusted contact added');
@@ -146,6 +171,8 @@ export const TrustedContactsManager: React.FC = () => {
       relationship: c.relationship || '',
       access_level: c.access_level,
       notes: c.notes || '',
+      assigned_sections: c.assigned_sections || [],
+      notify_on_updates: c.notify_on_updates !== false,
     });
     setModalOpen(true);
   };
