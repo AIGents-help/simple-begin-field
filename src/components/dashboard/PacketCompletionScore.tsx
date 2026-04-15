@@ -9,7 +9,7 @@ const SECTION_CHECKS: { table: string; label: string; sectionId: SectionId }[] =
   { table: 'family_members', label: 'Family & Contacts', sectionId: 'family' },
   { table: 'medical_records', label: 'Medical', sectionId: 'medical' },
   { table: 'banking_records', label: 'Banking & Financial', sectionId: 'banking' },
-  { table: 'real_estate_records', label: 'Real Estate', sectionId: 'realestate' },
+  { table: 'real_estate_records', label: 'Real Estate', sectionId: 'real-estate' },
   { table: 'retirement_records', label: 'Retirement', sectionId: 'retirement' },
   { table: 'vehicle_records', label: 'Vehicles', sectionId: 'vehicles' },
   { table: 'advisor_records', label: 'Advisors', sectionId: 'advisors' },

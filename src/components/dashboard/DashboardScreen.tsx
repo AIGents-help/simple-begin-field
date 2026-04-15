@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { PacketCompletionScore } from './PacketCompletionScore';
 import { 
   CheckCircle2, 
   Clock, 
