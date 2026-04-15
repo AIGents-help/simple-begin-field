@@ -22,7 +22,26 @@ interface TrustedContact {
   access_granted_at: string | null;
   notes: string | null;
   created_at: string;
+  assigned_sections: string[];
+  notify_on_updates: boolean;
 }
+
+const SECTION_OPTIONS = [
+  { key: 'all', label: 'All Sections' },
+  { key: 'info', label: 'Info & Identity' },
+  { key: 'family', label: 'Family & Contacts' },
+  { key: 'medical', label: 'Medical' },
+  { key: 'banking', label: 'Banking & Financial' },
+  { key: 'real_estate', label: 'Real Estate' },
+  { key: 'retirement', label: 'Retirement' },
+  { key: 'vehicles', label: 'Vehicles' },
+  { key: 'advisors', label: 'Advisors' },
+  { key: 'passwords', label: 'Passwords & Access' },
+  { key: 'property', label: 'Personal Property' },
+  { key: 'pets', label: 'Pets' },
+  { key: 'funeral', label: 'Funeral Wishes' },
+  { key: 'private', label: 'Private Items' },
+];
 
 const RELATIONSHIPS = [
   'Spouse/Partner', 'Adult Child', 'Sibling', 'Parent',
@@ -36,6 +55,8 @@ const emptyForm = {
   relationship: '',
   access_level: 'full',
   notes: '',
+  assigned_sections: [] as string[],
+  notify_on_updates: true,
 };
 
 export const TrustedContactsManager: React.FC = () => {
@@ -102,6 +123,8 @@ export const TrustedContactsManager: React.FC = () => {
             relationship: form.relationship || null,
             access_level: form.access_level,
             notes: form.notes.trim() || null,
+            assigned_sections: form.assigned_sections,
+            notify_on_updates: form.notify_on_updates,
             updated_at: new Date().toISOString(),
           })
           .eq('id', editingId);
@@ -121,6 +144,8 @@ export const TrustedContactsManager: React.FC = () => {
             relationship: form.relationship || null,
             access_level: form.access_level,
             notes: form.notes.trim() || null,
+            assigned_sections: form.assigned_sections,
+            notify_on_updates: form.notify_on_updates,
           });
         if (error) throw error;
         toast.success('Trusted contact added');
@@ -146,6 +171,8 @@ export const TrustedContactsManager: React.FC = () => {
       relationship: c.relationship || '',
       access_level: c.access_level,
       notes: c.notes || '',
+      assigned_sections: c.assigned_sections || [],
+      notify_on_updates: c.notify_on_updates !== false,
     });
     setModalOpen(true);
   };
@@ -261,6 +288,19 @@ export const TrustedContactsManager: React.FC = () => {
                       </span>
                     )}
                   </div>
+                  {/* Section pills */}
+                  {c.assigned_sections && c.assigned_sections.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {c.assigned_sections.map(s => {
+                        const label = SECTION_OPTIONS.find(o => o.key === s)?.label || s;
+                        return (
+                          <span key={s} className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-navy-muted/10 text-navy-muted">
+                            {label}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className="mt-2 space-y-1">
                     <p className="text-xs text-stone-500 flex items-center gap-1.5">
                       <Mail size={12} /> {c.contact_email}
@@ -374,6 +414,52 @@ export const TrustedContactsManager: React.FC = () => {
                     </div>
                   </label>
                 </div>
+              </div>
+              {/* Responsible Sections */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Responsible Sections</label>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto p-3 rounded-xl border border-stone-200 bg-stone-50/50">
+                  {SECTION_OPTIONS.map(opt => {
+                    const checked = form.assigned_sections.includes(opt.key);
+                    const allChecked = form.assigned_sections.includes('all');
+                    return (
+                      <label key={opt.key} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                        <input
+                          type="checkbox"
+                          checked={opt.key === 'all' ? allChecked : (allChecked || checked)}
+                          disabled={opt.key !== 'all' && allChecked}
+                          onChange={() => {
+                            setForm(f => {
+                              if (opt.key === 'all') {
+                                return { ...f, assigned_sections: checked ? [] : ['all'] };
+                              }
+                              const next = checked
+                                ? f.assigned_sections.filter(s => s !== opt.key)
+                                : [...f.assigned_sections.filter(s => s !== 'all'), opt.key];
+                              return { ...f, assigned_sections: next };
+                            });
+                          }}
+                          className="accent-navy-muted w-3.5 h-3.5"
+                        />
+                        <span className={`text-xs ${opt.key === 'all' ? 'font-bold text-navy-muted' : 'text-stone-600'}`}>{opt.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* Notify on updates toggle */}
+              <div className="flex items-center justify-between p-3 rounded-xl border border-stone-200">
+                <div>
+                  <p className="text-sm font-bold text-navy-muted">Notify when I update their sections</p>
+                  <p className="text-[10px] text-stone-400">Send an email when you update a section they're responsible for</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, notify_on_updates: !f.notify_on_updates }))}
+                  className={`relative w-10 h-6 rounded-full transition-colors ${form.notify_on_updates ? 'bg-navy-muted' : 'bg-stone-300'}`}
+                >
+                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.notify_on_updates ? 'left-[18px]' : 'left-0.5'}`} />
+                </button>
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Notes</label>

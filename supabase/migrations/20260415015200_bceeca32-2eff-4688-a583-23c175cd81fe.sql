@@ -1,0 +1,2 @@
+ALTER TABLE public.trusted_contacts ADD COLUMN IF NOT EXISTS assigned_sections TEXT[] DEFAULT ARRAY[]::TEXT[];
+ALTER TABLE public.trusted_contacts ADD COLUMN IF NOT EXISTS notify_on_updates BOOLEAN DEFAULT true;
