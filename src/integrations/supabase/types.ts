@@ -1117,33 +1117,45 @@ export type Database = {
       profiles: {
         Row: {
           affiliate_id: string | null
+          checkin_frequency: string | null
+          checkin_opted_out: boolean | null
           consent_timestamp: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
           id: string
+          last_checkin_acknowledged_at: string | null
+          last_checkin_sent_at: string | null
           legal_version_accepted: string | null
           role: string | null
           updated_at: string | null
         }
         Insert: {
           affiliate_id?: string | null
+          checkin_frequency?: string | null
+          checkin_opted_out?: boolean | null
           consent_timestamp?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id: string
+          last_checkin_acknowledged_at?: string | null
+          last_checkin_sent_at?: string | null
           legal_version_accepted?: string | null
           role?: string | null
           updated_at?: string | null
         }
         Update: {
           affiliate_id?: string | null
+          checkin_frequency?: string | null
+          checkin_opted_out?: boolean | null
           consent_timestamp?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          last_checkin_acknowledged_at?: string | null
+          last_checkin_sent_at?: string | null
           legal_version_accepted?: string | null
           role?: string | null
           updated_at?: string | null
