@@ -31,7 +31,7 @@ export const AddEditSheet = ({
   initialData?: any;
   categoryOptions?: CategoryOption[];
 }) => {
-  const { activeTab, activeScope, currentPacket } = useAppContext();
+  const { activeTab, activeScope, currentPacket, profile } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [isNA, setIsNA] = useState(false);
