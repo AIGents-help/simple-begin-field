@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Link as LinkIcon,
   DollarSign,
+  Scale,
   User
 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
@@ -45,6 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'My Conversions', icon: Activity, path: '/dashboard/conversions', roles: ['professional'] },
   { label: 'Payouts', icon: DollarSign, path: '/dashboard/payouts', roles: ['professional'] },
   { label: 'Profile', icon: User, path: '/dashboard/profile', roles: ['professional'] },
+  { label: 'Attorney Portal', icon: Scale, path: '/dashboard/attorney-portal', roles: ['professional'] },
 ];
 
 export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
