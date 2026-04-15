@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Bird, Loader2, Check } from 'lucide-react';
+import { Loader2, Check } from 'lucide-react';
+import { HavenOwlSvg } from '@/components/haven/HavenOwlSvg';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '../../context/AppContext';
 import { toast } from 'sonner';
@@ -69,8 +70,8 @@ export const CheckInPreferences: React.FC = () => {
       <div className="paper-sheet p-5 space-y-5">
         {/* Intro */}
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Bird size={20} className="text-amber-600" />
+          <div className="flex-shrink-0">
+            <HavenOwlSvg size={48} />
           </div>
           <p className="text-xs text-stone-500 leading-relaxed">
             Haven will reach out periodically to make sure your Packet reflects your life as it is today — not as it was when you first set it up.

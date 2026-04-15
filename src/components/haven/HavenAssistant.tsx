@@ -3,49 +3,7 @@ import { X, Send, Loader2 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 import { sectionService } from '@/services/sectionService';
-
-// ── Haven Owl SVGs ──
-const HavenOwlSmall = () => (
-  <svg width="32" height="32" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="30" cy="26" r="16" fill="#1a2744" />
-    {/* Ear tufts - rounded */}
-    <ellipse cx="18" cy="14" rx="3" ry="5" fill="#1a2744" />
-    <ellipse cx="42" cy="14" rx="3" ry="5" fill="#1a2744" />
-    {/* Face disc */}
-    <ellipse cx="30" cy="28" rx="11" ry="9" fill="#2a3a5c" />
-    {/* Eyes */}
-    <circle cx="25" cy="26" r="4" fill="#f5e6c8" />
-    <circle cx="35" cy="26" r="4" fill="#f5e6c8" />
-    <circle cx="25" cy="26" r="2" fill="#d4920a" />
-    <circle cx="35" cy="26" r="2" fill="#d4920a" />
-    <circle cx="25" cy="25.5" r="0.8" fill="#1a2744" />
-    <circle cx="35" cy="25.5" r="0.8" fill="#1a2744" />
-    {/* Beak */}
-    <polygon points="28,31 32,31 30,34" fill="#c9a84c" />
-    {/* Gold collar */}
-    <path d="M22,38 L30,42 L38,38" stroke="#c9a84c" strokeWidth="2" fill="none" strokeLinecap="round" />
-    {/* Body */}
-    <ellipse cx="30" cy="48" rx="14" ry="10" fill="#1a2744" />
-  </svg>
-);
-
-const HavenOwlLarge = () => (
-  <svg width="56" height="56" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="30" cy="26" r="16" fill="#1a2744" />
-    <ellipse cx="18" cy="14" rx="3" ry="5" fill="#1a2744" />
-    <ellipse cx="42" cy="14" rx="3" ry="5" fill="#1a2744" />
-    <ellipse cx="30" cy="28" rx="11" ry="9" fill="#2a3a5c" />
-    <circle cx="25" cy="26" r="4" fill="#f5e6c8" />
-    <circle cx="35" cy="26" r="4" fill="#f5e6c8" />
-    <circle cx="25" cy="26" r="2" fill="#d4920a" />
-    <circle cx="35" cy="26" r="2" fill="#d4920a" />
-    <circle cx="25" cy="25.5" r="0.8" fill="#1a2744" />
-    <circle cx="35" cy="25.5" r="0.8" fill="#1a2744" />
-    <polygon points="28,31 32,31 30,34" fill="#c9a84c" />
-    <path d="M22,38 L30,42 L38,38" stroke="#c9a84c" strokeWidth="2" fill="none" strokeLinecap="round" />
-    <ellipse cx="30" cy="48" rx="14" ry="10" fill="#1a2744" />
-  </svg>
-);
+import { HavenOwlSvg } from './HavenOwlSvg';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -178,10 +136,10 @@ export const HavenAssistant = () => {
       <div className="fixed bottom-24 right-4 z-40 md:bottom-8 md:right-8 group">
         <button
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full bg-navy-muted shadow-lg flex items-center justify-center hover:scale-105 transition-transform relative"
+          className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform relative"
           aria-label="Ask Haven"
         >
-          <HavenOwlSmall />
+          <HavenOwlSvg size={64} />
           {/* Gold pulsing badge */}
           {hasIncomplete && (
             <span className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-[#c9a84c] border-2 border-[#fdfaf3] animate-pulse" />
@@ -209,7 +167,7 @@ export const HavenAssistant = () => {
       >
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-stone-100 bg-stone-50 flex-shrink-0">
-          <HavenOwlLarge />
+          <HavenOwlSvg size={80} />
           <div className="flex-1">
             <h2 className="text-lg font-bold text-stone-900" style={{ fontFamily: "'Playfair Display', serif" }}>
               Haven
