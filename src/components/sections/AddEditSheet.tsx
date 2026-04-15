@@ -350,6 +350,24 @@ export const AddEditSheet = ({
       }
       
       console.log("Final save success");
+
+      // Notify trusted contacts about the section update (fire-and-forget)
+      const SECTION_DISPLAY_NAMES: Record<string, string> = {
+        info: 'Info & Identity', family: 'Family & Contacts', medical: 'Medical Information',
+        banking: 'Banking & Financial', 'real-estate': 'Real Estate', retirement: 'Retirement Accounts',
+        vehicles: 'Vehicles', advisors: 'Advisors', passwords: 'Passwords & Access',
+        property: 'Personal Property', pets: 'Pets', funeral: 'Funeral Wishes', private: 'Private Items',
+      };
+      const sectionKey = (activeTab || '').replace('-', '_'); // normalize real-estate → real_estate
+      supabase.functions.invoke('notify-contact-update', {
+        body: {
+          user_id: user.id,
+          section_name: sectionKey,
+          section_display_name: SECTION_DISPLAY_NAMES[activeTab || ''] || activeTab,
+          packet_owner_name: profile?.full_name || '',
+        },
+      }).catch(err => console.error('Contact notification failed (non-blocking):', err));
+
       toast.success("Information saved successfully!", { icon: <CheckCircle size={18} className="text-emerald-500" />, duration: 3000, position: "bottom-center" });
       if (onSuccess) onSuccess(savedRecord);
       handleClose();
