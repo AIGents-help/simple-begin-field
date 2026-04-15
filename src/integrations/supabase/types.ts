@@ -425,6 +425,72 @@ export type Database = {
           },
         ]
       }
+      featured_professionals: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          email: string | null
+          firm: string | null
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          name: string
+          phone: string | null
+          profession_type: string
+          service_area_states: string[] | null
+          service_area_zips: string[] | null
+          state: string | null
+          updated_at: string | null
+          website: string | null
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          email?: string | null
+          firm?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          name: string
+          phone?: string | null
+          profession_type: string
+          service_area_states?: string[] | null
+          service_area_zips?: string[] | null
+          state?: string | null
+          updated_at?: string | null
+          website?: string | null
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          email?: string | null
+          firm?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          name?: string
+          phone?: string | null
+          profession_type?: string
+          service_area_states?: string[] | null
+          service_area_zips?: string[] | null
+          state?: string | null
+          updated_at?: string | null
+          website?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       funeral_records: {
         Row: {
           additional_instructions: string | null
