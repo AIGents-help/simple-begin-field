@@ -58,9 +58,9 @@ export const authService = {
     return this.updateProfile(userId, { private_pin: newPin });
   },
 
-  onAuthStateChange(callback: (user: any) => void) {
-    return supabase.auth.onAuthStateChange((_event, session) => {
-      callback(session?.user ?? null);
+  onAuthStateChange(callback: (user: any, event?: string) => void) {
+    return supabase.auth.onAuthStateChange((event, session) => {
+      callback(session?.user ?? null, event);
     });
   }
 };

@@ -18,6 +18,7 @@ import { DataUsageSummary } from './pages/legal/DataUsageSummary';
 import { PricingPage } from './components/billing/PricingPage';
 import { CheckoutSuccess } from './components/billing/CheckoutSuccess';
 import NotFound from "./pages/NotFound.tsx";
+import { InstallPromptBanner } from './components/pwa/InstallPromptBanner';
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ export default function App() {
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <InstallPromptBanner />
         <AppProvider>
           <Router>
             <Routes>
