@@ -178,8 +178,24 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     void initializeAuth();
 
-    const { data: { subscription } } = authService.onAuthStateChange((nextUser) => {
+    const { data: { subscription } } = authService.onAuthStateChange((nextUser, event) => {
       void hydrateUserState(nextUser);
+
+      // Enroll new signups in Loops welcome sequence
+      if (event === 'SIGNED_IN' && nextUser) {
+        const seenKey = `sp_loops_synced_${nextUser.id}`;
+        if (!sessionStorage.getItem(seenKey)) {
+          sessionStorage.setItem(seenKey, '1');
+          supabase.functions.invoke('loops-sync', {
+            body: {
+              action: 'welcome_email',
+              email: nextUser.email,
+              firstName: nextUser.user_metadata?.full_name || nextUser.email?.split('@')[0] || '',
+              userId: nextUser.id,
+            },
+          }).catch((err: any) => console.error('Loops sync failed:', err));
+        }
+      }
     });
 
     return () => {
