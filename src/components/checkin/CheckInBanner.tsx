@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Bird, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { HavenOwlSvg } from '@/components/haven/HavenOwlSvg';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '../../context/AppContext';
 import { toast } from 'sonner';
@@ -55,8 +56,8 @@ export const CheckInBanner: React.FC = () => {
   return (
     <div className="bg-gradient-to-r from-amber-50 to-[#F5F0E8] border border-amber-200/60 rounded-2xl p-5 mb-6">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-          <Bird size={22} className="text-amber-600" />
+        <div className="flex-shrink-0">
+          <HavenOwlSvg size={48} />
         </div>
         <div className="flex-1 space-y-2">
           <h3 className="text-sm font-serif font-bold text-navy-muted">

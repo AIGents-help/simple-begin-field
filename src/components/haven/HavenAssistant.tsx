@@ -178,10 +178,10 @@ export const HavenAssistant = () => {
       <div className="fixed bottom-24 right-4 z-40 md:bottom-8 md:right-8 group">
         <button
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full bg-navy-muted shadow-lg flex items-center justify-center hover:scale-105 transition-transform relative"
+          className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform relative"
           aria-label="Ask Haven"
         >
-          <HavenOwlSmall />
+          <HavenOwlSvg size={64} />
           {/* Gold pulsing badge */}
           {hasIncomplete && (
             <span className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-[#c9a84c] border-2 border-[#fdfaf3] animate-pulse" />
@@ -209,7 +209,7 @@ export const HavenAssistant = () => {
       >
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-stone-100 bg-stone-50 flex-shrink-0">
-          <HavenOwlLarge />
+          <HavenOwlSvg size={80} />
           <div className="flex-1">
             <h2 className="text-lg font-bold text-stone-900" style={{ fontFamily: "'Playfair Display', serif" }}>
               Haven

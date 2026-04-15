@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Loader2, Pencil, Plus } from 'lucide-react';
+import { HavenOwlSvg } from '@/components/haven/HavenOwlSvg';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -16,38 +17,7 @@ interface TreeNode {
   children: TreeNode[];
 }
 
-// ── Haven the Owl SVG ──
-const HavenOwl = () => (
-  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
-    {/* Cloak body */}
-    <ellipse cx="60" cy="78" rx="32" ry="30" fill="#1a2744" />
-    {/* Head */}
-    <circle cx="60" cy="42" r="22" fill="#1a2744" />
-    {/* Ear tufts */}
-    <polygon points="42,28 38,12 48,26" fill="#1a2744" />
-    <polygon points="78,28 82,12 72,26" fill="#1a2744" />
-    {/* Face disc */}
-    <ellipse cx="60" cy="44" rx="16" ry="14" fill="#2a3a5c" />
-    {/* Eyes */}
-    <circle cx="52" cy="42" r="5" fill="#f5e6c8" />
-    <circle cx="68" cy="42" r="5" fill="#f5e6c8" />
-    <circle cx="52" cy="42" r="2.5" fill="#d4920a" />
-    <circle cx="68" cy="42" r="2.5" fill="#d4920a" />
-    <circle cx="52" cy="41" r="1" fill="#1a2744" />
-    <circle cx="68" cy="41" r="1" fill="#1a2744" />
-    {/* Beak */}
-    <polygon points="57,48 63,48 60,53" fill="#c9a84c" />
-    {/* Gold collar */}
-    <ellipse cx="60" cy="60" rx="18" ry="4" fill="#c9a84c" />
-    {/* Scroll in claws */}
-    <rect x="46" y="94" width="28" height="6" rx="3" fill="#f5e6c8" stroke="#c9a84c" strokeWidth="1" />
-    <line x1="50" y1="96" x2="70" y2="96" stroke="#c9a84c" strokeWidth="0.5" />
-    <line x1="50" y1="98" x2="65" y2="98" stroke="#c9a84c" strokeWidth="0.5" />
-    {/* Feet */}
-    <path d="M48 104 L44 110 M48 104 L48 110 M48 104 L52 110" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M72 104 L68 110 M72 104 L72 110 M72 104 L76 110" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-);
+const HavenOwl = () => <HavenOwlSvg size={120} className="mx-auto" />;
 
 // ── Node card dimensions ──
 const NODE_W = 140;
