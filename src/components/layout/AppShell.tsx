@@ -18,6 +18,7 @@ import { InviteAcceptanceScreen } from '../auth/InviteAcceptanceScreen';
 import { AffiliatePage } from '../../pages/AffiliatePage';
 import { PricingPage } from '../billing/PricingPage';
 import { FindProfessionalScreen } from '../directory/FindProfessionalScreen';
+import { AdminFeaturedProfessionals } from '../admin/AdminFeaturedProfessionals';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import { CategoryOption } from '../upload/types';
@@ -138,6 +139,8 @@ export const AppShell = () => {
         return <PricingPage />;
       case 'directory':
         return <FindProfessionalScreen />;
+      case 'admin':
+        return <AdminFeaturedProfessionals />;
       default:
         return <DashboardScreen />;
     }
