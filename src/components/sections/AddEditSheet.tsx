@@ -463,6 +463,69 @@ export const AddEditSheet = ({
                   </button>
                 </div>
 
+                {/* Family: Living / Deceased toggle */}
+                {!isNA && activeTab === 'family' && (
+                  <div className="p-4 bg-white border border-stone-200 rounded-2xl space-y-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-navy-muted">Life Status</h4>
+                      <p className="text-[10px] text-stone-500 font-medium uppercase tracking-wider mt-0.5">
+                        Affects estate distribution and family tree display
+                      </p>
+                    </div>
+                    <LifeStatusToggle
+                      value={!!formData.is_deceased}
+                      onChange={(deceased) => setFormData({ ...formData, is_deceased: deceased })}
+                      disabled={loading}
+                    />
+                    {formData.is_deceased && (
+                      <div className="space-y-3 pt-2 border-t border-stone-100">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
+                            Date of Death (optional)
+                          </label>
+                          <input
+                            type="date"
+                            className="w-full p-3 bg-white rounded-xl border border-stone-200 focus:border-navy-muted outline-none text-sm"
+                            value={formData.date_of_death || ''}
+                            onChange={(e) => setFormData({ ...formData, date_of_death: e.target.value })}
+                            disabled={loading}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
+                            Cause of Death (optional, private)
+                          </label>
+                          <textarea
+                            rows={2}
+                            placeholder="Kept private — visible only to you and trusted contacts"
+                            className="w-full p-3 bg-white rounded-xl border border-stone-200 focus:border-navy-muted outline-none text-sm resize-none"
+                            value={formData.cause_of_death || ''}
+                            onChange={(e) => setFormData({ ...formData, cause_of_death: e.target.value })}
+                            disabled={loading}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Advisors: Active / Retired / Former / Deceased */}
+                {!isNA && activeTab === 'advisors' && (
+                  <div className="p-4 bg-white border border-stone-200 rounded-2xl space-y-3">
+                    <div>
+                      <h4 className="text-sm font-bold text-navy-muted">Advisor Status</h4>
+                      <p className="text-[10px] text-stone-500 font-medium uppercase tracking-wider mt-0.5">
+                        Controls whether their contact info should be acted upon
+                      </p>
+                    </div>
+                    <AdvisorStatusToggle
+                      value={formData.advisor_status || 'active'}
+                      onChange={(s) => setFormData({ ...formData, advisor_status: s })}
+                      disabled={loading}
+                    />
+                  </div>
+                )}
+
                 {!isNA && hasSectionFields && sectionFields && (
                   <>
                     {/* Show read-only label for pre-filled select fields */}
