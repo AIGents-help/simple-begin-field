@@ -1,21 +1,42 @@
 import React from 'react';
-import { SectionScreenTemplate, RecordCard } from '../components/sections/SectionScreenTemplate';
-import { Activity, ShieldCheck } from 'lucide-react';
+import { toast } from 'sonner';
+import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
+import { Activity } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
+import { sectionService } from '../services/sectionService';
+import { useAppContext } from '../context/AppContext';
 
 export const MedicalSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
+  const { bumpCompletion } = useAppContext();
+
+  const handleDelete = async (record: any, refresh: () => void) => {
+    if (!record?.id) return;
+    if (!window.confirm(`Delete "${record.provider_name || 'this provider'}"? This cannot be undone.`)) return;
+    const { error } = await sectionService.deleteRecord('medical', record.id);
+    if (error) {
+      toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });
+      return;
+    }
+    refresh();
+    bumpCompletion();
+    toast.success('Record deleted.', { duration: 3000, position: 'bottom-center' });
+  };
+
   return (
     <SectionScreenTemplate onAddClick={onAddClick} onRefresh={onRefresh}>
-      {(records) => (
+      {(records, _docs, refresh) => (
         <div className="space-y-4">
           {records.map(record => (
-            <RecordCard 
+            <RecordCard
               key={record.id}
-              title={record.title}
-              subtitle={record.category}
+              title={record.provider_name || record.title}
+              subtitle={buildSubtitle(record.specialty, record.phone)}
+              subtitlePlaceholder="No specialty or phone added"
               icon={Activity}
               badge={record.scope === 'shared' ? 'Shared' : undefined}
               data={record}
+              onEdit={() => onAddClick(undefined, record)}
+              onDelete={() => handleDelete(record, refresh)}
             />
           ))}
         </div>

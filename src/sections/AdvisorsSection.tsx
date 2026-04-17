@@ -1,12 +1,28 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
-import { SectionScreenTemplate, RecordCard } from '../components/sections/SectionScreenTemplate';
-import { ShieldCheck, User, Phone, Mail, Search } from 'lucide-react';
+import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
+import { ShieldCheck, Search } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { ProfessionalFinder } from '../components/directory/ProfessionalFinder';
+import { sectionService } from '../services/sectionService';
 
 export const AdvisorsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const [activeView, setActiveView] = useState<'list' | 'find'>('list');
+  const { bumpCompletion } = useAppContext();
+
+  const handleDelete = async (record: any, refresh: () => void) => {
+    if (!record?.id) return;
+    if (!window.confirm(`Delete "${record.name || 'this advisor'}"? This cannot be undone.`)) return;
+    const { error } = await sectionService.deleteRecord('advisors', record.id);
+    if (error) {
+      toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });
+      return;
+    }
+    refresh();
+    bumpCompletion();
+    toast.success('Advisor deleted.', { duration: 3000, position: 'bottom-center' });
+  };
 
   return (
     <div>
@@ -39,15 +55,19 @@ export const AdvisorsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?:
 
       {activeView === 'list' ? (
         <SectionScreenTemplate onAddClick={onAddClick} onRefresh={onRefresh}>
-          {(records) => (
+          {(records, _docs, refresh) => (
             <div className="space-y-4">
               {records.map(record => (
-                <RecordCard 
+                <RecordCard
                   key={record.id}
                   title={record.name}
-                  subtitle={`${record.advisor_type} • ${record.firm || ''}`}
+                  subtitle={buildSubtitle(record.advisor_type, record.firm, record.phone)}
+                  subtitlePlaceholder="No contact details added"
                   icon={ShieldCheck}
                   badge={record.advisor_type}
+                  data={record}
+                  onEdit={() => onAddClick(undefined, record)}
+                  onDelete={() => handleDelete(record, refresh)}
                 />
               ))}
             </div>

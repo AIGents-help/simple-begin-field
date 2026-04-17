@@ -1,12 +1,31 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
-import { SectionScreenTemplate, RecordCard } from '../components/sections/SectionScreenTemplate';
+import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
 import { User, List, GitBranch } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { FamilyTreeView } from '../components/family/FamilyTreeView';
+import { sectionService } from '../services/sectionService';
 
 export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
+  const { bumpCompletion } = useAppContext();
+
+  const handleDelete = async (record: any, refresh: () => void) => {
+    if (!record?.id) {
+      toast.error('Cannot delete: this record is missing an ID.', { duration: 4000, position: 'bottom-center' });
+      return;
+    }
+    if (!window.confirm(`Delete "${record.name || 'this family member'}"? This cannot be undone.`)) return;
+    const { error } = await sectionService.deleteRecord('family', record.id);
+    if (error) {
+      toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });
+      return;
+    }
+    refresh();
+    bumpCompletion();
+    toast.success('Family member deleted.', { duration: 3000, position: 'bottom-center' });
+  };
 
   return (
     <div>
@@ -40,16 +59,19 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
 
       {viewMode === 'list' ? (
         <SectionScreenTemplate onAddClick={onAddClick} onRefresh={onRefresh}>
-          {(records) => (
+          {(records, _docs, refresh) => (
             <div className="space-y-4">
               {records.map(record => (
-                <RecordCard 
+                <RecordCard
                   key={record.id}
                   title={record.name}
-                  subtitle={`${record.relationship} • ${record.phone || record.email || ''}`}
+                  subtitle={buildSubtitle(record.relationship, record.phone, record.email)}
+                  subtitlePlaceholder="No contact details added"
                   icon={User}
                   badge={record.birthday ? 'Birthday' : undefined}
                   data={record}
+                  onEdit={() => onAddClick(undefined, record)}
+                  onDelete={() => handleDelete(record, refresh)}
                 />
               ))}
             </div>
