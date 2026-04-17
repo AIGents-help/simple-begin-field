@@ -7,6 +7,7 @@ import { useAppContext } from '@/context/AppContext';
 import { uploadService } from '@/services/uploadService';
 import { PetMedicationsEditor, PetMedicationDraft } from './PetMedicationsEditor';
 import { PetDocuments } from './PetDocuments';
+import { LifeStatusToggle } from '../common/LifeStatusToggle';
 
 interface Props {
   isOpen: boolean;
@@ -174,6 +175,9 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
         tag_license_number: form.tag_license_number || null,
         special_needs: form.special_needs || null,
         photo_path,
+        is_deceased: !!form.is_deceased,
+        date_of_death: form.is_deceased ? (form.date_of_death || null) : null,
+        deceased_notes: form.is_deceased ? (form.deceased_notes || null) : null,
       };
 
       // 3. Upsert pet record
@@ -392,6 +396,44 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
                   />
                 </div>
                 <p className="text-xs text-stone-500">Tap camera to add a photo</p>
+              </div>
+
+              {/* Living / Deceased toggle */}
+              <div className="p-4 bg-white border border-stone-200 rounded-2xl space-y-3">
+                <div>
+                  <h4 className="text-sm font-bold text-navy-muted">Life Status</h4>
+                  <p className="text-[10px] text-stone-500 font-medium uppercase tracking-wider mt-0.5">
+                    Deceased pets stay in your records under "Past Pets"
+                  </p>
+                </div>
+                <LifeStatusToggle
+                  value={!!form.is_deceased}
+                  onChange={(d) => handleField('is_deceased', d)}
+                  disabled={saving}
+                />
+                {form.is_deceased && (
+                  <div className="space-y-3 pt-2 border-t border-stone-100">
+                    <div>
+                      <label className="block text-xs font-bold text-stone-600 mb-1">Date of Death (optional)</label>
+                      <input
+                        type="date"
+                        value={form.date_of_death ?? ''}
+                        onChange={(e) => handleField('date_of_death', e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-stone-600 mb-1">Notes (optional)</label>
+                      <textarea
+                        rows={2}
+                        value={form.deceased_notes ?? ''}
+                        onChange={(e) => handleField('deceased_notes', e.target.value)}
+                        placeholder="Any notes you'd like to keep…"
+                        className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20 resize-none"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <Section id="basics">
