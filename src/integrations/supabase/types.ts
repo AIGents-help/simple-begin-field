@@ -17,6 +17,7 @@ export type Database = {
       advisor_records: {
         Row: {
           address: string | null
+          advisor_status: string
           advisor_type: string | null
           category: string | null
           created_at: string | null
@@ -34,6 +35,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          advisor_status?: string
           advisor_type?: string | null
           category?: string | null
           created_at?: string | null
@@ -51,6 +53,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          advisor_status?: string
           advisor_type?: string | null
           category?: string | null
           created_at?: string | null
@@ -420,6 +423,7 @@ export type Database = {
           address: string | null
           birthday: string | null
           category: string | null
+          cause_of_death: string | null
           created_at: string | null
           date_of_death: string | null
           email: string | null
@@ -440,6 +444,7 @@ export type Database = {
           address?: string | null
           birthday?: string | null
           category?: string | null
+          cause_of_death?: string | null
           created_at?: string | null
           date_of_death?: string | null
           email?: string | null
@@ -460,6 +465,7 @@ export type Database = {
           address?: string | null
           birthday?: string | null
           category?: string | null
+          cause_of_death?: string | null
           created_at?: string | null
           date_of_death?: string | null
           email?: string | null
@@ -1531,6 +1537,8 @@ export type Database = {
           color_markings: string | null
           created_at: string | null
           date_of_birth: string | null
+          date_of_death: string | null
+          deceased_notes: string | null
           emergency_notes: string | null
           emergency_vet_clinic: string | null
           emergency_vet_name: string | null
@@ -1544,6 +1552,7 @@ export type Database = {
           id: string
           insurance_policy_number: string | null
           insurance_provider: string | null
+          is_deceased: boolean
           is_na: boolean | null
           medications: string | null
           microchip_info: string | null
@@ -1577,6 +1586,8 @@ export type Database = {
           color_markings?: string | null
           created_at?: string | null
           date_of_birth?: string | null
+          date_of_death?: string | null
+          deceased_notes?: string | null
           emergency_notes?: string | null
           emergency_vet_clinic?: string | null
           emergency_vet_name?: string | null
@@ -1590,6 +1601,7 @@ export type Database = {
           id?: string
           insurance_policy_number?: string | null
           insurance_provider?: string | null
+          is_deceased?: boolean
           is_na?: boolean | null
           medications?: string | null
           microchip_info?: string | null
@@ -1623,6 +1635,8 @@ export type Database = {
           color_markings?: string | null
           created_at?: string | null
           date_of_birth?: string | null
+          date_of_death?: string | null
+          deceased_notes?: string | null
           emergency_notes?: string | null
           emergency_vet_clinic?: string | null
           emergency_vet_name?: string | null
@@ -1636,6 +1650,7 @@ export type Database = {
           id?: string
           insurance_policy_number?: string | null
           insurance_provider?: string | null
+          is_deceased?: boolean
           is_na?: boolean | null
           medications?: string | null
           microchip_info?: string | null
@@ -2192,9 +2207,11 @@ export type Database = {
           contact_name: string
           contact_phone: string | null
           created_at: string | null
+          date_of_death: string | null
           id: string
           invite_sent_at: string | null
           invite_token: string | null
+          is_deceased: boolean
           notes: string | null
           notify_on: string | null
           notify_on_updates: boolean | null
@@ -2213,9 +2230,11 @@ export type Database = {
           contact_name: string
           contact_phone?: string | null
           created_at?: string | null
+          date_of_death?: string | null
           id?: string
           invite_sent_at?: string | null
           invite_token?: string | null
+          is_deceased?: boolean
           notes?: string | null
           notify_on?: string | null
           notify_on_updates?: boolean | null
@@ -2234,9 +2253,11 @@ export type Database = {
           contact_name?: string
           contact_phone?: string | null
           created_at?: string | null
+          date_of_death?: string | null
           id?: string
           invite_sent_at?: string | null
           invite_token?: string | null
+          is_deceased?: boolean
           notes?: string | null
           notify_on?: string | null
           notify_on_updates?: boolean | null
