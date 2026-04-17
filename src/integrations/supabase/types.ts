@@ -559,6 +559,114 @@ export type Database = {
         }
         Relationships: []
       }
+      funeral_music: {
+        Row: {
+          artist: string | null
+          created_at: string
+          display_order: number | null
+          funeral_record_id: string
+          id: string
+          notes: string | null
+          packet_id: string
+          song_title: string
+          updated_at: string
+          when_to_play: string | null
+        }
+        Insert: {
+          artist?: string | null
+          created_at?: string
+          display_order?: number | null
+          funeral_record_id: string
+          id?: string
+          notes?: string | null
+          packet_id: string
+          song_title: string
+          updated_at?: string
+          when_to_play?: string | null
+        }
+        Update: {
+          artist?: string | null
+          created_at?: string
+          display_order?: number | null
+          funeral_record_id?: string
+          id?: string
+          notes?: string | null
+          packet_id?: string
+          song_title?: string
+          updated_at?: string
+          when_to_play?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funeral_music_funeral_record_id_fkey"
+            columns: ["funeral_record_id"]
+            isOneToOne: false
+            referencedRelation: "funeral_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funeral_music_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      funeral_readings: {
+        Row: {
+          author: string | null
+          created_at: string
+          display_order: number | null
+          full_text: string | null
+          funeral_record_id: string
+          id: string
+          packet_id: string
+          reader_name: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          created_at?: string
+          display_order?: number | null
+          full_text?: string | null
+          funeral_record_id: string
+          id?: string
+          packet_id: string
+          reader_name?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          created_at?: string
+          display_order?: number | null
+          full_text?: string | null
+          funeral_record_id?: string
+          id?: string
+          packet_id?: string
+          reader_name?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funeral_readings_funeral_record_id_fkey"
+            columns: ["funeral_record_id"]
+            isOneToOne: false
+            referencedRelation: "funeral_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funeral_readings_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       funeral_records: {
         Row: {
           additional_instructions: string | null
@@ -566,14 +674,24 @@ export type Database = {
           category: string | null
           cemetery_plot_details: string | null
           created_at: string | null
+          eulogy_author: string | null
+          eulogy_text: string | null
+          flowers_preferences: string | null
           funeral_director: string | null
           funeral_home: string | null
+          funeral_home_email: string | null
+          funeral_home_phone: string | null
           id: string
           is_na: boolean | null
+          last_sent_to_email: string | null
+          last_sent_to_funeral_home_at: string | null
           notes: string | null
           obituary_notes: string | null
+          obituary_text: string | null
           packet_id: string | null
+          personal_messages: string | null
           prepaid_arrangements: string | null
+          reception_wishes: string | null
           religious_cultural_preferences: string | null
           scope: string | null
           service_preferences: string | null
@@ -586,14 +704,24 @@ export type Database = {
           category?: string | null
           cemetery_plot_details?: string | null
           created_at?: string | null
+          eulogy_author?: string | null
+          eulogy_text?: string | null
+          flowers_preferences?: string | null
           funeral_director?: string | null
           funeral_home?: string | null
+          funeral_home_email?: string | null
+          funeral_home_phone?: string | null
           id?: string
           is_na?: boolean | null
+          last_sent_to_email?: string | null
+          last_sent_to_funeral_home_at?: string | null
           notes?: string | null
           obituary_notes?: string | null
+          obituary_text?: string | null
           packet_id?: string | null
+          personal_messages?: string | null
           prepaid_arrangements?: string | null
+          reception_wishes?: string | null
           religious_cultural_preferences?: string | null
           scope?: string | null
           service_preferences?: string | null
@@ -606,14 +734,24 @@ export type Database = {
           category?: string | null
           cemetery_plot_details?: string | null
           created_at?: string | null
+          eulogy_author?: string | null
+          eulogy_text?: string | null
+          flowers_preferences?: string | null
           funeral_director?: string | null
           funeral_home?: string | null
+          funeral_home_email?: string | null
+          funeral_home_phone?: string | null
           id?: string
           is_na?: boolean | null
+          last_sent_to_email?: string | null
+          last_sent_to_funeral_home_at?: string | null
           notes?: string | null
           obituary_notes?: string | null
+          obituary_text?: string | null
           packet_id?: string | null
+          personal_messages?: string | null
           prepaid_arrangements?: string | null
+          reception_wishes?: string | null
           religious_cultural_preferences?: string | null
           scope?: string | null
           service_preferences?: string | null
@@ -623,6 +761,51 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "funeral_records_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      funeral_send_log: {
+        Row: {
+          created_at: string
+          funeral_record_id: string | null
+          id: string
+          packet_id: string
+          payload_summary: Json | null
+          sent_by: string | null
+          sent_to_email: string
+        }
+        Insert: {
+          created_at?: string
+          funeral_record_id?: string | null
+          id?: string
+          packet_id: string
+          payload_summary?: Json | null
+          sent_by?: string | null
+          sent_to_email: string
+        }
+        Update: {
+          created_at?: string
+          funeral_record_id?: string | null
+          id?: string
+          packet_id?: string
+          payload_summary?: Json | null
+          sent_by?: string | null
+          sent_to_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funeral_send_log_funeral_record_id_fkey"
+            columns: ["funeral_record_id"]
+            isOneToOne: false
+            referencedRelation: "funeral_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funeral_send_log_packet_id_fkey"
             columns: ["packet_id"]
             isOneToOne: false
             referencedRelation: "packets"
@@ -856,6 +1039,155 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "medications_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memories: {
+        Row: {
+          content: string | null
+          created_at: string
+          date_written: string | null
+          delivery_instructions: string | null
+          entry_type: string
+          id: string
+          media_mime: string | null
+          media_path: string | null
+          notes: string | null
+          packet_id: string
+          recipient: string | null
+          scope: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          date_written?: string | null
+          delivery_instructions?: string | null
+          entry_type: string
+          id?: string
+          media_mime?: string | null
+          media_path?: string | null
+          notes?: string | null
+          packet_id: string
+          recipient?: string | null
+          scope?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          date_written?: string | null
+          delivery_instructions?: string | null
+          entry_type?: string
+          id?: string
+          media_mime?: string | null
+          media_path?: string | null
+          notes?: string | null
+          packet_id?: string
+          recipient?: string | null
+          scope?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memories_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_album_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number | null
+          file_path: string
+          id: string
+          memory_id: string
+          packet_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          file_path: string
+          id?: string
+          memory_id: string
+          packet_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          file_path?: string
+          id?: string
+          memory_id?: string
+          packet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_album_photos_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: false
+            referencedRelation: "memories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memory_album_photos_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_bucket_items: {
+        Row: {
+          completed: boolean | null
+          created_at: string
+          display_order: number | null
+          id: string
+          item_text: string
+          memory_id: string
+          packet_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          item_text: string
+          memory_id: string
+          packet_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          item_text?: string
+          memory_id?: string
+          packet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_bucket_items_memory_id_fkey"
+            columns: ["memory_id"]
+            isOneToOne: false
+            referencedRelation: "memories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memory_bucket_items_packet_id_fkey"
             columns: ["packet_id"]
             isOneToOne: false
             referencedRelation: "packets"

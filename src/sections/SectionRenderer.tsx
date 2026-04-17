@@ -15,6 +15,7 @@ import { FuneralSection } from '../sections/FuneralSection';
 import { MedicalSection } from '../sections/MedicalSection';
 import { PrivateSection } from '../sections/PrivateSection';
 import { AffiliateSection } from '../sections/AffiliateSection';
+import { MemoriesSection } from '../sections/MemoriesSection';
 import { PrivateLockGate } from '../components/private/PrivateLockGate';
 import { PlanGate } from '../components/billing/PlanGate';
 
@@ -51,6 +52,8 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
         return <PetsSection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'funeral':
         return <FuneralSection onAddClick={onAddClick} onRefresh={onRefresh} />;
+      case 'memories':
+        return <MemoriesSection />;
       case 'medical':
         return <MedicalSection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'private':

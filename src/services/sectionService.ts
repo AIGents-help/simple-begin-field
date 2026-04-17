@@ -18,9 +18,10 @@ export const sectionService = {
     'property': 'personal_property_records',
     'pets': 'pet_records',
     'funeral': 'funeral_records',
+    'memories': 'memories',
     'private': 'private_items',
     'medical': 'medical_records'
-  } as Record<string, keyof Tables>,
+  } as Record<string, any>,
 
   async getRecords(packetId: string, sectionKey: string, scope?: 'personA' | 'personB' | 'shared') {
     const tableName = this.tableMap[sectionKey];
