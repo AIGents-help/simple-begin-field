@@ -11,6 +11,7 @@ import { FileAttachmentField } from '../upload/FileAttachmentField';
 import { CategorySelector } from '../upload/CategorySelector';
 import { CategoryOption, FileMetadata } from '../upload/types';
 import { INFO_CATEGORY_OPTIONS } from '../../config/categories';
+import { LifeStatusToggle, AdvisorStatusToggle } from '../common/LifeStatusToggle';
 
 export const AddEditSheet = ({ 
   isOpen, 
