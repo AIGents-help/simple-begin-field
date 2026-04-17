@@ -282,17 +282,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     userDisplayName, 
     userInitials, 
     currentPacket, 
-    packets, 
-    loading,
-    billingLoading,
-    planKey,
-    planName,
-    isPaid,
-    isCouple,
-    isLifetime,
-    currentPlan,
-    refreshBilling
-  ]);
 
   return (
     <AppContext.Provider value={contextValue}>
