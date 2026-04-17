@@ -20,6 +20,7 @@ import { DownloadPacketButton } from '../download/DownloadPacketButton';
 export const DashboardScreen = () => {
   const { setView, setTab, currentPacket, userDisplayName, view } = useAppContext();
   const [stats, setStats] = useState<any[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,8 +33,12 @@ export const DashboardScreen = () => {
     if (!currentPacket) return;
     setLoading(true);
     try {
-      const { data } = await sectionService.getCompletionStats(currentPacket.id);
+      const [{ data }, countsResult] = await Promise.all([
+        sectionService.getCompletionStats(currentPacket.id),
+        sectionService.getSectionCounts(currentPacket.id),
+      ]);
       setStats(data || []);
+      setCounts(countsResult || {});
     } catch (err) {
       console.error("Error fetching stats:", err);
     } finally {
@@ -43,10 +48,18 @@ export const DashboardScreen = () => {
 
   const getSectionStat = (sectionId: string) => {
     const sectionStats = stats.filter(s => s.section_key === sectionId);
-    if (sectionStats.length === 0) return { status: 'empty', count: 0, percentage: 0 };
+    // Real count comes from actual table rows + uploaded documents,
+    // not from the section_completion bookkeeping table.
+    const totalRecords = counts[sectionId] ?? 0;
 
-    const totalRecords = sectionStats.reduce((acc, s) => acc + (s.record_count || 0), 0);
-    
+    if (sectionStats.length === 0) {
+      return {
+        status: totalRecords > 0 ? 'in_progress' : 'empty',
+        count: totalRecords,
+        percentage: 0,
+      };
+    }
+
     const completeCount = sectionStats.filter(s => s.status === 'complete' || s.status === 'not_applicable').length;
     const allComplete = completeCount === sectionStats.length && sectionStats.length > 0;
     const anyInProgress = sectionStats.some(s => s.status === 'in_progress');
@@ -56,8 +69,8 @@ export const DashboardScreen = () => {
     if (allComplete) status = 'complete';
     else if (anyInProgress || anyComplete || totalRecords > 0) status = 'in_progress';
 
-    const percentage = sectionStats.length > 0 
-      ? Math.round((completeCount / sectionStats.length) * 100) 
+    const percentage = sectionStats.length > 0
+      ? Math.round((completeCount / sectionStats.length) * 100)
       : 0;
 
     return { status, count: totalRecords, percentage };
