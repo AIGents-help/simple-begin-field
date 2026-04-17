@@ -192,58 +192,128 @@ export const SectionScreenTemplate = ({
   );
 };
 
-export const RecordCard = ({ 
-  title, 
-  subtitle, 
+/**
+ * Sanitize a value for display — converts null/undefined and the literal
+ * strings "null"/"undefined" into an empty string so the UI never renders raw "null".
+ */
+const sanitize = (val: any): string => {
+  if (val === null || val === undefined) return '';
+  const s = String(val).trim();
+  if (s === '' || s.toLowerCase() === 'null' || s.toLowerCase() === 'undefined') return '';
+  return s;
+};
+
+/**
+ * Build a subtitle from a list of parts joined by " • ", dropping any null/empty
+ * pieces. Returns '' if nothing is left.
+ */
+export const buildSubtitle = (...parts: any[]): string => {
+  return parts.map(sanitize).filter(Boolean).join(' • ');
+};
+
+export const RecordCard = ({
+  title,
+  subtitle,
   description,
-  icon: Icon, 
+  icon: Icon,
   onClick,
+  onEdit,
+  onDelete,
   badge,
-  data
-}: { 
+  data,
+  subtitlePlaceholder,
+}: {
   key?: React.Key;
-  title?: string; 
-  subtitle?: string; 
+  title?: string;
+  subtitle?: string;
   description?: string;
   icon?: React.ElementType;
   onClick?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   badge?: string;
   data?: any;
+  subtitlePlaceholder?: string;
 }) => {
   const isNA = data?.is_na || data?.status === 'not_applicable';
-  const displayTitle = title || data?.title || data?.name || data?.item_name || data?.institution || data?.service_name || data?.firm || 'Untitled Record';
-  
+  const cleanTitle = sanitize(title) ||
+    sanitize(data?.title) || sanitize(data?.name) || sanitize(data?.item_name) ||
+    sanitize(data?.institution) || sanitize(data?.service_name) || sanitize(data?.firm) ||
+    'Untitled Record';
+  const cleanSubtitle = sanitize(subtitle) || sanitize(description);
+  const cleanBadge = sanitize(badge);
+  // Default tap behavior is to edit (so cards are never "stuck" without an action)
+  const handleCardClick = onClick || onEdit;
+
   return (
-    <button 
-      onClick={onClick}
-      className={`w-full text-left paper-sheet p-5 flex items-center justify-between group active:scale-[0.98] transition-all ${isNA ? 'opacity-60 bg-stone-50/50' : ''}`}
+    <div
+      className={`w-full paper-sheet p-5 group transition-all relative overflow-hidden ${isNA ? 'opacity-60 bg-stone-50/50' : ''}`}
     >
-      <div className="flex items-center gap-4">
-        {Icon && (
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isNA ? 'bg-stone-100 text-stone-400' : 'bg-stone-50 text-navy-muted'}`}>
-            <Icon size={20} />
-          </div>
-        )}
-        <div>
-          <div className="flex items-center gap-2">
-            <h4 className={`font-bold ${isNA ? 'text-stone-400 line-through' : 'text-navy-muted'}`}>{displayTitle}</h4>
-            {isNA && (
-              <span className="px-2 py-0.5 bg-stone-200 rounded text-[10px] font-bold uppercase text-stone-500 border border-stone-300">
-                N/A
-              </span>
+      <button
+        type="button"
+        onClick={handleCardClick}
+        disabled={!handleCardClick}
+        className="w-full text-left flex items-center justify-between active:scale-[0.99] transition-transform disabled:cursor-default"
+      >
+        <div className="flex items-center gap-4 min-w-0">
+          {Icon && (
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isNA ? 'bg-stone-100 text-stone-400' : 'bg-stone-50 text-navy-muted'}`}>
+              <Icon size={20} />
+            </div>
+          )}
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h4 className={`font-bold ${isNA ? 'text-stone-400 line-through' : 'text-navy-muted'}`}>{cleanTitle}</h4>
+              {isNA && (
+                <span className="px-2 py-0.5 bg-stone-200 rounded text-[10px] font-bold uppercase text-stone-500 border border-stone-300">
+                  N/A
+                </span>
+              )}
+              {cleanBadge && !isNA && (
+                <span className="px-2 py-0.5 bg-manila rounded text-[10px] font-bold uppercase text-navy-muted border border-folder-edge">
+                  {cleanBadge}
+                </span>
+              )}
+            </div>
+            {!isNA && (
+              cleanSubtitle ? (
+                <p className="text-xs text-stone-500 mt-0.5 truncate">{cleanSubtitle}</p>
+              ) : subtitlePlaceholder ? (
+                <p className="text-xs text-stone-400 italic mt-0.5 truncate">{subtitlePlaceholder}</p>
+              ) : null
             )}
-            {badge && !isNA && (
-              <span className="px-2 py-0.5 bg-manila rounded text-[10px] font-bold uppercase text-navy-muted border border-folder-edge">
-                {badge}
-              </span>
-            )}
+            {isNA && <p className="text-[10px] text-stone-400 italic mt-0.5">Marked as Not Applicable</p>}
           </div>
-          {(subtitle || description) && !isNA && <p className="text-xs text-stone-500 mt-0.5">{subtitle || description}</p>}
-          {isNA && <p className="text-[10px] text-stone-400 italic mt-0.5">Marked as Not Applicable</p>}
         </div>
-      </div>
-      <ChevronRight size={18} className="text-stone-300 group-hover:text-navy-muted transition-colors" />
-    </button>
+        <div className="flex items-center gap-1 shrink-0 ml-2">
+          {onEdit && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onEdit(); } }}
+              className="p-1.5 hover:bg-stone-100 rounded-lg text-stone-400 hover:text-navy-muted transition-colors cursor-pointer"
+              aria-label="Edit"
+            >
+              <Edit2 size={14} />
+            </span>
+          )}
+          {onDelete && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onDelete(); } }}
+              className="p-1.5 hover:bg-red-50 rounded-lg text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+              aria-label="Delete"
+            >
+              <Trash2 size={14} />
+            </span>
+          )}
+          <ChevronRight size={18} className="text-stone-300 group-hover:text-navy-muted transition-colors" />
+        </div>
+      </button>
+    </div>
   );
 };
 
