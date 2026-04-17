@@ -69,6 +69,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [packets, setPackets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<AppState>(defaultState);
+  const [completionVersion, setCompletionVersion] = useState(0);
+  const bumpCompletion = React.useCallback(() => setCompletionVersion(v => v + 1), []);
   const currentPacketRef = React.useRef<any | null>(null);
 
   const {
@@ -251,8 +253,29 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setCurrentPacket,
     refreshPackets,
     refreshPacketData: refreshPackets,
-    signOut
+    signOut,
+    completionVersion,
+    bumpCompletion,
   }), [
+    state, 
+    user, 
+    profile, 
+    userDisplayName, 
+    userInitials, 
+    currentPacket, 
+    packets, 
+    loading,
+    billingLoading,
+    planKey,
+    planName,
+    isPaid,
+    isCouple,
+    isLifetime,
+    currentPlan,
+    refreshBilling,
+    completionVersion,
+    bumpCompletion,
+  ]);
     state, 
     user, 
     profile, 
