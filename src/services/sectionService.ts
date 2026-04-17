@@ -133,6 +133,49 @@ export const sectionService = {
     return { data, error };
   },
 
+  /**
+   * Returns a map of sectionKey -> total count (records + uploaded documents)
+   * for the given packet. Used by the dashboard folder cards.
+   *
+   * Counts are derived from the *actual* tables (and the documents table),
+   * not from the section_completion bookkeeping table — which historically
+   * lacked a record_count column and always returned 0.
+   */
+  async getSectionCounts(packetId: string): Promise<Record<string, number>> {
+    const sectionKeys = Object.keys(this.tableMap);
+
+    // Count records per section table (one head request per table)
+    const recordCounts = await Promise.all(
+      sectionKeys.map(async (key) => {
+        const tableName = this.tableMap[key];
+        const { count } = await supabase
+          .from(tableName)
+          .select('id', { count: 'exact', head: true })
+          .eq('packet_id', packetId);
+        return [key, count ?? 0] as const;
+      })
+    );
+
+    // Count documents grouped by section_key (single query)
+    const { data: docRows } = await supabase
+      .from('documents')
+      .select('section_key')
+      .eq('packet_id', packetId);
+
+    const docCounts: Record<string, number> = {};
+    for (const row of docRows || []) {
+      const k = (row as any).section_key as string | null;
+      if (!k) continue;
+      docCounts[k] = (docCounts[k] || 0) + 1;
+    }
+
+    const result: Record<string, number> = {};
+    for (const [key, recordCount] of recordCounts) {
+      result[key] = recordCount + (docCounts[key] || 0);
+    }
+    return result;
+  },
+
   async searchRecords(packetId: string, query: string) {
     const { data, error } = await supabase
       .from('section_records')

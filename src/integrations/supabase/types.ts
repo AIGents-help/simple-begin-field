@@ -193,6 +193,7 @@ export type Database = {
           institution: string
           is_na: boolean | null
           notes: string | null
+          online_login_instructions: string | null
           packet_id: string | null
           routing_number_encrypted: string | null
           routing_number_masked: string | null
@@ -211,6 +212,7 @@ export type Database = {
           institution: string
           is_na?: boolean | null
           notes?: string | null
+          online_login_instructions?: string | null
           packet_id?: string | null
           routing_number_encrypted?: string | null
           routing_number_masked?: string | null
@@ -229,6 +231,7 @@ export type Database = {
           institution?: string
           is_na?: boolean | null
           notes?: string | null
+          online_login_instructions?: string | null
           packet_id?: string | null
           routing_number_encrypted?: string | null
           routing_number_masked?: string | null
@@ -239,6 +242,65 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "banking_records_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_cards: {
+        Row: {
+          card_type: string | null
+          category: string | null
+          created_at: string
+          credit_limit: number | null
+          id: string
+          is_na: boolean | null
+          issuer: string
+          last_four: string | null
+          notes: string | null
+          online_login_instructions: string | null
+          packet_id: string
+          scope: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          card_type?: string | null
+          category?: string | null
+          created_at?: string
+          credit_limit?: number | null
+          id?: string
+          is_na?: boolean | null
+          issuer: string
+          last_four?: string | null
+          notes?: string | null
+          online_login_instructions?: string | null
+          packet_id: string
+          scope?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          card_type?: string | null
+          category?: string | null
+          created_at?: string
+          credit_limit?: number | null
+          id?: string
+          is_na?: boolean | null
+          issuer?: string
+          last_four?: string | null
+          notes?: string | null
+          online_login_instructions?: string | null
+          packet_id?: string
+          scope?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_cards_packet_id_fkey"
             columns: ["packet_id"]
             isOneToOne: false
             referencedRelation: "packets"
@@ -359,8 +421,10 @@ export type Database = {
           birthday: string | null
           category: string | null
           created_at: string | null
+          date_of_death: string | null
           email: string | null
           id: string
+          is_deceased: boolean
           is_na: boolean | null
           name: string
           packet_id: string | null
@@ -377,8 +441,10 @@ export type Database = {
           birthday?: string | null
           category?: string | null
           created_at?: string | null
+          date_of_death?: string | null
           email?: string | null
           id?: string
+          is_deceased?: boolean
           is_na?: boolean | null
           name: string
           packet_id?: string | null
@@ -395,8 +461,10 @@ export type Database = {
           birthday?: string | null
           category?: string | null
           created_at?: string | null
+          date_of_death?: string | null
           email?: string | null
           id?: string
+          is_deceased?: boolean
           is_na?: boolean | null
           name?: string
           packet_id?: string | null
@@ -612,12 +680,78 @@ export type Database = {
           },
         ]
       }
-      medical_records: {
+      legal_documents: {
         Row: {
+          attorney_firm: string | null
+          attorney_name: string | null
+          attorney_phone: string | null
           category: string | null
-          created_at: string | null
+          created_at: string
+          document_date: string | null
+          document_type: string
           id: string
           is_na: boolean | null
+          notes: string | null
+          original_location: string | null
+          packet_id: string
+          scope: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          attorney_firm?: string | null
+          attorney_name?: string | null
+          attorney_phone?: string | null
+          category?: string | null
+          created_at?: string
+          document_date?: string | null
+          document_type: string
+          id?: string
+          is_na?: boolean | null
+          notes?: string | null
+          original_location?: string | null
+          packet_id: string
+          scope?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attorney_firm?: string | null
+          attorney_name?: string | null
+          attorney_phone?: string | null
+          category?: string | null
+          created_at?: string
+          document_date?: string | null
+          document_type?: string
+          id?: string
+          is_na?: boolean | null
+          notes?: string | null
+          original_location?: string | null
+          packet_id?: string
+          scope?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_documents_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medical_records: {
+        Row: {
+          address: string | null
+          category: string | null
+          created_at: string | null
+          group_number: string | null
+          id: string
+          insurance_provider: string | null
+          is_na: boolean | null
+          member_id: string | null
           notes: string | null
           packet_id: string | null
           phone: string | null
@@ -628,10 +762,14 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          address?: string | null
           category?: string | null
           created_at?: string | null
+          group_number?: string | null
           id?: string
+          insurance_provider?: string | null
           is_na?: boolean | null
+          member_id?: string | null
           notes?: string | null
           packet_id?: string | null
           phone?: string | null
@@ -642,10 +780,14 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          address?: string | null
           category?: string | null
           created_at?: string | null
+          group_number?: string | null
           id?: string
+          insurance_provider?: string | null
           is_na?: boolean | null
+          member_id?: string | null
           notes?: string | null
           packet_id?: string | null
           phone?: string | null
@@ -658,6 +800,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "medical_records_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medications: {
+        Row: {
+          created_at: string
+          dose: string | null
+          frequency: string | null
+          id: string
+          is_na: boolean | null
+          name: string
+          notes: string | null
+          packet_id: string
+          pharmacy: string | null
+          prescribing_doctor: string | null
+          scope: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dose?: string | null
+          frequency?: string | null
+          id?: string
+          is_na?: boolean | null
+          name: string
+          notes?: string | null
+          packet_id: string
+          pharmacy?: string | null
+          prescribing_doctor?: string | null
+          scope?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dose?: string | null
+          frequency?: string | null
+          id?: string
+          is_na?: boolean | null
+          name?: string
+          notes?: string | null
+          packet_id?: string
+          pharmacy?: string | null
+          prescribing_doctor?: string | null
+          scope?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medications_packet_id_fkey"
             columns: ["packet_id"]
             isOneToOne: false
             referencedRelation: "packets"
@@ -947,15 +1145,19 @@ export type Database = {
           emergency_notes: string | null
           feeding_instructions: string | null
           id: string
+          insurance_provider: string | null
           is_na: boolean | null
           medications: string | null
           microchip_info: string | null
+          microchip_number: string | null
           packet_id: string | null
           pet_name: string | null
           scope: string | null
           species_breed: string | null
           status: string | null
           updated_at: string | null
+          vet_name: string | null
+          vet_phone: string | null
           veterinarian_contact: string | null
         }
         Insert: {
@@ -966,15 +1168,19 @@ export type Database = {
           emergency_notes?: string | null
           feeding_instructions?: string | null
           id?: string
+          insurance_provider?: string | null
           is_na?: boolean | null
           medications?: string | null
           microchip_info?: string | null
+          microchip_number?: string | null
           packet_id?: string | null
           pet_name?: string | null
           scope?: string | null
           species_breed?: string | null
           status?: string | null
           updated_at?: string | null
+          vet_name?: string | null
+          vet_phone?: string | null
           veterinarian_contact?: string | null
         }
         Update: {
@@ -985,15 +1191,19 @@ export type Database = {
           emergency_notes?: string | null
           feeding_instructions?: string | null
           id?: string
+          insurance_provider?: string | null
           is_na?: boolean | null
           medications?: string | null
           microchip_info?: string | null
+          microchip_number?: string | null
           packet_id?: string | null
           pet_name?: string | null
           scope?: string | null
           species_breed?: string | null
           status?: string | null
           updated_at?: string | null
+          vet_name?: string | null
+          vet_phone?: string | null
           veterinarian_contact?: string | null
         }
         Relationships: [
@@ -1166,6 +1376,78 @@ export type Database = {
             columns: ["affiliate_id"]
             isOneToOne: false
             referencedRelation: "affiliate_referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_utilities: {
+        Row: {
+          account_number: string | null
+          agent_contact: string | null
+          annual_amount: number | null
+          contact_phone: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          monthly_amount: number | null
+          notes: string | null
+          packet_id: string
+          pin: string | null
+          policy_number: string | null
+          property_record_id: string
+          provider_name: string | null
+          updated_at: string
+          utility_type: string
+        }
+        Insert: {
+          account_number?: string | null
+          agent_contact?: string | null
+          annual_amount?: number | null
+          contact_phone?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          monthly_amount?: number | null
+          notes?: string | null
+          packet_id: string
+          pin?: string | null
+          policy_number?: string | null
+          property_record_id: string
+          provider_name?: string | null
+          updated_at?: string
+          utility_type: string
+        }
+        Update: {
+          account_number?: string | null
+          agent_contact?: string | null
+          annual_amount?: number | null
+          contact_phone?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          monthly_amount?: number | null
+          notes?: string | null
+          packet_id?: string
+          pin?: string | null
+          policy_number?: string | null
+          property_record_id?: string
+          provider_name?: string | null
+          updated_at?: string
+          utility_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_utilities_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_utilities_property_record_id_fkey"
+            columns: ["property_record_id"]
+            isOneToOne: false
+            referencedRelation: "real_estate_records"
             referencedColumns: ["id"]
           },
         ]
@@ -1524,54 +1806,72 @@ export type Database = {
       }
       vehicle_records: {
         Row: {
+          agent_contact: string | null
           category: string | null
           created_at: string | null
           id: string
           insurance: string | null
           is_na: boolean | null
+          lender_name: string | null
           license_plate: string | null
           lien_info: string | null
           make: string | null
           model: string | null
+          monthly_payment: number | null
           notes: string | null
           packet_id: string | null
+          payoff_amount: number | null
+          policy_number: string | null
           scope: string | null
+          state: string | null
           status: string | null
           updated_at: string | null
           vin: string | null
           year: string | null
         }
         Insert: {
+          agent_contact?: string | null
           category?: string | null
           created_at?: string | null
           id?: string
           insurance?: string | null
           is_na?: boolean | null
+          lender_name?: string | null
           license_plate?: string | null
           lien_info?: string | null
           make?: string | null
           model?: string | null
+          monthly_payment?: number | null
           notes?: string | null
           packet_id?: string | null
+          payoff_amount?: number | null
+          policy_number?: string | null
           scope?: string | null
+          state?: string | null
           status?: string | null
           updated_at?: string | null
           vin?: string | null
           year?: string | null
         }
         Update: {
+          agent_contact?: string | null
           category?: string | null
           created_at?: string | null
           id?: string
           insurance?: string | null
           is_na?: boolean | null
+          lender_name?: string | null
           license_plate?: string | null
           lien_info?: string | null
           make?: string | null
           model?: string | null
+          monthly_payment?: number | null
           notes?: string | null
           packet_id?: string | null
+          payoff_amount?: number | null
+          policy_number?: string | null
           scope?: string | null
+          state?: string | null
           status?: string | null
           updated_at?: string | null
           vin?: string | null
