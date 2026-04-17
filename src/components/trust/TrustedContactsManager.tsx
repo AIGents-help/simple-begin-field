@@ -291,11 +291,16 @@ export const TrustedContactsManager: React.FC = () => {
       ) : (
         <div className="space-y-4">
           {contacts.map(c => (
-            <div key={c.id} className="paper-sheet p-5">
+            <div key={c.id} className={`paper-sheet p-5 ${c.is_deceased ? 'opacity-75 bg-stone-50/40' : ''}`}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-base font-bold text-navy-muted">{c.contact_name}</h3>
+                    <h3 className={`text-base font-bold ${c.is_deceased ? 'text-stone-500' : 'text-navy-muted'}`}>{c.contact_name}</h3>
+                    {c.is_deceased && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-stone-200 text-stone-600 border border-stone-300 flex items-center gap-1">
+                        <Cross size={10} /> Deceased
+                      </span>
+                    )}
                     {/* Access level badge */}
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${
                       c.access_level === 'full'
@@ -345,6 +350,11 @@ export const TrustedContactsManager: React.FC = () => {
                         Granted on {new Date(c.access_granted_at).toLocaleDateString()}
                       </p>
                     )}
+                    {c.is_deceased && (
+                      <p className="text-[10px] italic text-stone-500 mt-1">
+                        Marked deceased — do not contact.
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -356,6 +366,14 @@ export const TrustedContactsManager: React.FC = () => {
                     <Trash2 size={14} className="text-stone-400" />
                   </button>
                 </div>
+              </div>
+
+              {/* Life status toggle — saves immediately */}
+              <div className="mt-4 pt-3 border-t border-stone-100">
+                <LifeStatusToggle
+                  value={!!c.is_deceased}
+                  onChange={(d) => handleToggleDeceased(c, d)}
+                />
               </div>
 
               {/* Bottom controls */}
@@ -373,7 +391,7 @@ export const TrustedContactsManager: React.FC = () => {
                 </button>
 
                 {/* Grant access button */}
-                {!c.access_granted && (
+                {!c.access_granted && !c.is_deceased && (
                   <button
                     onClick={() => setConfirmGrantId(c.id)}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors"
