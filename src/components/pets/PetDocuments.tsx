@@ -93,11 +93,10 @@ export const PetDocuments: React.FC<Props> = ({ packetId, petRecordId }) => {
   };
 
   const handleDownload = async (doc: DocRow) => {
-    const url = await documentService.getDocumentUrl(doc.file_path, doc.is_private);
-    if (typeof url === 'string') {
-      window.open(url, '_blank');
-    } else if (url && (url as any).data?.signedUrl) {
-      window.open((url as any).data.signedUrl, '_blank');
+    const res: any = await documentService.getDocumentUrl(doc.file_path, doc.is_private);
+    const href = res?.url || (typeof res === 'string' ? res : null);
+    if (href) {
+      window.open(href, '_blank');
     } else {
       toast.error('Could not generate download link', {
         duration: 4000,

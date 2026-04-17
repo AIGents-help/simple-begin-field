@@ -13,8 +13,8 @@ export const PetCard: React.FC<Props> = ({ pet, onClick }) => {
   useEffect(() => {
     let cancelled = false;
     if (pet?.photo_path) {
-      uploadService.getSignedUrl('packet-documents', pet.photo_path).then((res: any) => {
-        if (!cancelled) setPhotoUrl(res?.data?.signedUrl || null);
+      uploadService.getSignedUrl('packet-documents', pet.photo_path, 3600).then((res) => {
+        if (!cancelled) setPhotoUrl(res?.url || null);
       });
     } else {
       setPhotoUrl(null);

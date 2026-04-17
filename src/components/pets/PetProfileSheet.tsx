@@ -70,8 +70,8 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
         .then(({ data }) => setMeds((data as any) || []));
       // Load photo signed URL
       if (pet.photo_path) {
-        uploadService.getSignedUrl('packet-documents', pet.photo_path).then((res: any) => {
-          setPhotoSignedUrl(res?.data?.signedUrl || null);
+        uploadService.getSignedUrl('packet-documents', pet.photo_path, 3600).then((res) => {
+          setPhotoSignedUrl(res?.url || null);
         });
       } else {
         setPhotoSignedUrl(null);
