@@ -236,6 +236,12 @@ export const RecordCard = ({
   subtitlePlaceholder?: string;
 }) => {
   const isNA = data?.is_na || data?.status === 'not_applicable';
+  // Person/animal lifecycle dimming — applies to family/pets/trusted contacts (is_deceased)
+  // and advisors (advisor_status !== 'active').
+  const isDeceased = data?.is_deceased === true;
+  const advisorStatus = data?.advisor_status as string | undefined;
+  const isInactiveAdvisor = advisorStatus && advisorStatus !== 'active';
+  const isMuted = isDeceased || isInactiveAdvisor;
   const cleanTitle = sanitize(title) ||
     sanitize(data?.title) || sanitize(data?.name) || sanitize(data?.item_name) ||
     sanitize(data?.institution) || sanitize(data?.service_name) || sanitize(data?.firm) ||
@@ -245,9 +251,18 @@ export const RecordCard = ({
   // Default tap behavior is to edit (so cards are never "stuck" without an action)
   const handleCardClick = onClick || onEdit;
 
+  // Status badge text
+  const statusBadge = isDeceased
+    ? '† Deceased'
+    : advisorStatus === 'retired'
+    ? 'Retired'
+    : advisorStatus === 'former'
+    ? 'Former'
+    : null;
+
   return (
     <div
-      className={`w-full paper-sheet p-5 group transition-all relative overflow-hidden ${isNA ? 'opacity-60 bg-stone-50/50' : ''}`}
+      className={`w-full paper-sheet p-5 group transition-all relative overflow-hidden ${isNA ? 'opacity-60 bg-stone-50/50' : ''} ${isMuted && !isNA ? 'opacity-75 bg-stone-50/40' : ''}`}
     >
       <button
         type="button"
@@ -257,19 +272,24 @@ export const RecordCard = ({
       >
         <div className="flex items-center gap-4 min-w-0">
           {Icon && (
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isNA ? 'bg-stone-100 text-stone-400' : 'bg-stone-50 text-navy-muted'}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isNA || isMuted ? 'bg-stone-100 text-stone-400' : 'bg-stone-50 text-navy-muted'}`}>
               <Icon size={20} />
             </div>
           )}
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className={`font-bold ${isNA ? 'text-stone-400 line-through' : 'text-navy-muted'}`}>{cleanTitle}</h4>
+              <h4 className={`font-bold ${isNA ? 'text-stone-400 line-through' : isMuted ? 'text-stone-500' : 'text-navy-muted'}`}>{cleanTitle}</h4>
               {isNA && (
                 <span className="px-2 py-0.5 bg-stone-200 rounded text-[10px] font-bold uppercase text-stone-500 border border-stone-300">
                   N/A
                 </span>
               )}
-              {cleanBadge && !isNA && (
+              {!isNA && statusBadge && (
+                <span className="px-2 py-0.5 bg-stone-200 rounded text-[10px] font-bold uppercase text-stone-600 border border-stone-300">
+                  {statusBadge}
+                </span>
+              )}
+              {cleanBadge && !isNA && !statusBadge && (
                 <span className="px-2 py-0.5 bg-manila rounded text-[10px] font-bold uppercase text-navy-muted border border-folder-edge">
                   {cleanBadge}
                 </span>
