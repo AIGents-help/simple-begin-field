@@ -21,7 +21,7 @@ export const sectionService = {
     'memories': 'memories',
     'private': 'private_items',
     'medical': 'medical_records'
-  } as Record<string, keyof Tables>,
+  } as Record<string, any>,
 
   async getRecords(packetId: string, sectionKey: string, scope?: 'personA' | 'personB' | 'shared') {
     const tableName = this.tableMap[sectionKey];
