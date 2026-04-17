@@ -10,6 +10,7 @@ import { DashboardShell } from './components/dashboard/DashboardShell';
 import { AdminOverview, ProfessionalOverview } from './components/dashboard/Overview';
 import { AdminCustomers, AdminPackets, AdminBilling } from './components/dashboard/AdminScreens';
 import { AdminAffiliates, AdminInvites } from './components/dashboard/AdminAffiliates';
+import { AdminTools } from './components/dashboard/AdminTools';
 import { MyReferrals, MyLinks, MyPayouts } from './components/dashboard/ProfessionalScreens';
 import { AttorneyPortal } from './components/dashboard/AttorneyPortal';
 import { useAppContext } from './context/AppContext';
@@ -41,6 +42,7 @@ const DashboardRoutes = () => {
             <Route path="affiliates" element={<AdminAffiliates />} />
             <Route path="plans" element={<div className="p-8 text-stone-400 italic">Plans Management Coming Soon</div>} />
             <Route path="activity" element={<div className="p-8 text-stone-400 italic">Activity Feed Coming Soon</div>} />
+            <Route path="tools" element={<AdminTools />} />
             <Route path="settings" element={<div className="p-8 text-stone-400 italic">Admin Settings Coming Soon</div>} />
           </>
         )}

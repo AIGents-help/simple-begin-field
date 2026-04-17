@@ -15,7 +15,8 @@ import {
   Link as LinkIcon,
   DollarSign,
   Scale,
-  User
+  User,
+  Wrench
 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -37,6 +38,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Affiliates', icon: Share2, path: '/dashboard/affiliates', roles: ['admin'] },
   { label: 'Plans', icon: FileText, path: '/dashboard/plans', roles: ['admin'] },
   { label: 'Activity', icon: Activity, path: '/dashboard/activity', roles: ['admin'] },
+  { label: 'Tools', icon: Wrench, path: '/dashboard/tools', roles: ['admin'] },
   { label: 'Settings', icon: Settings, path: '/dashboard/settings', roles: ['admin'] },
 
   // Professional Nav
