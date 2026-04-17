@@ -4,8 +4,9 @@ import { useAppContext } from '../../context/AppContext';
 import { toast } from 'sonner';
 import {
   UserPlus, Pencil, Trash2, ShieldCheck, Clock, X, Loader2,
-  Mail, Phone, Users, Bell, BellOff, CheckCircle2, AlertCircle
+  Mail, Phone, Users, Bell, BellOff, CheckCircle2, AlertCircle, Cross
 } from 'lucide-react';
+import { LifeStatusToggle } from '../common/LifeStatusToggle';
 
 interface TrustedContact {
   id: string;
@@ -24,6 +25,8 @@ interface TrustedContact {
   created_at: string;
   assigned_sections: string[];
   notify_on_updates: boolean;
+  is_deceased?: boolean | null;
+  date_of_death?: string | null;
 }
 
 const SECTION_OPTIONS = [
@@ -222,6 +225,30 @@ export const TrustedContactsManager: React.FC = () => {
     } catch (err: any) {
       console.error('Toggle notify error:', err);
       toast.error(err.message || 'Failed to update');
+    }
+  };
+
+  const handleToggleDeceased = async (c: TrustedContact, deceased: boolean) => {
+    // Optimistic update
+    setContacts(prev => prev.map(x => x.id === c.id ? { ...x, is_deceased: deceased } : x));
+    try {
+      const { error } = await supabase
+        .from('trusted_contacts')
+        .update({
+          is_deceased: deceased,
+          date_of_death: deceased ? (c.date_of_death || null) : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', c.id);
+      if (error) throw error;
+      toast.success(deceased ? `${c.contact_name} marked as deceased` : `${c.contact_name} marked as living`, {
+        duration: 3000, position: 'bottom-center',
+      });
+    } catch (err: any) {
+      // Roll back
+      setContacts(prev => prev.map(x => x.id === c.id ? { ...x, is_deceased: !deceased } : x));
+      console.error('Toggle deceased error:', err);
+      toast.error(err.message || 'Failed to update status', { duration: 4000, position: 'bottom-center' });
     }
   };
 
