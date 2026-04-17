@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Loader2, CheckCircle } from 'lucide-react';
+import { X, Save, Loader2, CheckCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '@/lib/supabase';
