@@ -91,18 +91,46 @@ export const PetsSection = ({
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {pets.map((pet) => (
-            <PetCard key={pet.id} pet={pet} onClick={() => openEdit(pet)} />
-          ))}
-          <button
-            onClick={openAdd}
-            className="w-full py-4 border-2 border-dashed border-stone-200 rounded-2xl flex items-center justify-center gap-2 text-stone-400 hover:border-navy-muted hover:text-navy-muted transition-colors"
-          >
-            <Plus size={18} />
-            <span className="font-bold text-sm">Add Pet</span>
-          </button>
-        </div>
+        (() => {
+          const livingPets = pets.filter((p) => !p?.is_deceased);
+          const pastPets = pets.filter((p) => !!p?.is_deceased);
+          return (
+            <div className="space-y-6">
+              {livingPets.length > 0 && (
+                <div className="space-y-3">
+                  {livingPets.map((pet) => (
+                    <PetCard key={pet.id} pet={pet} onClick={() => openEdit(pet)} />
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={openAdd}
+                className="w-full py-4 border-2 border-dashed border-stone-200 rounded-2xl flex items-center justify-center gap-2 text-stone-400 hover:border-navy-muted hover:text-navy-muted transition-colors"
+              >
+                <Plus size={18} />
+                <span className="font-bold text-sm">Add Pet</span>
+              </button>
+
+              {pastPets.length > 0 && (
+                <div className="pt-2">
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-stone-400">
+                      Past Pets · In Memory
+                    </h3>
+                    <div className="flex-1 h-px bg-stone-200" />
+                    <span className="text-[10px] text-stone-400">{pastPets.length}</span>
+                  </div>
+                  <div className="space-y-3">
+                    {pastPets.map((pet) => (
+                      <PetCard key={pet.id} pet={pet} onClick={() => openEdit(pet)} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()
       )}
 
       <PetProfileSheet

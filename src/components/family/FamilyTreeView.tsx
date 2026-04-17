@@ -10,6 +10,8 @@ interface FamilyMember {
   relationship: string | null;
   birthday: string | null;
   parent_member_id: string | null;
+  is_deceased?: boolean | null;
+  date_of_death?: string | null;
 }
 
 interface TreeNode {
@@ -73,7 +75,7 @@ export const FamilyTreeView = ({ onEditMember, onAddMember }: FamilyTreeViewProp
       setLoading(true);
       const { data } = await supabase
         .from('family_members')
-        .select('id, name, relationship, birthday, parent_member_id')
+        .select('id, name, relationship, birthday, parent_member_id, is_deceased, date_of_death')
         .eq('packet_id', currentPacket.id)
         .order('created_at', { ascending: true });
       setMembers((data as any[]) || []);
@@ -186,21 +188,29 @@ export const FamilyTreeView = ({ onEditMember, onAddMember }: FamilyTreeViewProp
             const nx = ln.x + offsetX - NODE_W / 2;
             const ny = ln.y + offsetY;
             const isRoot = i === 0;
-            const name = isRoot ? rootName : ln.node.member?.name || '';
-            const label = isRoot ? 'You' : ln.node.member?.relationship || '';
-            const year = ln.node.member?.birthday
-              ? new Date(ln.node.member.birthday).getFullYear().toString()
+            const member = ln.node.member;
+            const deceased = !isRoot && !!member?.is_deceased;
+            const name = isRoot ? rootName : member?.name || '';
+            const label = isRoot ? 'You' : member?.relationship || '';
+            const year = member?.birthday
+              ? new Date(member.birthday).getFullYear().toString()
               : '';
+            const deathYear = member?.date_of_death
+              ? new Date(member.date_of_death).getFullYear().toString()
+              : '';
+            const fillColor = deceased ? '#6b7280' : '#1a2744';
+            const nameOpacity = deceased ? 0.7 : 1;
+            const displayName = (deceased ? '† ' : '') + name;
 
             return (
-              <g key={isRoot ? 'root' : ln.node.member?.id}>
+              <g key={isRoot ? 'root' : member?.id} opacity={deceased ? 0.75 : 1}>
                 <rect
                   x={nx}
                   y={ny}
                   width={NODE_W}
                   height={NODE_H}
                   rx={12}
-                  fill="#1a2744"
+                  fill={fillColor}
                 />
                 {/* Name */}
                 <text
@@ -211,32 +221,35 @@ export const FamilyTreeView = ({ onEditMember, onAddMember }: FamilyTreeViewProp
                   fontSize="12"
                   fontWeight="700"
                   fontFamily="inherit"
+                  opacity={nameOpacity}
                 >
-                  {name.length > 16 ? name.slice(0, 15) + '…' : name}
+                  {displayName.length > 16 ? displayName.slice(0, 15) + '…' : displayName}
                 </text>
                 {/* Relationship label */}
                 <text
                   x={nx + NODE_W / 2}
                   y={ny + 38}
                   textAnchor="middle"
-                  fill="#c9a84c"
+                  fill={deceased ? '#d4d4d4' : '#c9a84c'}
                   fontSize="10"
                   fontWeight="600"
                   fontFamily="inherit"
                 >
                   {label}
                 </text>
-                {/* Birth year */}
-                {year && (
+                {/* Birth / death years */}
+                {(year || deathYear) && (
                   <text
                     x={nx + NODE_W / 2}
                     y={ny + 52}
                     textAnchor="middle"
-                    fill="#8899aa"
+                    fill="#bbbbbb"
                     fontSize="9"
                     fontFamily="inherit"
                   >
-                    b. {year}
+                    {year && `b. ${year}`}
+                    {year && deathYear && '  '}
+                    {deathYear && `d. ${deathYear}`}
                   </text>
                 )}
                 {/* Edit button (not on root) */}
