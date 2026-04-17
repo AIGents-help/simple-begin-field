@@ -622,8 +622,8 @@ export const AddEditSheet = ({
             )}
           </div>
 
-          <div className="p-6 border-t border-stone-100 bg-white">
-            <button 
+          <div className="p-6 border-t border-stone-100 bg-white space-y-3">
+            <button
               onClick={handleSave}
               disabled={loading}
               className="w-full py-4 bg-navy-muted text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all disabled:opacity-50"
@@ -635,6 +635,29 @@ export const AddEditSheet = ({
               )}
               {isNA ? 'Confirm N/A Status' : 'Save Information'}
             </button>
+            {initialData?.id && activeTab && (
+              <button
+                onClick={async () => {
+                  if (!window.confirm('Delete this record? This cannot be undone.')) return;
+                  setLoading(true);
+                  const { error } = await sectionService.deleteRecord(activeTab, initialData.id);
+                  setLoading(false);
+                  if (error) {
+                    toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });
+                    return;
+                  }
+                  toast.success('Record deleted.', { duration: 3000, position: 'bottom-center' });
+                  bumpCompletion();
+                  if (onSuccess) onSuccess(undefined);
+                  handleClose();
+                }}
+                disabled={loading}
+                className="w-full py-3 bg-white border border-red-200 text-red-600 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50 hover:bg-red-50"
+              >
+                <Trash2 size={16} />
+                Delete Record
+              </button>
+            )}
           </div>
         </motion.div>
         </>
