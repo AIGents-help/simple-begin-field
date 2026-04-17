@@ -1,59 +1,27 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
-import { SectionId } from '../../config/types';
+import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
+import { usePacketCompletion } from '../../hooks/usePacketCompletion';
 
-const SECTION_CHECKS: { table: string; label: string; sectionId: SectionId }[] = [
-  { table: 'info_records', label: 'Additional Info', sectionId: 'info' },
-  { table: 'family_members', label: 'Family & Contacts', sectionId: 'family' },
-  { table: 'medical_records', label: 'Medical', sectionId: 'medical' },
-  { table: 'banking_records', label: 'Banking & Financial', sectionId: 'banking' },
-  { table: 'real_estate_records', label: 'Real Estate', sectionId: 'real-estate' },
-  { table: 'retirement_records', label: 'Retirement', sectionId: 'retirement' },
-  { table: 'vehicle_records', label: 'Vehicles', sectionId: 'vehicles' },
-  { table: 'advisor_records', label: 'Advisors', sectionId: 'advisors' },
-  { table: 'password_records', label: 'Passwords', sectionId: 'passwords' },
-  { table: 'personal_property_records', label: 'Personal Property', sectionId: 'property' },
-  { table: 'pet_records', label: 'Pets', sectionId: 'pets' },
-  { table: 'funeral_records', label: 'Funeral & End-of-Life', sectionId: 'funeral' },
-  { table: 'private_items', label: 'Private Items', sectionId: 'private' },
-  { table: 'trusted_contacts', label: 'Trusted Contacts', sectionId: 'info' },
-  { table: 'documents', label: 'Documents', sectionId: 'info' },
-];
-
-const TOTAL = SECTION_CHECKS.length;
-
+/**
+ * Packet completion ring + "what's missing" expandable list.
+ * Reads from `usePacketCompletion` — the SINGLE source of truth shared
+ * with DashboardScreen's header badge and folder cards.
+ */
 export const PacketCompletionScore: React.FC<{ packetId: string }> = ({ packetId }) => {
   const { setView, setTab } = useAppContext();
-  const [completed, setCompleted] = useState<boolean[]>([]);
-  const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
 
-  const check = useCallback(async () => {
-    const results = await Promise.all(
-      SECTION_CHECKS.map(async (s) => {
-        try {
-          const q = s.table === 'trusted_contacts'
-            ? supabase.from(s.table as any).select('id', { count: 'exact', head: true })
-            : supabase.from(s.table as any).select('id', { count: 'exact', head: true }).eq('packet_id', packetId);
-          const { count } = await q;
-          return (count ?? 0) > 0;
-        } catch {
-          return false;
-        }
-      })
-    );
-    setCompleted(results);
-    setLoading(false);
-  }, [packetId]);
-
-  useEffect(() => { check(); }, [check]);
+  const {
+    loading,
+    overallPercent: pct,
+    completedSections: doneCount,
+    totalSections: total,
+    sectionStatus,
+  } = usePacketCompletion(packetId);
 
   if (loading) return null;
-
-  const doneCount = completed.filter(Boolean).length;
-  const pct = Math.round((doneCount / TOTAL) * 100);
 
   // Ring color
   let ringColor = '#ef4444'; // red
@@ -65,7 +33,10 @@ export const PacketCompletionScore: React.FC<{ packetId: string }> = ({ packetId
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (pct / 100) * circumference;
 
-  const missing = SECTION_CHECKS.filter((_, i) => !completed[i]);
+  // Sections that count toward overall but currently have no content
+  const missing = SECTIONS_CONFIG
+    .filter(s => s.id !== 'affiliate')
+    .filter(s => !sectionStatus[s.id]?.hasContent);
 
   return (
     <div className="paper-sheet p-6">
@@ -99,7 +70,7 @@ export const PacketCompletionScore: React.FC<{ packetId: string }> = ({ packetId
           ) : (
             <>
               <p className="text-base font-bold text-navy-muted">Your Packet is {pct}% complete</p>
-              <p className="text-xs text-stone-500 mt-1">{doneCount} of {TOTAL} sections have information</p>
+              <p className="text-xs text-stone-500 mt-1">{doneCount} of {total} sections have information</p>
             </>
           )}
 
@@ -109,7 +80,7 @@ export const PacketCompletionScore: React.FC<{ packetId: string }> = ({ packetId
               className="mt-2 flex items-center gap-1 text-xs font-bold text-stone-500 hover:text-navy-muted transition-colors"
             >
               {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              {expanded ? 'Hide details' : 'See what\'s missing'}
+              {expanded ? 'Hide details' : "See what's missing"}
             </button>
           )}
         </div>
@@ -120,8 +91,8 @@ export const PacketCompletionScore: React.FC<{ packetId: string }> = ({ packetId
         <div className="mt-4 pt-4 border-t border-stone-100 grid grid-cols-1 sm:grid-cols-2 gap-2">
           {missing.map((s) => (
             <button
-              key={s.table}
-              onClick={() => { setTab(s.sectionId); setView('sections'); }}
+              key={s.id}
+              onClick={() => { setTab(s.id); setView('sections'); }}
               className="flex items-center justify-between px-3 py-2 rounded-lg bg-stone-50 hover:bg-stone-100 transition-colors text-left group"
             >
               <span className="text-xs font-medium text-stone-600">{s.label}</span>
