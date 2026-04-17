@@ -12,7 +12,8 @@ import {
   Flower2, 
   Lock,
   Activity,
-  Share2
+  Share2,
+  Sparkles
 } from 'lucide-react';
 import { Section, SectionId } from './types';
 
@@ -112,6 +113,14 @@ export const SECTIONS_CONFIG: Section[] = [
     description: 'Individual and shared funeral preferences.',
     emptyStateText: 'No funeral preferences saved yet.',
     addButtonLabel: 'Add Preference'
+  },
+  {
+    id: 'memories',
+    label: 'Memories',
+    icon: Sparkles,
+    description: 'Letters, advice, photos, videos, and personal messages for loved ones.',
+    emptyStateText: 'No memories added yet.',
+    addButtonLabel: 'Add Memory'
   },
   { 
     id: 'private', 
