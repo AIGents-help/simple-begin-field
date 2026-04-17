@@ -33,6 +33,11 @@ interface AppContextType extends AppState {
   refreshPackets: () => Promise<void>;
   refreshPacketData: () => Promise<void>; // Alias for refreshPackets
   signOut: () => Promise<void>;
+  // Single-source-of-truth completion bus.
+  // Anything that mutates packet data (saves, deletes, uploads) calls
+  // bumpCompletion() so every completion display refreshes together.
+  completionVersion: number;
+  bumpCompletion: () => void;
 }
 
 const defaultState: AppState = {
