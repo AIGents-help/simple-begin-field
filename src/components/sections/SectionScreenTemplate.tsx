@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Upload, ChevronRight, Loader2, Clock, UserPlus, FileText } from 'lucide-react';
+import { Plus, Upload, ChevronRight, Loader2, Clock, UserPlus, FileText, Edit2, Trash2 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { ScopeToggle } from '../layout/ScopeToggle';
