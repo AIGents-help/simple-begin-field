@@ -327,39 +327,8 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       'Which items need extra protection?',
     ]
   },
-  pets: {
-    entries: [
-      { label: 'Pet Profile', prefill: { pet_name: 'Pet Profile' } },
-      { label: 'Species / Breed', prefill: { pet_name: 'Species/Breed' } },
-      { label: 'Age', prefill: { pet_name: 'Age' } },
-      { label: 'Medications', prefill: { pet_name: 'Medications' } },
-      { label: 'Feeding Schedule', prefill: { pet_name: 'Feeding Schedule' } },
-      { label: 'Vet Details', prefill: { pet_name: 'Vet Details' } },
-      { label: 'Grooming Instructions', prefill: { pet_name: 'Grooming Instructions' } },
-      { label: 'Boarding / Sitter Notes', prefill: { pet_name: 'Boarding/Sitter Notes' } },
-      { label: 'Microchip Details', prefill: { pet_name: 'Microchip Details' } },
-    ],
-    documents: [
-      { label: 'Vaccination Records', prefill: { name: 'Vaccination Records' } },
-      { label: 'Vet Records', prefill: { name: 'Vet Records' } },
-      { label: 'Microchip Paperwork', prefill: { name: 'Microchip Paperwork' } },
-      { label: 'Pet Insurance Policy', prefill: { name: 'Pet Insurance Policy' } },
-      { label: 'Medication List', prefill: { name: 'Pet Medication List' } },
-    ],
-    contacts: [
-      { label: 'Veterinarian', prefill: { name: 'Veterinarian' } },
-      { label: 'Emergency Vet', prefill: { name: 'Emergency Vet' } },
-      { label: 'Pet Sitter', prefill: { name: 'Pet Sitter' } },
-      { label: 'Boarding Provider', prefill: { name: 'Boarding Provider' } },
-      { label: 'Backup Caretaker', prefill: { name: 'Backup Caretaker' } },
-    ],
-    considerations: [
-      'Who should take the pet immediately?',
-      'Daily care routine',
-      'Medication timing',
-      'Behavior issues or fears',
-    ]
-  },
+  // pets: intentionally omitted — Pets uses a dedicated multi-pet
+  // profile UI (see src/sections/PetsSection.tsx) instead of chips.
   funeral: {
     entries: [
       { label: 'Burial', prefill: { burial_or_cremation: 'Burial' } },

@@ -1136,72 +1136,192 @@ export type Database = {
           },
         ]
       }
+      pet_medications: {
+        Row: {
+          created_at: string
+          dose: string | null
+          frequency: string | null
+          id: string
+          name: string
+          notes: string | null
+          packet_id: string
+          pet_record_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dose?: string | null
+          frequency?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          packet_id: string
+          pet_record_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dose?: string | null
+          frequency?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          packet_id?: string
+          pet_record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_medications_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pet_medications_pet_record_id_fkey"
+            columns: ["pet_record_id"]
+            isOneToOne: false
+            referencedRelation: "pet_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pet_records: {
         Row: {
           age: string | null
+          allergies_dietary: string | null
+          behavioral_notes: string | null
+          boarding_instructions: string | null
+          breed: string | null
           care_instructions: string | null
           category: string | null
+          color_markings: string | null
           created_at: string | null
+          date_of_birth: string | null
           emergency_notes: string | null
+          emergency_vet_clinic: string | null
+          emergency_vet_name: string | null
+          emergency_vet_phone: string | null
+          feeding_frequency: string | null
           feeding_instructions: string | null
+          food_amount: string | null
+          food_brand: string | null
+          gender: string | null
+          grooming_notes: string | null
           id: string
+          insurance_policy_number: string | null
           insurance_provider: string | null
           is_na: boolean | null
           medications: string | null
           microchip_info: string | null
           microchip_number: string | null
+          microchip_registry: string | null
           packet_id: string | null
           pet_name: string | null
+          photo_path: string | null
           scope: string | null
+          spayed_neutered: boolean | null
+          special_needs: string | null
+          species: string | null
           species_breed: string | null
           status: string | null
+          tag_license_number: string | null
           updated_at: string | null
+          vet_address: string | null
+          vet_clinic: string | null
           vet_name: string | null
           vet_phone: string | null
           veterinarian_contact: string | null
         }
         Insert: {
           age?: string | null
+          allergies_dietary?: string | null
+          behavioral_notes?: string | null
+          boarding_instructions?: string | null
+          breed?: string | null
           care_instructions?: string | null
           category?: string | null
+          color_markings?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           emergency_notes?: string | null
+          emergency_vet_clinic?: string | null
+          emergency_vet_name?: string | null
+          emergency_vet_phone?: string | null
+          feeding_frequency?: string | null
           feeding_instructions?: string | null
+          food_amount?: string | null
+          food_brand?: string | null
+          gender?: string | null
+          grooming_notes?: string | null
           id?: string
+          insurance_policy_number?: string | null
           insurance_provider?: string | null
           is_na?: boolean | null
           medications?: string | null
           microchip_info?: string | null
           microchip_number?: string | null
+          microchip_registry?: string | null
           packet_id?: string | null
           pet_name?: string | null
+          photo_path?: string | null
           scope?: string | null
+          spayed_neutered?: boolean | null
+          special_needs?: string | null
+          species?: string | null
           species_breed?: string | null
           status?: string | null
+          tag_license_number?: string | null
           updated_at?: string | null
+          vet_address?: string | null
+          vet_clinic?: string | null
           vet_name?: string | null
           vet_phone?: string | null
           veterinarian_contact?: string | null
         }
         Update: {
           age?: string | null
+          allergies_dietary?: string | null
+          behavioral_notes?: string | null
+          boarding_instructions?: string | null
+          breed?: string | null
           care_instructions?: string | null
           category?: string | null
+          color_markings?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           emergency_notes?: string | null
+          emergency_vet_clinic?: string | null
+          emergency_vet_name?: string | null
+          emergency_vet_phone?: string | null
+          feeding_frequency?: string | null
           feeding_instructions?: string | null
+          food_amount?: string | null
+          food_brand?: string | null
+          gender?: string | null
+          grooming_notes?: string | null
           id?: string
+          insurance_policy_number?: string | null
           insurance_provider?: string | null
           is_na?: boolean | null
           medications?: string | null
           microchip_info?: string | null
           microchip_number?: string | null
+          microchip_registry?: string | null
           packet_id?: string | null
           pet_name?: string | null
+          photo_path?: string | null
           scope?: string | null
+          spayed_neutered?: boolean | null
+          special_needs?: string | null
+          species?: string | null
           species_breed?: string | null
           status?: string | null
+          tag_license_number?: string | null
           updated_at?: string | null
+          vet_address?: string | null
+          vet_clinic?: string | null
           vet_name?: string | null
           vet_phone?: string | null
           veterinarian_contact?: string | null
