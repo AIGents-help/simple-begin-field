@@ -3,6 +3,7 @@ import { Video, Upload, Download, Trash2, AlertCircle, Loader2, FileVideo } from
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
+import { useAppContext } from '@/context/AppContext';
 
 interface HomeInventoryVideoProps {
   packetId: string;
@@ -29,6 +30,7 @@ const formatSize = (bytes: number) => {
 };
 
 export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId, propertyRecordId, scope }) => {
+  const { bumpCompletion } = useAppContext();
   const [videos, setVideos] = useState<VideoDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -118,6 +120,7 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       await fetchVideos();
+      bumpCompletion();
     } catch (err: any) {
       toast.error(err.message || 'Upload failed', { duration: 5000, position: 'bottom-center' });
     } finally {
@@ -157,6 +160,7 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
 
       toast.success('Video deleted', { duration: 3000, position: 'bottom-center' });
       await fetchVideos();
+      bumpCompletion();
     } catch (err: any) {
       toast.error(err.message || 'Delete failed', { duration: 5000, position: 'bottom-center' });
     } finally {
