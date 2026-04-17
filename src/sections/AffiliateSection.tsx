@@ -31,7 +31,8 @@ export const AffiliateSection = ({ onAddClick, onRefresh }: { onAddClick: () => 
               <RecordCard
                 key={record.id}
                 title={record.title}
-                description={record.description}
+                subtitle={record.description}
+                subtitlePlaceholder="No description"
                 icon={Share2}
                 data={record.data}
               />

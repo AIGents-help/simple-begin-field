@@ -157,7 +157,13 @@ export const InfoRecordCard = ({ record, hasFile, onClick, onEdit, onDelete, onV
           
           {isEntryType && entryData && !isNA ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 mb-3">
-              {Object.entries(entryData).map(([key, value]) => (
+              {Object.entries(entryData)
+                .filter(([_, value]) => {
+                  if (value === null || value === undefined) return false;
+                  const s = String(value).trim().toLowerCase();
+                  return s !== '' && s !== 'null' && s !== 'undefined';
+                })
+                .map(([key, value]) => (
                 <div key={key} className="flex items-baseline gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 shrink-0">
                     {formatKey(key)}:
@@ -168,7 +174,7 @@ export const InfoRecordCard = ({ record, hasFile, onClick, onEdit, onDelete, onV
                 </div>
               ))}
             </div>
-          ) : record.notes && !isNA && (
+          ) : record.notes && !isNA && record.notes.trim().toLowerCase() !== 'null' && (
             <p className="text-xs text-stone-500 line-clamp-2 mb-2">{record.notes}</p>
           )}
 
