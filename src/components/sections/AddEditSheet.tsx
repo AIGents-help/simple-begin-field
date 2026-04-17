@@ -31,7 +31,7 @@ export const AddEditSheet = ({
   initialData?: any;
   categoryOptions?: CategoryOption[];
 }) => {
-  const { activeTab, activeScope, currentPacket, profile } = useAppContext();
+  const { activeTab, activeScope, currentPacket, profile, bumpCompletion } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [isNA, setIsNA] = useState(false);
@@ -369,6 +369,7 @@ export const AddEditSheet = ({
       }).catch(err => console.error('Contact notification failed (non-blocking):', err));
 
       toast.success("Information saved successfully!", { icon: <CheckCircle size={18} className="text-emerald-500" />, duration: 3000, position: "bottom-center" });
+      bumpCompletion(); // refresh all completion displays (header badge, ring, folder cards)
       if (onSuccess) onSuccess(savedRecord);
       handleClose();
     } catch (err: any) {
