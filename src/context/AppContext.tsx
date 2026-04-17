@@ -276,25 +276,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     completionVersion,
     bumpCompletion,
   ]);
-    state, 
-    user, 
-    profile, 
-    userDisplayName, 
-    userInitials, 
-    currentPacket, 
-    packets, 
-    loading,
-    billingLoading,
-    planKey,
-    planName,
-    isPaid,
-    isCouple,
-    isLifetime,
-    currentPlan,
-    refreshBilling,
-    completionVersion,
-    bumpCompletion,
-  ]);
+
 
   return (
     <AppContext.Provider value={contextValue}>
