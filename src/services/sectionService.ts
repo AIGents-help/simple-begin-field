@@ -18,6 +18,7 @@ export const sectionService = {
     'property': 'personal_property_records',
     'pets': 'pet_records',
     'funeral': 'funeral_records',
+    'memories': 'memories',
     'private': 'private_items',
     'medical': 'medical_records'
   } as Record<string, keyof Tables>,
