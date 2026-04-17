@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { PacketCompletionScore } from './PacketCompletionScore';
 import { CheckInBanner } from '../checkin/CheckInBanner';
 import { 
@@ -9,76 +9,37 @@ import {
   Loader2,
   ChevronRight,
   FileText,
-  Download,
   ShieldCheck
 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
-import { sectionService } from '../../services/sectionService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
+import { usePacketCompletion } from '../../hooks/usePacketCompletion';
 
 export const DashboardScreen = () => {
-  const { setView, setTab, currentPacket, userDisplayName, view } = useAppContext();
-  const [stats, setStats] = useState<any[]>([]);
-  const [counts, setCounts] = useState<Record<string, number>>({});
-  const [loading, setLoading] = useState(true);
+  const { setView, setTab, currentPacket, userDisplayName } = useAppContext();
 
-  useEffect(() => {
-    if (currentPacket && view === 'dashboard') {
-      fetchStats();
-    }
-  }, [currentPacket, view]);
-
-  const fetchStats = async () => {
-    if (!currentPacket) return;
-    setLoading(true);
-    try {
-      const [{ data }, countsResult] = await Promise.all([
-        sectionService.getCompletionStats(currentPacket.id),
-        sectionService.getSectionCounts(currentPacket.id),
-      ]);
-      setStats(data || []);
-      setCounts(countsResult || {});
-    } catch (err) {
-      console.error("Error fetching stats:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // SINGLE SOURCE OF TRUTH for completion (header badge, progress bar,
+  // ring, AND each folder card all read from this hook).
+  const {
+    loading,
+    overallPercent,
+    sectionStatus,
+  } = usePacketCompletion(currentPacket?.id);
 
   const getSectionStat = (sectionId: string) => {
-    const sectionStats = stats.filter(s => s.section_key === sectionId);
-    // Real count comes from actual table rows + uploaded documents,
-    // not from the section_completion bookkeeping table.
-    const totalRecords = counts[sectionId] ?? 0;
-
-    if (sectionStats.length === 0) {
-      return {
-        status: totalRecords > 0 ? 'in_progress' : 'empty',
-        count: totalRecords,
-        percentage: 0,
-      };
-    }
-
-    const completeCount = sectionStats.filter(s => s.status === 'complete' || s.status === 'not_applicable').length;
-    const allComplete = completeCount === sectionStats.length && sectionStats.length > 0;
-    const anyInProgress = sectionStats.some(s => s.status === 'in_progress');
-    const anyComplete = sectionStats.some(s => s.status === 'complete');
-
-    let status = 'empty';
-    if (allComplete) status = 'complete';
-    else if (anyInProgress || anyComplete || totalRecords > 0) status = 'in_progress';
-
-    const percentage = sectionStats.length > 0
-      ? Math.round((completeCount / sectionStats.length) * 100)
-      : 0;
-
-    return { status, count: totalRecords, percentage };
+    const s = sectionStatus[sectionId];
+    const count = s?.count ?? 0;
+    const hasContent = s?.hasContent ?? false;
+    return {
+      status: hasContent ? 'in_progress' : 'empty',
+      count,
+      percentage: s?.percent ?? 0,
+    };
   };
 
-  const overallProgress = stats.length > 0 
-    ? Math.round((stats.filter(s => s.status === 'complete' || s.status === 'not_applicable').length / stats.length) * 100) 
-    : 0;
+  const overallProgress = overallPercent;
+
 
   const StatusBadge = ({ status }: { status: string }) => {
     switch (status) {

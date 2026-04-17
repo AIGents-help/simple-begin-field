@@ -33,6 +33,11 @@ interface AppContextType extends AppState {
   refreshPackets: () => Promise<void>;
   refreshPacketData: () => Promise<void>; // Alias for refreshPackets
   signOut: () => Promise<void>;
+  // Single-source-of-truth completion bus.
+  // Anything that mutates packet data (saves, deletes, uploads) calls
+  // bumpCompletion() so every completion display refreshes together.
+  completionVersion: number;
+  bumpCompletion: () => void;
 }
 
 const defaultState: AppState = {
@@ -64,6 +69,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [packets, setPackets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<AppState>(defaultState);
+  const [completionVersion, setCompletionVersion] = useState(0);
+  const bumpCompletion = React.useCallback(() => setCompletionVersion(v => v + 1), []);
   const currentPacketRef = React.useRef<any | null>(null);
 
   const {
@@ -246,7 +253,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setCurrentPacket,
     refreshPackets,
     refreshPacketData: refreshPackets,
-    signOut
+    signOut,
+    completionVersion,
+    bumpCompletion,
   }), [
     state, 
     user, 
@@ -263,8 +272,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     isCouple,
     isLifetime,
     currentPlan,
-    refreshBilling
+    refreshBilling,
+    completionVersion,
+    bumpCompletion,
   ]);
+
 
   return (
     <AppContext.Provider value={contextValue}>

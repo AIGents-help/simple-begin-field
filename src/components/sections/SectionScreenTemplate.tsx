@@ -26,7 +26,7 @@ export const SectionScreenTemplate = ({
   emptyState,
   onRefresh
 }: SectionScreenTemplateProps) => {
-  const { activeTab, activeScope, currentPacket, setView, packets } = useAppContext();
+  const { activeTab, activeScope, currentPacket, setView, packets, bumpCompletion } = useAppContext();
   const [records, setRecords] = useState<any[]>([]);
   const [docs, setDocs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,6 +106,7 @@ export const SectionScreenTemplate = ({
             const { error } = await sectionService.createRecord(activeTab, record);
             if (error) throw error;
             fetchData();
+            bumpCompletion();
           } catch (err) {
             console.error("Error marking as N/A:", err);
             toast.error("Failed to mark as N/A", { duration: 4000, position: "bottom-center" });
@@ -125,6 +126,7 @@ export const SectionScreenTemplate = ({
               const { error } = await sectionService.deleteRecord(activeTab, record.id);
               if (error) throw error;
               fetchData();
+              bumpCompletion();
             }
           } catch (err) {
             console.error("Error restoring N/A item:", err);
