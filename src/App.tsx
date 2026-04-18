@@ -25,6 +25,7 @@ import { PricingPage } from './components/billing/PricingPage';
 import { CheckoutSuccess } from './components/billing/CheckoutSuccess';
 import { TrustedContactInviteAccept } from './components/trust/TrustedContactInviteAccept';
 import { TrustedContactDashboard } from './components/trust/TrustedContactDashboard';
+import { CheckInRedirect } from './pages/CheckInRedirect';
 import NotFound from "./pages/NotFound.tsx";
 import { InstallPromptBanner } from './components/pwa/InstallPromptBanner';
 
@@ -91,6 +92,7 @@ export default function App() {
               <Route path="/checkout/cancel" element={<Navigate to="/pricing" replace />} />
               <Route path="/trusted/invite/:token" element={<TrustedContactInviteAccept />} />
               <Route path="/trusted" element={<TrustedContactDashboard />} />
+              <Route path="/checkin" element={<CheckInRedirect />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
