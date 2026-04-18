@@ -35,6 +35,8 @@ import { EmergencyView } from './components/emergency/EmergencyView';
 import RedeemGift from './pages/RedeemGift';
 import CorporateDashboard from './pages/CorporateDashboard';
 import EnterpriseContact from './pages/EnterpriseContact';
+import FamilyAccept from './pages/FamilyAccept';
+import CorporateAccept from './pages/CorporateAccept';
 import NotFound from "./pages/NotFound.tsx";
 import { InstallPromptBanner } from './components/pwa/InstallPromptBanner';
 
@@ -111,6 +113,8 @@ export default function App() {
               <Route path="/gift/redeem" element={<RedeemGift />} />
               <Route path="/gift/success" element={<RedeemGift />} />
               <Route path="/corporate/dashboard" element={<CorporateDashboard />} />
+              <Route path="/corporate/accept/:token" element={<CorporateAccept />} />
+              <Route path="/family/accept/:token" element={<FamilyAccept />} />
               <Route path="/contact" element={<EnterpriseContact />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
