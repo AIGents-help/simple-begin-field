@@ -707,6 +707,12 @@ export const AddEditSheet = ({
         Object.keys(record).forEach((k) => {
           if (k.startsWith('__')) delete record[k];
         });
+        // Apply newly uploaded / cleared profile photo for person records
+        if (activeTab === 'family' || activeTab === 'advisors') {
+          if (profilePhotoPath !== undefined) {
+            record.photo_path = profilePhotoPath;
+          }
+        }
         // Property: coerce Yes/No strings to booleans for boolean columns and empty dates to null
         if (activeTab === 'property') {
           const boolKeys = [
