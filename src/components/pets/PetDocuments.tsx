@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 import { Upload, Trash2, FileText, Loader2, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -117,34 +118,24 @@ export const PetDocuments: React.FC<Props> = ({ packetId, petRecordId }) => {
         const existing = docs.filter((d) => d.category === cat.key);
         const isUploading = uploadingKey === cat.key;
         return (
-          <div key={cat.key} className="rounded-xl border border-stone-200 bg-white p-3">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-bold text-navy-muted">{cat.label}</p>
-              <input
-                ref={(el) => (inputRefs.current[cat.key] = el)}
-                type="file"
-                className="hidden"
-                accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleUpload(cat.key, f);
-                  e.target.value = '';
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => inputRefs.current[cat.key]?.click()}
-                disabled={isUploading}
-                className="px-3 py-1.5 rounded-lg bg-navy-muted text-white text-xs font-bold flex items-center gap-1.5 active:scale-95 transition-all disabled:opacity-50"
-              >
-                {isUploading ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : (
-                  <Upload size={12} />
-                )}
-                Upload
-              </button>
-            </div>
+          <PetDocCategoryCard
+            key={cat.key}
+            label={cat.label}
+            isUploading={isUploading}
+            onPick={() => inputRefs.current[cat.key]?.click()}
+            onFile={(f) => handleUpload(cat.key, f)}
+          >
+            <input
+              ref={(el) => (inputRefs.current[cat.key] = el)}
+              type="file"
+              className="hidden"
+              accept=".pdf,.jpg,.jpeg,.png,.heic,.doc,.docx"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleUpload(cat.key, f);
+                e.target.value = '';
+              }}
+            />
             {loading ? (
               <p className="text-xs text-stone-400">Loading...</p>
             ) : existing.length === 0 ? (
