@@ -98,9 +98,7 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
-  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const stagePhoto = (file: File) => {
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file', { duration: 4000, position: 'bottom-center' });
       return;
@@ -112,6 +110,16 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
     setPhotoFile(file);
     setPhotoPreview(URL.createObjectURL(file));
   };
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) stagePhoto(file);
+  };
+
+  const photoDropzone = useFileDropzone({
+    onFiles: (files) => files[0] && stagePhoto(files[0]),
+    multiple: false,
+  });
 
   const validate = (): boolean => {
     const next: Record<string, string> = {};
