@@ -7,6 +7,7 @@ import { useAppContext } from '@/context/AppContext';
 import { uploadService } from '@/services/uploadService';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
 import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
+import { RecordDocumentUpload } from '../common/RecordDocumentUpload';
 import { useConfirm } from '@/context/ConfirmDialogContext';
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
   onSaved: () => void;
 }
 
-type SectionKey = 'identity' | 'marriage' | 'contact' | 'work' | 'sensitive' | 'lifecycle';
+type SectionKey = 'identity' | 'marriage' | 'contact' | 'work' | 'sensitive' | 'documents' | 'lifecycle';
 
 const SECTION_LABELS: Record<SectionKey, string> = {
   identity: 'Identity',
@@ -24,6 +25,7 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   contact: 'Contact & Address',
   work: 'Occupation',
   sensitive: 'Sensitive Info',
+  documents: 'Documents',
   lifecycle: 'Life Status',
 };
 
