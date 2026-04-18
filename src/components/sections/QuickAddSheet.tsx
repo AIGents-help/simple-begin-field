@@ -18,6 +18,8 @@ export const QuickAddSheet = ({
 }) => {
   const [step, setStep] = useState<'section' | 'category'>('section');
   const [selectedSection, setSelectedSection] = useState<SectionId | null>(null);
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const { customSections, refreshCustomSections, setActiveCustomSection, setTab, setView } = useAppContext();
 
   const handleSectionSelect = (sectionId: SectionId) => {
     setSelectedSection(sectionId);
