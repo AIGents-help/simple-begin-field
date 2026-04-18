@@ -305,6 +305,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     bumpCompletion,
     directoryQuery,
     setDirectoryQuery,
+    customSections,
+    refreshCustomSections,
+    activeCustomSectionId,
+    setActiveCustomSection,
   }), [
     state, 
     user, 
@@ -328,6 +332,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     completionVersion,
     bumpCompletion,
     directoryQuery,
+    customSections,
+    refreshCustomSections,
+    activeCustomSectionId,
+    setActiveCustomSection,
   ]);
 
 
