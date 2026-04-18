@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Loader2, Plus, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { Loader2, Plus, AlertTriangle, ShieldAlert, Check } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CategoryOption } from '../components/upload/types';
 import {
