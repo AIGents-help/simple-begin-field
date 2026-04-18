@@ -324,6 +324,96 @@ export type Database = {
           },
         ]
       }
+      checkin_events: {
+        Row: {
+          checked_in_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          reminder_count: number
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          token: string | null
+          token_expires_at: string | null
+          triggered_at: string | null
+          user_id: string
+        }
+        Insert: {
+          checked_in_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reminder_count?: number
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          token?: string | null
+          token_expires_at?: string | null
+          triggered_at?: string | null
+          user_id: string
+        }
+        Update: {
+          checked_in_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reminder_count?: number
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          token?: string | null
+          token_expires_at?: string | null
+          triggered_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      checkin_settings: {
+        Row: {
+          checkin_method: string
+          created_at: string
+          frequency_days: number
+          grace_period_days: number
+          id: string
+          is_enabled: boolean
+          is_paused: boolean
+          pause_until: string | null
+          release_behavior: string
+          selected_contact_ids: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checkin_method?: string
+          created_at?: string
+          frequency_days?: number
+          grace_period_days?: number
+          id?: string
+          is_enabled?: boolean
+          is_paused?: boolean
+          pause_until?: string | null
+          release_behavior?: string
+          selected_contact_ids?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checkin_method?: string
+          created_at?: string
+          frequency_days?: number
+          grace_period_days?: number
+          id?: string
+          is_enabled?: boolean
+          is_paused?: boolean
+          pause_until?: string | null
+          release_behavior?: string
+          selected_contact_ids?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       credit_cards: {
         Row: {
           card_type: string | null
@@ -2375,12 +2465,14 @@ export type Database = {
           affiliate_id: string | null
           checkin_frequency: string | null
           checkin_opted_out: boolean | null
+          checkin_status: string | null
           consent_timestamp: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
           id: string
           last_checkin_acknowledged_at: string | null
+          last_checkin_at: string | null
           last_checkin_sent_at: string | null
           last_login_at: string | null
           legal_version_accepted: string | null
@@ -2391,12 +2483,14 @@ export type Database = {
           affiliate_id?: string | null
           checkin_frequency?: string | null
           checkin_opted_out?: boolean | null
+          checkin_status?: string | null
           consent_timestamp?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id: string
           last_checkin_acknowledged_at?: string | null
+          last_checkin_at?: string | null
           last_checkin_sent_at?: string | null
           last_login_at?: string | null
           legal_version_accepted?: string | null
@@ -2407,12 +2501,14 @@ export type Database = {
           affiliate_id?: string | null
           checkin_frequency?: string | null
           checkin_opted_out?: boolean | null
+          checkin_status?: string | null
           consent_timestamp?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
           last_checkin_acknowledged_at?: string | null
+          last_checkin_at?: string | null
           last_checkin_sent_at?: string | null
           last_login_at?: string | null
           legal_version_accepted?: string | null
@@ -3302,7 +3398,24 @@ export type Database = {
       }
     }
     Functions: {
+      complete_checkin_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          message: string
+          next_due: string
+          success: boolean
+          user_id: string
+        }[]
+      }
       current_user_role: { Args: never; Returns: string }
+      get_checkin_status: {
+        Args: { p_user_id: string }
+        Returns: {
+          last_checkin_at: string
+          next_due_at: string
+          status: string
+        }[]
+      }
       has_trusted_access: {
         Args: { p_packet_id: string; p_section_key: string }
         Returns: boolean
@@ -3314,6 +3427,7 @@ export type Database = {
       }
       is_packet_member: { Args: { p_id: string }; Returns: boolean }
       is_professional: { Args: never; Returns: boolean }
+      manual_check_in: { Args: never; Returns: undefined }
       run_inactivity_release_sweep: {
         Args: never
         Returns: {
