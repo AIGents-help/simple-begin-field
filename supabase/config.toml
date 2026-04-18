@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.generate-packet-pdf]
 verify_jwt = false
+
+[functions.get-emergency-info]
+verify_jwt = false
