@@ -317,6 +317,7 @@ export const AddEditSheet = ({
           { name: 'provider_name', label: 'Provider Name', required: true, placeholder: 'e.g. Dr. Smith' },
           { name: 'specialty', label: 'Specialty', placeholder: 'e.g. Cardiologist' },
           { name: 'phone', label: 'Phone', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'referring_physician', label: 'Referring Physician', placeholder: 'Dr. who referred you' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'advisors':
@@ -335,7 +336,9 @@ export const AddEditSheet = ({
           { name: 'account_type', label: 'Account Type', type: 'select', options: ['Checking', 'Savings', 'Money Market', 'CD', 'Other'] },
           { name: 'account_number_masked', label: 'Account Number', placeholder: 'Last 4 digits only for security' },
           { name: 'routing_number_masked', label: 'Routing Number', placeholder: 'Last 4 digits only' },
-          { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address or phone' },
+          { name: 'joint_account_holder', label: 'Joint Account Holder', placeholder: 'Spouse or co-owner name' },
+          { name: 'beneficiary_notes', label: 'Beneficiary Notes', type: 'textarea', placeholder: 'Who is the beneficiary?' },
+          { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address, phone or advisor' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'retirement':
@@ -355,6 +358,7 @@ export const AddEditSheet = ({
           { name: 'vin', label: 'VIN', placeholder: '17-character VIN' },
           { name: 'license_plate', label: 'License Plate', placeholder: 'ABC-1234' },
           { name: 'insurance', label: 'Insurance', placeholder: 'Carrier and policy number' },
+          { name: 'garaging_address', label: 'Garaging Address (for insurance)', type: 'textarea', placeholder: 'Where the vehicle is normally parked', rows: 2 },
           { name: 'lien_info', label: 'Lien Info', placeholder: 'Lien holder if any' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
