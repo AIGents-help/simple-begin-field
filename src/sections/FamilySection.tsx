@@ -11,6 +11,7 @@ import { sectionService } from '../services/sectionService';
 import { StorageImage } from '../components/common/StorageImage';
 import { PersonAvatar } from '../components/common/PersonAvatar';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { TemplateLauncher } from '../components/templates/TemplateLauncher';
 
 export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
@@ -142,8 +143,23 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
         >
           {(records, _docs, refresh) => {
             const hasSpouse = records.some((r) => isSpouse(r));
+            const hasMinorChild = records.some((r) => {
+              const rel = (r.relationship || '').toLowerCase();
+              if (!/child|son|daughter/.test(rel)) return false;
+              if (!r.birthday) return false;
+              const age = (Date.now() - new Date(r.birthday).getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+              return age < 18;
+            });
             return (
               <div className="space-y-4">
+                {hasMinorChild && (
+                  <TemplateLauncher
+                    templateType="guardianship_nomination"
+                    title="Name a guardian for your minor children"
+                    description="The Guardianship Nomination Letter template walks you through naming a primary and alternate guardian, financial provisions, and care preferences."
+                    buttonLabel="Open Guardianship Template"
+                  />
+                )}
                 {/* Dedicated "Add Spouse" CTA when there is no spouse yet */}
                 {!hasSpouse && (
                   <button

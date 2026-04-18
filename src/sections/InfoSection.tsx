@@ -11,6 +11,7 @@ import { documentService } from '../services/documentService';
 import { CategoryOption } from '../components/upload/types';
 import { INFO_CATEGORY_OPTIONS } from '../config/categories';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { TemplateLauncher } from '../components/templates/TemplateLauncher';
 
 const CATEGORY_GROUPS: Record<string, string[]> = {
   'Legal': ['Will', 'Living Will', 'HCPOA', 'Financial POA', 'Trust', 'Special Needs Trust', 'Medical Directive'],
@@ -160,6 +161,14 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
                 ))}
               </div>
             </div>
+
+            {/* Template entry point */}
+            <TemplateLauncher
+              templateType="digital_asset_letter"
+              title="Organize your digital footprint"
+              description="The Digital Asset Instruction Letter template helps you document accounts, social media, crypto, and what should happen to each — pulled from your packet data."
+              buttonLabel="Open Digital Asset Template"
+            />
 
             {/* Info Record List */}
             <div className="space-y-4">
