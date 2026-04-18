@@ -5,13 +5,23 @@ import { Activity } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { sectionService } from '../services/sectionService';
 import { useAppContext } from '../context/AppContext';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 export const MedicalSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const { bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
 
   const handleDelete = async (record: any, refresh: () => void) => {
     if (!record?.id) return;
-    if (!window.confirm(`Delete "${record.provider_name || 'this provider'}"? This cannot be undone.`)) return;
+    const ok = await confirm({
+
+      title: 'Delete this record?',
+
+      description: `Delete "${record.provider_name || 'this provider'}"? This action cannot be undone.`,
+
+    });
+
+    if (!ok) return;
     const { error } = await sectionService.deleteRecord('medical', record.id);
     if (error) {
       toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });

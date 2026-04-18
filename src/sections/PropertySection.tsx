@@ -5,13 +5,23 @@ import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/
 import { Package } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { sectionService } from '../services/sectionService';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 export const PropertySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const { bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
 
   const handleDelete = async (record: any, refresh: () => void) => {
     if (!record?.id) return;
-    if (!window.confirm(`Delete "${record.item_name || 'this item'}"? This cannot be undone.`)) return;
+    const ok = await confirm({
+
+      title: 'Delete this record?',
+
+      description: `Delete "${record.item_name || 'this item'}"? This action cannot be undone.`,
+
+    });
+
+    if (!ok) return;
     const { error } = await sectionService.deleteRecord('property', record.id);
     if (error) {
       toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });

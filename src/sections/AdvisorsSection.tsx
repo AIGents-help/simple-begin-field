@@ -6,14 +6,24 @@ import { ShieldCheck, Search } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { ProfessionalFinder } from '../components/directory/ProfessionalFinder';
 import { sectionService } from '../services/sectionService';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 export const AdvisorsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const [activeView, setActiveView] = useState<'list' | 'find'>('list');
   const { bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
 
   const handleDelete = async (record: any, refresh: () => void) => {
     if (!record?.id) return;
-    if (!window.confirm(`Delete "${record.name || 'this advisor'}"? This cannot be undone.`)) return;
+    const ok = await confirm({
+
+      title: 'Delete this record?',
+
+      description: `Delete "${record.name || 'this advisor'}"? This action cannot be undone.`,
+
+    });
+
+    if (!ok) return;
     const { error } = await sectionService.deleteRecord('advisors', record.id);
     if (error) {
       toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });

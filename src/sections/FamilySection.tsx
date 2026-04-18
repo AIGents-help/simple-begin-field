@@ -8,6 +8,7 @@ import { FamilyTreeView } from '../components/family/FamilyTreeView';
 import { SpouseProfileSheet } from '../components/family/SpouseProfileSheet';
 import { sectionService } from '../services/sectionService';
 import { StorageImage } from '../components/common/StorageImage';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
@@ -15,6 +16,7 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
   const [editingSpouse, setEditingSpouse] = useState<any | null>(null);
   const refreshRef = React.useRef<(() => void) | null>(null);
   const { bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
 
   const isSpouse = (record: any) =>
     (record?.relationship || '').toLowerCase() === 'spouse';
@@ -24,7 +26,15 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
       toast.error('Cannot delete: this record is missing an ID.', { duration: 4000, position: 'bottom-center' });
       return;
     }
-    if (!window.confirm(`Delete "${record.name || 'this family member'}"? This cannot be undone.`)) return;
+    const ok = await confirm({
+
+      title: 'Delete this record?',
+
+      description: `Delete "${record.name || 'this family member'}"? This action cannot be undone.`,
+
+    });
+
+    if (!ok) return;
     const { error } = await sectionService.deleteRecord('family', record.id);
     if (error) {
       toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });
