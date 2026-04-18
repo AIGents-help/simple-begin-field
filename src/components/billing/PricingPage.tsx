@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { PUBLIC_PLANS, getPlansByCategory, PricingPlan, PlanCategory } from '../../config/pricingConfig';
 import { useAppContext } from '../../context/AppContext';
 import { CheckoutButton } from './CheckoutButton';
+import { GiftPurchaseModal } from './GiftPurchaseModal';
 
 type Tab = 'individual' | 'couple' | 'family' | 'corporate' | 'gift';
 
@@ -282,41 +283,40 @@ const CorporateTab = ({ plans }: { plans: PricingPlan[] }) => {
   );
 };
 
-const GiftTab = ({ plans }: { plans: PricingPlan[] }) => (
-  <div className="max-w-5xl mx-auto">
-    <div className="text-center mb-8">
-      <Gift size={32} className="mx-auto text-navy-muted mb-3" />
-      <h3 className="text-2xl font-serif font-bold text-navy-muted">Give the gift of peace of mind</h3>
-      <p className="text-stone-500 mt-2 text-sm max-w-xl mx-auto">
-        Purchase a lifetime account for someone you love. They receive a personal note and a redemption code.
-      </p>
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {plans.map((plan) => (
-        <div key={plan.id} className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 flex flex-col">
-          <h4 className="font-bold text-navy-muted text-sm">{plan.name.replace('Gift — ', '')}</h4>
-          <div className="text-3xl font-bold text-navy-muted mt-2">${plan.price}</div>
-          <div className="text-xs text-stone-500 mt-1 flex-1">
-            {plan.featureTier === 'full' ? 'Full Feature' : 'Basic'} • {plan.seatLimit === 2 ? 'Couple' : 'Single'}
-          </div>
-          {plan.stripePriceId ? (
-            <CheckoutButton
-              stripePriceId={plan.stripePriceId}
-              planKey={plan.id}
-              className="mt-4 w-full py-2.5 rounded-xl bg-navy-muted text-white font-bold text-xs"
+const GiftTab = ({ plans }: { plans: PricingPlan[] }) => {
+  const [active, setActive] = useState<PricingPlan | null>(null);
+  return (
+    <div className="max-w-5xl mx-auto">
+      <div className="text-center mb-8">
+        <Gift size={32} className="mx-auto text-navy-muted mb-3" />
+        <h3 className="text-2xl font-serif font-bold text-navy-muted">Give the gift of peace of mind</h3>
+        <p className="text-stone-500 mt-2 text-sm max-w-xl mx-auto">
+          Purchase a lifetime account for someone you love. They receive a personal note and a redemption code.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {plans.map((plan) => (
+          <div key={plan.id} className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 flex flex-col">
+            <h4 className="font-bold text-navy-muted text-sm">{plan.name.replace('Gift — ', '')}</h4>
+            <div className="text-3xl font-bold text-navy-muted mt-2">${plan.price}</div>
+            <div className="text-xs text-stone-500 mt-1 flex-1">
+              {plan.featureTier === 'full' ? 'Full Feature' : 'Basic'} • {plan.seatLimit === 2 ? 'Couple' : 'Single'}
+            </div>
+            <button
+              onClick={() => setActive(plan)}
+              className="mt-4 w-full py-2.5 rounded-xl bg-navy-muted text-white font-bold text-xs hover:bg-navy-muted/90"
             >
               Gift it
-            </CheckoutButton>
-          ) : (
-            <button disabled className="mt-4 w-full py-2.5 rounded-xl bg-stone-100 text-stone-400 font-bold text-xs">
-              Coming Soon
             </button>
-          )}
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
+      <p className="text-center text-xs text-stone-500 mt-6">
+        Recipient details and personal message are collected at checkout. Codes expire 1 year from purchase.
+      </p>
+      {active && (
+        <GiftPurchaseModal plan={active} isOpen={!!active} onClose={() => setActive(null)} />
+      )}
     </div>
-    <p className="text-center text-xs text-stone-500 mt-6">
-      Recipient details and personal message are collected at checkout. Codes expire 1 year from purchase.
-    </p>
-  </div>
-);
+  );
+};
