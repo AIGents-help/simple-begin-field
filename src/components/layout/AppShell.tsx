@@ -24,6 +24,7 @@ import { Shield } from 'lucide-react';
 import { CategoryOption } from '../upload/types';
 import { SectionId } from '../../config/types';
 import { HavenAssistant } from '../haven/HavenAssistant';
+import { EstateSummaryPage } from '../estate/EstateSummaryPage';
 
 export const AppShell = () => {
   const { onboarded, view, setView, loading, user, profile, setTab } = useAppContext();
@@ -141,6 +142,8 @@ export const AppShell = () => {
         return <FindProfessionalScreen />;
       case 'admin':
         return <AdminFeaturedProfessionals />;
+      case 'estate':
+        return <EstateSummaryPage />;
       default:
         return <DashboardScreen />;
     }
