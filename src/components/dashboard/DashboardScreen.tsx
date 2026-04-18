@@ -262,8 +262,85 @@ export const DashboardScreen = () => {
             </div>
           );
         })}
+
+        {/* Custom user-created folders */}
+        {customSections.map((cs) => {
+          const Icon = getCustomSectionIcon(cs.icon);
+          return (
+            <div key={cs.id} className="relative pt-8 group">
+              <div className="absolute top-0 left-0 h-8 w-[45%] rounded-t-lg border-t border-x border-amber-300 flex items-center px-3 justify-between bg-amber-100 text-amber-800 z-0">
+                <span className="text-[9px] font-bold uppercase tracking-wider truncate mr-1">{cs.name}</span>
+                <span className="text-[8px] font-bold">CUSTOM</span>
+              </div>
+              <button
+                onClick={() => { setActiveCustomSection(cs.id); setTab('custom'); setView('sections'); }}
+                className="relative w-full text-left bg-amber-50/60 p-6 rounded-tr-2xl rounded-bl-2xl rounded-br-2xl border border-amber-200 shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between h-52 z-10"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="p-3 rounded-xl bg-white/80 text-amber-800 border border-amber-200 shadow-inner">
+                    <Icon size={24} />
+                  </div>
+                  <span className="px-2 py-0.5 bg-amber-200/70 text-amber-900 text-[9px] font-bold uppercase tracking-wider rounded border border-amber-300/60">
+                    Custom
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-serif font-bold text-lg text-navy-muted leading-tight">{cs.name}</h3>
+                    <ChevronRight size={18} className="text-stone-400 group-hover:text-navy-muted transition-colors shrink-0" />
+                  </div>
+                  {cs.description && (
+                    <p className="font-serif italic text-[12px] text-stone-500/80 leading-snug line-clamp-2">
+                      {cs.description}
+                    </p>
+                  )}
+                </div>
+              </button>
+            </div>
+          );
+        })}
+
+        {/* Create custom section card */}
+        {customSections.length < 3 ? (
+          <div className="relative pt-8">
+            <button
+              onClick={() => setShowCreateCustom(true)}
+              className="relative w-full text-left bg-amber-50/30 p-6 rounded-2xl border-2 border-dashed border-amber-300 hover:border-amber-400 hover:bg-amber-50/60 transition-all duration-200 flex flex-col justify-center items-center gap-3 h-60"
+            >
+              <div className="p-3 rounded-xl bg-amber-100 text-amber-700 border border-amber-200">
+                <Plus size={28} />
+              </div>
+              <div className="text-center">
+                <h3 className="font-serif font-bold text-lg text-navy-muted">Create Your Own Section</h3>
+                <p className="text-[12px] text-stone-500 mt-1">
+                  Add up to 3 personalized folders ({customSections.length}/3)
+                </p>
+              </div>
+            </button>
+          </div>
+        ) : (
+          <div className="relative pt-8">
+            <div className="relative w-full bg-stone-50 p-6 rounded-2xl border border-stone-200 flex flex-col justify-center items-center gap-2 h-60 text-center">
+              <div className="p-3 rounded-xl bg-stone-100 text-stone-400">
+                <Plus size={28} />
+              </div>
+              <p className="text-sm font-bold text-stone-500">Custom sections (3/3)</p>
+              <p className="text-[11px] text-stone-400">You've reached the maximum.</p>
+            </div>
+          </div>
+        )}
       </div>
 
+      <CustomSectionModal
+        isOpen={showCreateCustom}
+        onClose={() => setShowCreateCustom(false)}
+        onSaved={(s) => {
+          void refreshCustomSections();
+          setActiveCustomSection(s.id);
+          setTab('custom');
+          setView('sections');
+        }}
+      />
       {/* Download My Packet Banner */}
       <div className="bg-gradient-to-br from-teal-50 to-emerald-50/60 border border-teal-200/60 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
         <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0">
