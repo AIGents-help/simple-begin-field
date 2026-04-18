@@ -384,7 +384,18 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
               const isUser = !!n.isUser;
               const deceased = !isUser && !!member?.is_deceased;
               const name = isUser ? rootName : member?.name || '';
-              const label = isUser ? 'You' : member?.relationship || '';
+              // Relabel spouses based on marital status so the tree never shows
+              // a divorced/widowed person as a current "Spouse".
+              const rawRel = isUser ? 'You' : member?.relationship || '';
+              const status = (member?.marital_status || '').toLowerCase();
+              const isSpouseLike = ['spouse', 'partner', 'husband', 'wife'].includes(rawRel.toLowerCase());
+              const label = isUser
+                ? 'You'
+                : isSpouseLike && (status === 'divorced' || status === 'separated')
+                ? 'Ex-Spouse'
+                : isSpouseLike && status === 'widowed'
+                ? 'Widowed'
+                : rawRel;
               const year = validYear(member?.birthday);
               const deathYear = validYear(member?.date_of_death);
               const fillColor = isUser ? '#0f1d3a' : deceased ? '#6b7280' : '#1a2744';
