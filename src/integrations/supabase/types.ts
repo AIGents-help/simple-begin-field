@@ -29,6 +29,7 @@ export type Database = {
           notes: string | null
           packet_id: string | null
           phone: string | null
+          photo_path: string | null
           scope: string | null
           status: string | null
           updated_at: string | null
@@ -47,6 +48,7 @@ export type Database = {
           notes?: string | null
           packet_id?: string | null
           phone?: string | null
+          photo_path?: string | null
           scope?: string | null
           status?: string | null
           updated_at?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           notes?: string | null
           packet_id?: string | null
           phone?: string | null
+          photo_path?: string | null
           scope?: string | null
           status?: string | null
           updated_at?: string | null
@@ -2948,6 +2951,7 @@ export type Database = {
           notify_on: string | null
           notify_on_updates: boolean | null
           packet_id: string
+          photo_path: string | null
           relationship: string | null
           status: string | null
           updated_at: string | null
@@ -2971,6 +2975,7 @@ export type Database = {
           notify_on?: string | null
           notify_on_updates?: boolean | null
           packet_id: string
+          photo_path?: string | null
           relationship?: string | null
           status?: string | null
           updated_at?: string | null
@@ -2994,6 +2999,7 @@ export type Database = {
           notify_on?: string | null
           notify_on_updates?: boolean | null
           packet_id?: string
+          photo_path?: string | null
           relationship?: string | null
           status?: string | null
           updated_at?: string | null
