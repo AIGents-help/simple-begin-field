@@ -167,7 +167,28 @@ export const PartnerSettings: React.FC = () => {
               </div>
             </div>
 
-            {/* Unlink */}
+            {/* Email notifications toggle */}
+            <div className="paper-sheet p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <Mail size={18} className="text-navy-muted mt-0.5 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-navy-muted">Email notifications</p>
+                    <p className="text-[11px] text-stone-500 mt-0.5">
+                      Get an email when your partner makes updates. In-app alerts always stay on.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleToggleEmail(!emailEnabled)}
+                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${emailEnabled ? 'bg-emerald-500' : 'bg-stone-300'}`}
+                  aria-pressed={emailEnabled}
+                >
+                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${emailEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                </button>
+              </div>
+            </div>
+
             <div className="paper-sheet p-5 border border-rose-100 bg-rose-50/30">
               <div className="flex items-start gap-3">
                 <AlertTriangle size={18} className="text-rose-600 mt-0.5 shrink-0" />
