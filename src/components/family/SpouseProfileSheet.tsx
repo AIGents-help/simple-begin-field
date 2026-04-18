@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '@/context/AppContext';
 import { uploadService } from '@/services/uploadService';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
+import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
 
 interface Props {
   isOpen: boolean;
