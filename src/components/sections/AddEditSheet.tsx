@@ -312,6 +312,11 @@ export const AddEditSheet = ({
           status: isNA ? 'not_applicable' : 'completed',
           is_na: isNA
         };
+        // Family: derive the legacy `name` column from first + last so the NOT NULL constraint is satisfied
+        if (activeTab === 'family') {
+          const composed = [formData.first_name, formData.last_name].filter(Boolean).join(' ').trim();
+          record.name = composed || formData.name || formData.preferred_name || 'Unnamed';
+        }
         const { id, created_at, updated_at, entryOnly, ...rest } = record;
         recordToSave = rest;
       }
