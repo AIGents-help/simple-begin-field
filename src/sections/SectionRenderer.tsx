@@ -72,10 +72,15 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
     }
   };
 
+  // Mobile: MobileTopBar (~61px) + FolderTabNav (~80px) = ~141px sticky stack -> pt-36
+  // Desktop (lg+): no sticky stack -> normal padding
+  // pb-28 on mobile to clear the BottomNav (BottomNav is ~88px incl. safe area)
+  const containerClass = "px-4 pt-36 pb-28 sm:px-6 sm:pt-36 lg:p-8 lg:pt-8 lg:pb-8";
+
   // Affiliate section is accessible to all logged-in users regardless of plan
   if (activeTab === 'affiliate') {
     return (
-      <div className="px-4 pb-4 pt-[5.5rem] sm:p-6 lg:p-8">
+      <div className={containerClass}>
         {renderSection()}
       </div>
     );
@@ -83,7 +88,7 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
 
   return (
     <PlanGate feature={activeTab}>
-      <div className="px-4 pb-4 pt-[5.5rem] sm:p-6 lg:p-8">
+      <div className={containerClass}>
         {renderSection()}
       </div>
     </PlanGate>
