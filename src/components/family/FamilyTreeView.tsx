@@ -192,12 +192,15 @@ export const FamilyTreeView = ({ onEditMember, onAddMember }: FamilyTreeViewProp
             const deceased = !isRoot && !!member?.is_deceased;
             const name = isRoot ? rootName : member?.name || '';
             const label = isRoot ? 'You' : member?.relationship || '';
-            const year = member?.birthday
-              ? new Date(member.birthday).getFullYear().toString()
-              : '';
-            const deathYear = member?.date_of_death
-              ? new Date(member.date_of_death).getFullYear().toString()
-              : '';
+            const validYear = (raw: string | null | undefined): string => {
+              if (!raw || raw.startsWith('0000-') || raw.startsWith('0001-')) return '';
+              const d = new Date(raw);
+              if (isNaN(d.getTime())) return '';
+              const y = d.getFullYear();
+              return y >= 1900 ? y.toString() : '';
+            };
+            const year = validYear(member?.birthday);
+            const deathYear = validYear(member?.date_of_death);
             const fillColor = deceased ? '#6b7280' : '#1a2744';
             const nameOpacity = deceased ? 0.7 : 1;
             const displayName = (deceased ? '† ' : '') + name;
