@@ -1235,16 +1235,26 @@ export type Database = {
           created_at: string | null
           date_of_death: string | null
           divorce_attorney: string | null
+          divorce_finalized: boolean | null
           divorce_finalized_date: string | null
           divorce_jurisdiction: string | null
           divorce_settlement_notes: string | null
           email: string | null
           employer: string | null
           first_name: string | null
+          guardian_name: string | null
+          guardian_phone: string | null
+          guardian_relationship: string | null
+          has_special_needs: boolean | null
           id: string
+          inlaw_subtype: string | null
+          is_beneficiary: boolean | null
           is_deceased: boolean
+          is_dependent: boolean | null
           is_na: boolean | null
           last_name: string | null
+          legacy_notes: string | null
+          lives_with_user: boolean | null
           marital_status: string | null
           marriage_certificate_on_file: boolean | null
           marriage_date: string | null
@@ -1254,20 +1264,26 @@ export type Database = {
           occupation: string | null
           packet_id: string | null
           parent_member_id: string | null
+          parent_side: string | null
           phone: string | null
           photo_path: string | null
           place_of_birth: string | null
           place_of_death: string | null
           preferred_name: string | null
+          related_to_spouse_id: string | null
           relationship: string | null
+          relationship_subtype: string | null
           reminder_notes: string | null
+          school_name: string | null
           scope: string | null
           separation_date: string | null
+          special_needs_notes: string | null
           ssn_encrypted: string | null
           ssn_masked: string | null
           status: string | null
           suffix: string | null
           updated_at: string | null
+          which_parent: string | null
         }
         Insert: {
           address?: string | null
@@ -1277,16 +1293,26 @@ export type Database = {
           created_at?: string | null
           date_of_death?: string | null
           divorce_attorney?: string | null
+          divorce_finalized?: boolean | null
           divorce_finalized_date?: string | null
           divorce_jurisdiction?: string | null
           divorce_settlement_notes?: string | null
           email?: string | null
           employer?: string | null
           first_name?: string | null
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          guardian_relationship?: string | null
+          has_special_needs?: boolean | null
           id?: string
+          inlaw_subtype?: string | null
+          is_beneficiary?: boolean | null
           is_deceased?: boolean
+          is_dependent?: boolean | null
           is_na?: boolean | null
           last_name?: string | null
+          legacy_notes?: string | null
+          lives_with_user?: boolean | null
           marital_status?: string | null
           marriage_certificate_on_file?: boolean | null
           marriage_date?: string | null
@@ -1296,20 +1322,26 @@ export type Database = {
           occupation?: string | null
           packet_id?: string | null
           parent_member_id?: string | null
+          parent_side?: string | null
           phone?: string | null
           photo_path?: string | null
           place_of_birth?: string | null
           place_of_death?: string | null
           preferred_name?: string | null
+          related_to_spouse_id?: string | null
           relationship?: string | null
+          relationship_subtype?: string | null
           reminder_notes?: string | null
+          school_name?: string | null
           scope?: string | null
           separation_date?: string | null
+          special_needs_notes?: string | null
           ssn_encrypted?: string | null
           ssn_masked?: string | null
           status?: string | null
           suffix?: string | null
           updated_at?: string | null
+          which_parent?: string | null
         }
         Update: {
           address?: string | null
@@ -1319,16 +1351,26 @@ export type Database = {
           created_at?: string | null
           date_of_death?: string | null
           divorce_attorney?: string | null
+          divorce_finalized?: boolean | null
           divorce_finalized_date?: string | null
           divorce_jurisdiction?: string | null
           divorce_settlement_notes?: string | null
           email?: string | null
           employer?: string | null
           first_name?: string | null
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          guardian_relationship?: string | null
+          has_special_needs?: boolean | null
           id?: string
+          inlaw_subtype?: string | null
+          is_beneficiary?: boolean | null
           is_deceased?: boolean
+          is_dependent?: boolean | null
           is_na?: boolean | null
           last_name?: string | null
+          legacy_notes?: string | null
+          lives_with_user?: boolean | null
           marital_status?: string | null
           marriage_certificate_on_file?: boolean | null
           marriage_date?: string | null
@@ -1338,20 +1380,26 @@ export type Database = {
           occupation?: string | null
           packet_id?: string | null
           parent_member_id?: string | null
+          parent_side?: string | null
           phone?: string | null
           photo_path?: string | null
           place_of_birth?: string | null
           place_of_death?: string | null
           preferred_name?: string | null
+          related_to_spouse_id?: string | null
           relationship?: string | null
+          relationship_subtype?: string | null
           reminder_notes?: string | null
+          school_name?: string | null
           scope?: string | null
           separation_date?: string | null
+          special_needs_notes?: string | null
           ssn_encrypted?: string | null
           ssn_masked?: string | null
           status?: string | null
           suffix?: string | null
           updated_at?: string | null
+          which_parent?: string | null
         }
         Relationships: [
           {
@@ -1364,6 +1412,13 @@ export type Database = {
           {
             foreignKeyName: "family_members_parent_member_id_fkey"
             columns: ["parent_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_related_to_spouse_id_fkey"
+            columns: ["related_to_spouse_id"]
             isOneToOne: false
             referencedRelation: "family_members"
             referencedColumns: ["id"]

@@ -49,8 +49,8 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       { label: 'Parent', prefill: { relationship: 'Parent' } },
       { label: 'Sibling', prefill: { relationship: 'Sibling' } },
       { label: 'Grandparent', prefill: { relationship: 'Grandparent' } },
-      { label: 'Grandchild', prefill: { relationship: 'Grandchild' } },
-      { label: 'Friend', prefill: { relationship: 'Friend' } },
+      { label: 'In-Law', prefill: { relationship: 'In-Law' } },
+      { label: 'Other Family Member', prefill: { relationship: 'Other' } },
     ],
     documents: [
       { label: 'Guardianship Papers', prefill: { name: 'Guardianship Papers' } },

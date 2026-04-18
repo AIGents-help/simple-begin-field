@@ -1,85 +1,105 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
-import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
-import { User, List, GitBranch, Heart } from 'lucide-react';
-import { getCategoryIcon } from '../config/categoryIcons';
+import { SectionScreenTemplate } from '../components/sections/SectionScreenTemplate';
+import { List, GitBranch, Plus, Heart } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { FamilyTreeView } from '../components/family/FamilyTreeView';
 import { SpouseProfileSheet } from '../components/family/SpouseProfileSheet';
-import { sectionService } from '../services/sectionService';
-import { StorageImage } from '../components/common/StorageImage';
-import { PersonAvatar } from '../components/common/PersonAvatar';
-import { useConfirm } from '../context/ConfirmDialogContext';
+import { AddFamilyMemberSheet } from '../components/family/AddFamilyMemberSheet';
+import { SpouseCard } from '../components/family/cards/SpouseCard';
+import { ParentCard } from '../components/family/cards/ParentCard';
+import { ChildCard } from '../components/family/cards/ChildCard';
+import { SiblingCard } from '../components/family/cards/SiblingCard';
+import { GrandparentCard } from '../components/family/cards/GrandparentCard';
+import { InLawCard } from '../components/family/cards/InLawCard';
+import { OtherFamilyCard } from '../components/family/cards/OtherFamilyCard';
 import { TemplateLauncher } from '../components/templates/TemplateLauncher';
+import { groupRelationship, RELATIONSHIP_GROUPS, isMinorFromBirthday } from '../services/familyService';
 
-export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
+type RelKey = 'spouse' | 'child' | 'parent' | 'sibling' | 'grandparent' | 'inlaw' | 'other' | 'grandchild';
+
+const draftId = () => `draft-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const cardForGroup = (group: string) => {
+  switch (group) {
+    case 'spouse': return SpouseCard;
+    case 'child': return ChildCard;
+    case 'parent': return ParentCard;
+    case 'sibling': return SiblingCard;
+    case 'grandparent': return GrandparentCard;
+    case 'inlaw': return InLawCard;
+    default: return OtherFamilyCard;
+  }
+};
+
+export const FamilySection = ({
+  onAddClick,
+  onRefresh,
+}: {
+  onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void;
+  onRefresh?: (fn: () => void) => void;
+}) => {
+  const { currentPacket, activeScope, bumpCompletion } = useAppContext();
   const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [spouseSheetOpen, setSpouseSheetOpen] = useState(false);
   const [editingSpouse, setEditingSpouse] = useState<any | null>(null);
-  // Bumping this triggers FamilyTreeView to re-fetch family_members so the
-  // tree never shows stale data after edits/saves/deletes.
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const refreshRef = React.useRef<(() => void) | null>(null);
-  const { bumpCompletion } = useAppContext();
-  const confirm = useConfirm();
+
+  // Local list of "draft" cards added inline that aren't in the DB yet.
+  const [drafts, setDrafts] = useState<any[]>([]);
 
   const isSpouse = (record: any) =>
-    (record?.relationship || '').toLowerCase() === 'spouse';
+    /spouse|partner/i.test(record?.relationship || '');
 
-  const handleDelete = async (record: any, refresh: () => void) => {
-    if (!record?.id) {
-      toast.error('Cannot delete: this record is missing an ID.', { duration: 4000, position: 'bottom-center' });
-      return;
-    }
-    const ok = await confirm({
-
-      title: 'Delete this record?',
-
-      description: `Delete "${record.name || 'this family member'}"? This action cannot be undone.`,
-
-    });
-
-    if (!ok) return;
-    const { error } = await sectionService.deleteRecord('family', record.id);
-    if (error) {
-      toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });
-      return;
-    }
-    refresh();
-    setTreeRefreshKey((k) => k + 1);
-    bumpCompletion();
-    toast.success('Family member deleted.', { duration: 3000, position: 'bottom-center' });
-  };
-
-  const openSpouseSheet = (records: any[], record?: any) => {
-    if (record) {
-      setEditingSpouse(record);
+  const handleAddPick = (relationship: string) => {
+    setPickerOpen(false);
+    if (relationship === 'Spouse') {
+      // Use the existing rich spouse sheet
+      setEditingSpouse(null);
       setSpouseSheetOpen(true);
       return;
     }
-    // Adding new — only block if there is already an ACTIVE (currently married) spouse.
-    // Past marriages (divorced/separated/widowed) are allowed alongside a current spouse,
-    // and a person may have multiple historical spouse records.
-    const activeMarriedSpouse = records.find(
-      (r) => isSpouse(r) && !r.is_deceased && (r.marital_status || 'married').toLowerCase() === 'married'
-    );
-    if (activeMarriedSpouse) {
-      toast.error('You already have a current spouse on file. Mark them as divorced, separated, widowed, or deceased before adding a new current spouse. Past marriages can still be added with a non-married status.', {
-        duration: 6000,
-        position: 'bottom-center',
-      });
-      return;
-    }
-    setEditingSpouse(null);
-    setSpouseSheetOpen(true);
+    // Create an inline draft card for the picked relationship
+    const draft: any = {
+      id: draftId(),
+      packet_id: currentPacket?.id,
+      scope: activeScope || 'shared',
+      relationship,
+      first_name: '',
+      last_name: '',
+      name: 'New family member',
+    };
+    setDrafts((d) => [draft, ...d]);
+    setExpandedId(draft.id);
+    // Scroll the new card into view
+    setTimeout(() => {
+      document.getElementById(`family-card-${draft.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
 
-  // Hand-rolled add button so we can intercept "Add Spouse" via the relationship picker
-  // For now, the "Add Family Member" button still flows through the generic sheet.
-  // When the user picks "Spouse" from the relationship dropdown there, the generic sheet
-  // saves a basic record — but they can also tap a spouse card to open the rich editor.
-  // To make spouse-add explicit, we surface a dedicated Add Spouse CTA at the top of the list.
+  const handleSaved = (saved: any, prevDraftId?: string) => {
+    if (prevDraftId) setDrafts((d) => d.filter((x) => x.id !== prevDraftId));
+    refreshRef.current?.();
+    setTreeRefreshKey((k) => k + 1);
+    bumpCompletion();
+  };
+
+  const handleDeleted = (id: string) => {
+    setDrafts((d) => d.filter((x) => x.id !== id));
+    refreshRef.current?.();
+    setTreeRefreshKey((k) => k + 1);
+    bumpCompletion();
+    if (expandedId === id) setExpandedId(null);
+  };
+
+  const handleCancelDraft = (id: string) => {
+    setDrafts((d) => d.filter((x) => x.id !== id));
+    if (expandedId === id) setExpandedId(null);
+  };
 
   return (
     <div>
@@ -89,9 +109,7 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
           <button
             onClick={() => setViewMode('list')}
             className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 ${
-              viewMode === 'list'
-                ? 'bg-white text-stone-900 shadow-sm'
-                : 'text-stone-500 hover:text-stone-700'
+              viewMode === 'list' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'
             }`}
           >
             <List className="w-3 h-3" />
@@ -100,9 +118,7 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
           <button
             onClick={() => setViewMode('tree')}
             className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 ${
-              viewMode === 'tree'
-                ? 'bg-white text-stone-900 shadow-sm'
-                : 'text-stone-500 hover:text-stone-700'
+              viewMode === 'tree' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'
             }`}
           >
             <GitBranch className="w-3 h-3" />
@@ -113,27 +129,17 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
 
       {viewMode === 'list' ? (
         <SectionScreenTemplate
-          onAddClick={(file, data, options) => {
-            // Family relationship entries (Parent, Child, Sibling, etc.) must use the
-            // full structured form — strip `entryOnly` which would otherwise force the
-            // generic Title/Notes layout.
-            const cleaned = data ? { ...data } : data;
-            if (cleaned && cleaned.relationship) {
-              delete cleaned.entryOnly;
-            }
-            // If the prefilled data already says Spouse, route to the rich sheet
-            if (cleaned?.relationship && (cleaned.relationship as string).toLowerCase() === 'spouse') {
-              setEditingSpouse(cleaned);
-              setSpouseSheetOpen(true);
+          onAddClick={(file, data) => {
+            // Intercept relationship-prefilled adds from the recommendations row
+            if (data?.relationship) {
+              handleAddPick(data.relationship);
               return;
             }
-            onAddClick(file, cleaned, options);
+            // Otherwise open the relationship picker
+            setPickerOpen(true);
           }}
           onRefresh={(fn) => {
             refreshRef.current = fn;
-            // Wrap the upstream refresh so any save coming through AppShell's
-            // AddEditSheet (non-spouse family edits) also bumps the tree key
-            // and the tree refetches automatically.
             const wrapped = (newRecord?: any) => {
               fn(newRecord);
               setTreeRefreshKey((k) => k + 1);
@@ -142,16 +148,17 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
           }}
         >
           {(records, _docs, refresh) => {
-            const hasSpouse = records.some((r) => isSpouse(r));
-            const hasMinorChild = records.some((r) => {
-              const rel = (r.relationship || '').toLowerCase();
-              if (!/child|son|daughter/.test(rel)) return false;
-              if (!r.birthday) return false;
-              const age = (Date.now() - new Date(r.birthday).getTime()) / (365.25 * 24 * 60 * 60 * 1000);
-              return age < 18;
-            });
+            // Merge real records + inline drafts; group by relationship type
+            const all = [...drafts, ...records];
+            const grouped: Record<string, any[]> = {};
+            for (const r of all) {
+              const g = groupRelationship(r);
+              (grouped[g] = grouped[g] || []).push(r);
+            }
+            const hasMinorChild = records.some((r) => /child/i.test(r.relationship || '') && isMinorFromBirthday(r.birthday));
+
             return (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {hasMinorChild && (
                   <TemplateLauncher
                     templateType="guardianship_nomination"
@@ -160,72 +167,62 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
                     buttonLabel="Open Guardianship Template"
                   />
                 )}
-                {/* Dedicated "Add Spouse" CTA when there is no spouse yet */}
-                {!hasSpouse && (
-                  <button
-                    type="button"
-                    onClick={() => openSpouseSheet(records)}
-                    className="w-full p-4 border-2 border-dashed border-rose-200 rounded-2xl flex items-center justify-center gap-2 text-rose-500 hover:border-rose-400 hover:bg-rose-50/40 transition-colors"
-                  >
-                    <Heart size={18} />
-                    <span className="font-bold text-sm">Add Spouse / Partner</span>
-                  </button>
-                )}
 
-                {records.map((record) => {
-                  const spouse = isSpouse(record);
-                  const status = (record.marital_status || 'married').toLowerCase();
-                  const isCurrentSpouse = spouse && status === 'married';
-                  const subtitleParts = spouse
-                    ? [
-                        record.preferred_name ? `"${record.preferred_name}"` : '',
-                        record.marriage_date ? `Married ${new Date(record.marriage_date).getFullYear()}` : '',
-                        record.phone,
-                        record.email,
-                      ]
-                    : [record.relationship, record.phone, record.email];
-
-                  // Spouse status → human-readable badge
-                  // Married → "Spouse", Divorced/Separated → "Ex-Spouse",
-                  // Widowed → "Widowed Spouse", anything else → titlecased status.
-                  const spouseBadge = (() => {
-                    if (status === 'married') return 'Spouse';
-                    if (status === 'divorced' || status === 'separated') return 'Ex-Spouse';
-                    if (status === 'widowed') return 'Widowed Spouse';
-                    return status.charAt(0).toUpperCase() + status.slice(1);
-                  })();
-
-                  const badge = spouse
-                    ? spouseBadge
-                    : record.birthday
-                    ? 'Birthday'
-                    : undefined;
-
+                {RELATIONSHIP_GROUPS.map((group) => {
+                  const list = grouped[group.key] || [];
+                  if (list.length === 0) return null;
                   return (
-                    <RecordCard
-                      key={record.id}
-                      title={record.name}
-                      subtitle={buildSubtitle(...subtitleParts)}
-                      subtitlePlaceholder="No contact details added"
-                      avatar={
-                        <PersonAvatar
-                          photoPath={record.photo_path}
-                          name={record.name}
-                          isDeceased={!!record.is_deceased}
-                          size={52}
-                        />
-                      }
-                      badge={badge}
-                      data={record}
-                      onEdit={() =>
-                        spouse
-                          ? openSpouseSheet(records, record)
-                          : onAddClick(undefined, record)
-                      }
-                      onDelete={() => handleDelete(record, refresh)}
-                    />
+                    <div key={group.key}>
+                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-400 mb-2 px-1">
+                        {group.label} <span className="text-stone-300">({list.length})</span>
+                      </h3>
+                      <div className="space-y-3">
+                        {list.map((record) => {
+                          if (group.key === 'spouse') {
+                            const Card = SpouseCard;
+                            return (
+                              <div key={record.id} id={`family-card-${record.id}`}>
+                                <Card
+                                  record={record}
+                                  packetId={currentPacket?.id}
+                                  expanded={expandedId === record.id}
+                                  onToggle={() => setExpandedId(expandedId === record.id ? null : record.id)}
+                                  onSaved={handleSaved}
+                                  onDeleted={(id: string) => { handleDeleted(id); refresh(); }}
+                                  onCancelDraft={handleCancelDraft}
+                                />
+                              </div>
+                            );
+                          }
+                          const Card = cardForGroup(group.key);
+                          return (
+                            <div key={record.id} id={`family-card-${record.id}`}>
+                              <Card
+                                record={record}
+                                packetId={currentPacket?.id}
+                                expanded={expandedId === record.id}
+                                onToggle={() => setExpandedId(expandedId === record.id ? null : record.id)}
+                                onSaved={handleSaved}
+                                onDeleted={(id: string) => { handleDeleted(id); refresh(); }}
+                                onCancelDraft={handleCancelDraft}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   );
                 })}
+
+                {/* Primary Add Family Member CTA */}
+                <button
+                  type="button"
+                  onClick={() => setPickerOpen(true)}
+                  className="w-full py-4 border-2 border-dashed border-stone-200 rounded-2xl flex items-center justify-center gap-2 text-stone-400 hover:border-navy-muted hover:text-navy-muted transition-colors"
+                >
+                  <Plus size={18} />
+                  <span className="font-bold text-sm">Add Family Member</span>
+                </button>
               </div>
             );
           }}
@@ -238,27 +235,36 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
           </div>
           <FamilyTreeView
             refreshKey={treeRefreshKey}
-            onAddMember={() => onAddClick?.()}
+            onAddMember={() => setPickerOpen(true)}
             onEditMember={(member) => {
               if (isSpouse(member)) {
                 setEditingSpouse(member);
                 setSpouseSheetOpen(true);
               } else {
-                onAddClick?.(undefined, member);
+                // Switch to list view, expand the matching card
+                setViewMode('list');
+                setExpandedId(member.id);
+                setTimeout(() => {
+                  document.getElementById(`family-card-${member.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
               }
             }}
           />
         </div>
       )}
 
+      <AddFamilyMemberSheet
+        isOpen={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onPick={handleAddPick}
+      />
+
       <SpouseProfileSheet
         isOpen={spouseSheetOpen}
         onClose={() => setSpouseSheetOpen(false)}
         spouse={editingSpouse}
         onSaved={() => {
-          // Refresh the family list (template exposed its refresh via onRefresh)
           refreshRef.current?.();
-          // Force the tree view to re-fetch so it never shows stale data
           setTreeRefreshKey((k) => k + 1);
         }}
       />

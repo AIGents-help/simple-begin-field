@@ -728,53 +728,17 @@ export const AddEditSheet = ({
           const dateKeys = ['last_appraisal_date', 'firearm_purchase_date', 'firearm_ccw_expiration'];
           dateKeys.forEach((k) => { if (record[k] === '') record[k] = null; });
         }
-        // Family: derive the legacy `name` column from first + last so the NOT NULL constraint is satisfied
+        // Family: route through the dedicated family service so all the new
+        // structured columns (is_dependent, is_beneficiary, guardian_*, etc.)
+        // persist correctly. Any unknown UI-only fields are folded into
+        // legacy_notes so data is never silently dropped.
         if (activeTab === 'family') {
-          const composed = [formData.first_name, formData.last_name].filter(Boolean).join(' ').trim();
-          record.name = composed || formData.name || formData.preferred_name || 'Unnamed';
-
-          // Whitelist columns that actually exist on family_members.
-          // Any extra UI-only fields get folded into reminder_notes so data isn't lost.
-          const allowed = new Set([
-            'packet_id', 'scope', 'name', 'first_name', 'middle_name', 'last_name',
-            'suffix', 'preferred_name', 'relationship', 'category', 'birthday',
-            'place_of_birth', 'phone', 'email', 'address', 'occupation', 'employer',
-            'reminder_notes', 'photo_path', 'is_deceased', 'date_of_death',
-            'cause_of_death', 'place_of_death', 'marital_status', 'marriage_date',
-            'marriage_place', 'marriage_certificate_on_file', 'parent_member_id',
-            'ssn_encrypted', 'ssn_masked', 'status', 'is_na', 'created_at', 'updated_at',
-            'id',
-          ]);
-          const labelMap: Record<string, string> = {
-            parent_role: 'Which parent',
-            is_dependent: 'Dependent',
-            is_beneficiary: 'Beneficiary',
-            has_special_needs: 'Special needs',
-            special_needs_notes: 'Special needs notes',
-            lives_with_me: 'Lives with me',
-            school_name: 'School',
-            guardian_name: 'Guardian',
-            guardian_relationship: 'Guardian relationship',
-            guardian_phone: 'Guardian phone',
-            spouse_name: 'Spouse name',
-            has_children: 'Has children',
-            grandparent_type: 'Grandparent type',
-            gender: 'Gender',
-          };
-          const extraEntries: string[] = [];
-          Object.keys(record).forEach((key) => {
-            if (!allowed.has(key)) {
-              const val = record[key];
-              if (val !== undefined && val !== null && val !== '') {
-                extraEntries.push(`${labelMap[key] || key}: ${val}`);
-              }
-              delete record[key];
-            }
-          });
-          if (extraEntries.length > 0) {
-            const existingNotes = record.reminder_notes ? `${record.reminder_notes}\n\n` : '';
-            record.reminder_notes = `${existingNotes}${extraEntries.join('\n')}`;
-          }
+          // Lazy import to avoid circular deps at module load time
+          const { sanitizeFamilyPayload } = await import('@/services/familyService');
+          const sanitized = sanitizeFamilyPayload(record);
+          // Merge sanitized result back into `record` (rest of the save pipeline expects `record`)
+          Object.keys(record).forEach((k) => { if (!(k in sanitized)) delete record[k]; });
+          Object.assign(record, sanitized);
         }
         const { id, created_at, updated_at, entryOnly, ...rest } = record;
         recordToSave = rest;
