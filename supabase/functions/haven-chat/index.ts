@@ -48,9 +48,29 @@ Deno.serve(async (req) => {
       else scoreGuidance = `The user's Packet Health Score is ${s}/100 (Strong/Excellent). Offer finishing-touch suggestions and confirm they're well prepared.`;
     }
 
+    // Build template suggestions based on critical gaps
+    let templateGuidance = '';
+    const gapLabels: string[] = (healthScore?.critical_gaps || []).map((g: any) => String(g.label || '').toLowerCase());
+    const gapMatches: string[] = [];
+    if (gapLabels.some((g) => g.includes('will'))) gapMatches.push('a Simple Will template');
+    if (gapLabels.some((g) => g.includes('power of attorney') || g.includes('poa'))) {
+      gapMatches.push('a Financial Power of Attorney template and a Healthcare Power of Attorney template');
+    }
+    if (gapLabels.some((g) => g.includes('directive') || g.includes('living will') || g.includes('healthcare'))) {
+      gapMatches.push('a Healthcare Directive / Living Will template');
+    }
+    if (section === 'funeral') gapMatches.push('a Funeral Instruction Letter template');
+    if (section === 'memories') gapMatches.push('a Letter to Loved Ones template');
+    if (section === 'family') gapMatches.push('a Guardianship Nomination Letter template (if minor children)');
+    if (gapMatches.length) {
+      templateGuidance = `If the user has gaps you can address with a starter template, gently suggest opening one of these and remind them it is only a starting point that needs attorney review: ${gapMatches.join('; ')}. They can find templates by going to Profile → Legal Document Templates. Never imply these are finished legal documents.`;
+    }
+
     const systemPrompt = `You are Haven, the wise and calm guide for Survivor Packet. Your role is to help users complete their life document packet so their loved ones are protected. You are warm, clear, and never morbid. You speak in short, direct sentences. You never say "I cannot" — instead, you guide. Never use markdown headers or bullet lists — respond in natural conversational sentences only.
 
 ${scoreGuidance}
+
+${templateGuidance}
 
 The user is currently in the ${section || 'dashboard'} section. Their current data is: ${JSON.stringify(sectionData || {})}. Identify what is missing and guide them to complete it step by step.`;
 

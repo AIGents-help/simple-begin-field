@@ -10,9 +10,10 @@ import {
 } from '../../services/legalTemplatesService';
 import { TemplateDisclaimerBanner } from './TemplateDisclaimerBanner';
 import { FindAttorneyButton } from './FindAttorneyButton';
-import { ArrowLeft, Save, Download, Printer, Link2, CheckCircle2, Lightbulb, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Download, Printer, Link2, CheckCircle2, Lightbulb, Sparkles, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Props {
   templateType: string;
@@ -199,6 +200,48 @@ export const TemplateEditor: React.FC<Props> = ({ templateType, draftId, onBack 
     window.print();
   };
 
+  const handleDownloadDocx = async () => {
+    if (!draft) return;
+    // Save first so the edge function reads latest values
+    if (dirtyRef.current) await save(false);
+    try {
+      toast.loading('Generating Word document…', { id: 'docx-gen' });
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        toast.error('Please sign in again to download.', { id: 'docx-gen' });
+        return;
+      }
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const url = `https://${projectId}.supabase.co/functions/v1/generate-template-docx`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ draftId: draft.id }),
+      });
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(errBody || 'Failed to generate document');
+      }
+      const blob = await res.blob();
+      const safe = (title || template?.name || 'template').replace(/[^a-z0-9]+/gi, '-');
+      const dlUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = dlUrl;
+      a.download = `${safe}-DRAFT.docx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(dlUrl);
+      toast.success('Word document downloaded', { id: 'docx-gen' });
+    } catch (e: any) {
+      toast.error(e?.message || 'Could not generate Word document', { id: 'docx-gen' });
+    }
+  };
+
   const handleShare = async () => {
     if (!draft) return;
     try {
@@ -233,6 +276,9 @@ export const TemplateEditor: React.FC<Props> = ({ templateType, draftId, onBack 
           </button>
           <button onClick={handleDownloadPdf} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-100 hover:bg-stone-200 text-sm font-medium">
             <Download className="w-4 h-4" /> PDF
+          </button>
+          <button onClick={handleDownloadDocx} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-100 hover:bg-stone-200 text-sm font-medium">
+            <FileText className="w-4 h-4" /> Word (.docx)
           </button>
           <button onClick={handlePrint} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-100 hover:bg-stone-200 text-sm font-medium">
             <Printer className="w-4 h-4" /> Print

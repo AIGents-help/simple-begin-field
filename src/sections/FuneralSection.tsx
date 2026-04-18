@@ -10,6 +10,7 @@ import { FuneralReadings } from '../components/funeral/FuneralReadings';
 import { FuneralPhotoGallery } from '../components/funeral/FuneralPhotoGallery';
 import { SendToFuneralHomeDialog } from '../components/funeral/SendToFuneralHomeDialog';
 import { QuickDownloadButton } from '../components/download/QuickDownloadButton';
+import { TemplateLauncher } from '../components/templates/TemplateLauncher';
 
 /**
  * FuneralSection — single structured editor per packet (one funeral_records row).
@@ -138,6 +139,13 @@ export const FuneralSection = ({
       <FuneralMusicList packetId={currentPacket!.id} funeralRecordId={record.id} />
       <FuneralReadings packetId={currentPacket!.id} funeralRecordId={record.id} />
       <FuneralPhotoGallery packetId={currentPacket!.id} funeralRecordId={record.id} />
+
+      <TemplateLauncher
+        templateType="funeral_instruction_letter"
+        title="Need a formatted letter for the funeral home?"
+        description="Use the Funeral Instruction Letter template to organize disposition, service, music, and reception preferences in a single document — auto-filled from this section."
+        buttonLabel="Open Funeral Templates"
+      />
 
       <SendToFuneralHomeDialog
         isOpen={sendOpen}
