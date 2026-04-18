@@ -630,6 +630,31 @@ export const AddEditSheet = ({
 
       toast.success("Information saved successfully!", { icon: <CheckCircle size={18} className="text-emerald-500" />, duration: 3000, position: "bottom-center" });
       bumpCompletion(); // refresh all completion displays (header badge, ring, folder cards)
+
+      // Cross-section sync prompt: if a federated source value changed,
+      // ask the user whether to review the downstream destinations.
+      const newSnap = buildSourceSnapshot(activeTab, savedRecord || recordToSave);
+      const changedKeys = (Object.keys(newSnap) as SourceKey[]).filter((k) => {
+        const newV = String(newSnap[k] ?? '').trim();
+        const oldV = String(originalSourceSnapshot[k] ?? '').trim();
+        return newV && newV !== oldV;
+      });
+      for (const key of changedKeys) {
+        const copy = sourceChangePromptCopy[key];
+        // Fire-and-forget — non-blocking confirm
+        confirm({
+          title: copy.title,
+          description: copy.description(originalSourceSnapshot[key], newSnap[key]),
+          confirmLabel: 'Review now',
+          cancelLabel: 'Not now',
+        }).then((ok) => {
+          if (ok) {
+            toast.info('Open the related sections to review auto-fill suggestions.', { duration: 4000, position: 'bottom-center' });
+          }
+        });
+        break; // one prompt per save to avoid stacking dialogs
+      }
+
       if (onSuccess) onSuccess(savedRecord);
       handleClose();
     } catch (err: any) {
