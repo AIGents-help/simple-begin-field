@@ -1059,92 +1059,109 @@ Deno.serve(async (req) => {
     };
 
     const dateLong = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const isFuneral = body.download_type === 'funeral_instructions';
+    const isEmergency = body.download_type === 'emergency_medical';
 
-    if (opts.includeCover) {
-      drawCoverPage(ctx, ownerName, dateLong);
-    } else {
+    if (isFuneral || isEmergency) {
+      // Specialty single-document PDFs — no cover, no TOC, no closing page.
       applyWatermark(ctx);
       drawFooter(ctx);
-    }
+      if (isFuneral) {
+        await buildFuneralInstructionsPdf(callerClient, ctx, packetId, ownerName, dateLong);
+      } else {
+        await buildEmergencyMedicalPdf(callerClient, ctx, packetId, ownerName, dateLong);
+      }
+    } else {
+      if (opts.includeCover) {
+        drawCoverPage(ctx, ownerName, dateLong);
+      } else {
+        applyWatermark(ctx);
+        drawFooter(ctx);
+      }
 
-    // Pre-fetch all section data via caller client (RLS-scoped)
-    const sectionData: { def: SectionDef; rows: any[] }[] = [];
-    for (const id of opts.sections) {
-      const def = SECTION_DEFS.find((d) => d.id === id);
-      if (!def || !def.table) continue;
-      try {
-        const { data, error } = await callerClient
-          .from(def.table as any)
-          .select('*')
-          .eq('packet_id', packetId);
-        if (error) {
-          console.warn(`[generate-packet-pdf] ${def.table}:`, error.message);
+      // Pre-fetch all section data via caller client (RLS-scoped)
+      const sectionData: { def: SectionDef; rows: any[] }[] = [];
+      for (const id of opts.sections) {
+        const def = SECTION_DEFS.find((d) => d.id === id);
+        if (!def || !def.table) continue;
+        try {
+          const { data, error } = await callerClient
+            .from(def.table as any)
+            .select('*')
+            .eq('packet_id', packetId);
+          if (error) {
+            console.warn(`[generate-packet-pdf] ${def.table}:`, error.message);
+            sectionData.push({ def, rows: [] });
+          } else {
+            sectionData.push({ def, rows: (data || []) as any[] });
+          }
+        } catch (e: any) {
+          console.warn(`[generate-packet-pdf] ${def.table} threw:`, e.message);
           sectionData.push({ def, rows: [] });
-        } else {
-          sectionData.push({ def, rows: (data || []) as any[] });
         }
-      } catch (e: any) {
-        console.warn(`[generate-packet-pdf] ${def.table} threw:`, e.message);
-        sectionData.push({ def, rows: [] });
-      }
-    }
-
-    // Reserve TOC page (we draw it after but record page numbers as if it lives next).
-    // Easier approach: pre-compute page numbers by simulating? Instead, we draw TOC FIRST
-    // with placeholder page refs, then sections. We'll reflect approximate offsets.
-    const tocStartPage = ctx.pageNum + 1; // TOC will be next page
-    let cursorPage = tocStartPage + 1; // sections start after TOC
-    const tocEntries: { label: string; count: number; page: number }[] = [];
-    for (const { def, rows } of sectionData) {
-      tocEntries.push({ label: def.label, count: rows.length, page: cursorPage });
-      // Rough estimate: 1 page per ~6 records minimum 1
-      const pages = Math.max(1, Math.ceil(rows.length / 6));
-      cursorPage += pages;
-    }
-    drawTOC(ctx, tocEntries);
-
-    // Section pages
-    for (const { def, rows } of sectionData) {
-      drawSectionHeader(ctx, def.label, rows.length);
-
-      // Special warning for passwords if sensitive included
-      if (def.id === 'passwords' && !opts.redactSensitive && rows.length > 0) {
-        ensure(ctx, 60);
-        ctx.page.drawRectangle({
-          x: MARGIN, y: ctx.y - 50, width: CONTENT_W, height: 50,
-          color: rgb(0.99, 0.93, 0.85),
-        });
-        ctx.page.drawText('HIGHLY SENSITIVE — SECURE THIS DOCUMENT', {
-          x: MARGIN + 14, y: ctx.y - 22, size: 11, font: ctx.sansBold, color: rgb(0.55, 0.20, 0.10),
-        });
-        ctx.page.drawText('The pages below contain unredacted credentials. Store this PDF securely.', {
-          x: MARGIN + 14, y: ctx.y - 38, size: 9, font: ctx.sans, color: rgb(0.40, 0.20, 0.10),
-        });
-        ctx.y -= 70;
       }
 
-      if (rows.length === 0) {
-        ensure(ctx, 24);
-        ctx.page.drawText('No information recorded for this section.', {
-          x: MARGIN, y: ctx.y - 10, size: 10, font: ctx.serif, color: MUTED,
-        });
-        ctx.y -= 24;
-        continue;
+      const tocStartPage = ctx.pageNum + 1;
+      let cursorPage = tocStartPage + 1;
+      const tocEntries: { label: string; count: number; page: number }[] = [];
+      for (const { def, rows } of sectionData) {
+        tocEntries.push({ label: def.label, count: rows.length, page: cursorPage });
+        const pages = Math.max(1, Math.ceil(rows.length / 6));
+        cursorPage += pages;
+      }
+      if (sectionData.length > 1) {
+        drawTOC(ctx, tocEntries);
       }
 
-      rows.forEach((row, i) => drawRecord(ctx, def, row, opts, i));
-    }
+      for (const { def, rows } of sectionData) {
+        drawSectionHeader(ctx, def.label, rows.length);
 
-    drawClosingPage(ctx, dateLong);
+        if (def.id === 'passwords' && !opts.redactSensitive && rows.length > 0) {
+          ensure(ctx, 60);
+          ctx.page.drawRectangle({
+            x: MARGIN, y: ctx.y - 50, width: CONTENT_W, height: 50,
+            color: rgb(0.99, 0.93, 0.85),
+          });
+          ctx.page.drawText('HIGHLY SENSITIVE — SECURE THIS DOCUMENT', {
+            x: MARGIN + 14, y: ctx.y - 22, size: 11, font: ctx.sansBold, color: rgb(0.55, 0.20, 0.10),
+          });
+          ctx.page.drawText('The pages below contain unredacted credentials. Store this PDF securely.', {
+            x: MARGIN + 14, y: ctx.y - 38, size: 9, font: ctx.sans, color: rgb(0.40, 0.20, 0.10),
+          });
+          ctx.y -= 70;
+        }
+
+        if (rows.length === 0) {
+          ensure(ctx, 24);
+          ctx.page.drawText('No information recorded for this section.', {
+            x: MARGIN, y: ctx.y - 10, size: 10, font: ctx.serif, color: MUTED,
+          });
+          ctx.y -= 24;
+          continue;
+        }
+
+        rows.forEach((row, i) => drawRecord(ctx, def, row, opts, i));
+      }
+
+      drawClosingPage(ctx, dateLong);
+    }
 
     const pdfBytes = await doc.save();
 
     // Log download history (service role)
     const safeName = ownerName.replace(/[^a-zA-Z0-9]/g, '-');
     const fileDate = new Date().toISOString().slice(0, 10);
-    const fileName = body.download_type === 'section' && opts.sections.length === 1
-      ? `SurvivorPacket_${SECTION_DEFS.find((d) => d.id === opts.sections[0])?.label.replace(/[^a-zA-Z0-9]/g, '') || 'Section'}_${safeName}_${fileDate}.pdf`
-      : `SurvivorPacket_${safeName}_${fileDate}.pdf`;
+    let fileName: string;
+    if (isFuneral) {
+      fileName = `FuneralInstructions_${safeName}_${fileDate}.pdf`;
+    } else if (isEmergency) {
+      fileName = `EmergencyMedical_${safeName}_${fileDate}.pdf`;
+    } else if (body.download_type === 'section' && opts.sections.length === 1) {
+      const sectionLabel = SECTION_DEFS.find((d) => d.id === opts.sections[0])?.label.replace(/[^a-zA-Z0-9]/g, '') || 'Section';
+      fileName = `SurvivorPacket_${sectionLabel}_${safeName}_${fileDate}.pdf`;
+    } else {
+      fileName = `SurvivorPacket_${safeName}_${fileDate}.pdf`;
+    }
 
     try {
       await adminClient.from('packet_download_history').insert({
