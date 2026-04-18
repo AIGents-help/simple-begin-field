@@ -328,7 +328,7 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
             </div>
           )}
 
-          {choice === 'comp' && (
+          {(choice === 'comp' || choice === 'comp_couple') && (
             <>
               <div>
                 <label className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block mb-1.5">
@@ -355,6 +355,11 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
                   className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/10"
                 />
               </div>
+              {choice === 'comp_couple' && (
+                <p className="text-[10px] text-stone-500 -mt-2">
+                  Grants couple-tier access (partner can be invited from the user's settings).
+                </p>
+              )}
             </>
           )}
 
