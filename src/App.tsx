@@ -31,6 +31,7 @@ import { TrustedContactDashboard } from './components/trust/TrustedContactDashbo
 import { CheckInRedirect } from './pages/CheckInRedirect';
 import { SharedTemplateView } from './components/templates/SharedTemplateView';
 import { CoupleInviteAccept } from './components/couple/CoupleInviteAccept';
+import { EmergencyView } from './components/emergency/EmergencyView';
 import NotFound from "./pages/NotFound.tsx";
 import { InstallPromptBanner } from './components/pwa/InstallPromptBanner';
 
