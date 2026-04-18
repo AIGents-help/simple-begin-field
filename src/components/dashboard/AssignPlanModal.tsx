@@ -372,6 +372,50 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
             </div>
           )}
 
+          {/* Full Admin Rights */}
+          <div className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 space-y-2">
+            <div className="flex items-start gap-2">
+              <ShieldAlert className="w-4 h-4 text-stone-700 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-stone-900">Full Admin Rights</p>
+                <p className="text-[11px] text-stone-500">
+                  {isCurrentlyAdmin
+                    ? 'This user already has the admin role.'
+                    : 'Grants this user complete access to the Admin Dashboard, all customer data, billing, and audit logs.'}
+                </p>
+              </div>
+            </div>
+            {!isCurrentlyAdmin && (
+              <>
+                <label className="flex items-center gap-2 text-xs text-stone-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={grantAdmin}
+                    onChange={(e) => {
+                      setGrantAdmin(e.target.checked);
+                      if (!e.target.checked) setConfirmAdmin(false);
+                    }}
+                    disabled={submitting}
+                    className="w-4 h-4"
+                  />
+                  Grant Full Admin Rights to this user
+                </label>
+                {grantAdmin && (
+                  <label className="flex items-start gap-2 text-[11px] text-rose-700 cursor-pointer pl-1">
+                    <input
+                      type="checkbox"
+                      checked={confirmAdmin}
+                      onChange={(e) => setConfirmAdmin(e.target.checked)}
+                      disabled={submitting}
+                      className="w-4 h-4 mt-0.5"
+                    />
+                    I understand this gives full admin access and is logged in the audit trail.
+                  </label>
+                )}
+              </>
+            )}
+          </div>
+
           <div>
             <label className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block mb-1.5">
               Internal Note (optional, admin only)
