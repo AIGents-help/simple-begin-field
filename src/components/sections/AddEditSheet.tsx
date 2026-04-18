@@ -471,8 +471,8 @@ export const AddEditSheet = ({
           { name: 'who_should_access', label: 'Who Should Access', placeholder: 'Who needs this after you?' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
-      case 'property':
-        return [
+      case 'property': {
+        const baseFields: any[] = [
           { name: 'title', label: 'Item Name / Title', required: true, placeholder: "e.g. Grandmother's diamond ring" },
           { name: 'category', label: 'Category', type: 'select', options: [
             'Jewelry & Watches', 'Art & Paintings', 'Collectibles & Memorabilia',
@@ -513,6 +513,49 @@ export const AddEditSheet = ({
           { name: 'special_handling', label: 'Special Handling Instructions', type: 'textarea', placeholder: 'Fragile, climate-sensitive, etc.', rows: 2 },
           { name: 'notes', label: 'Additional Notes', type: 'textarea', placeholder: 'Anything else...', rows: 2 },
         ];
+
+        if (formData.category === 'Firearms & Weapons') {
+          const firearmFields: any[] = [
+            { name: '__firearm_id_header', type: 'header', label: 'Firearm Identification' },
+            { name: 'firearm_type', label: 'Firearm Type', type: 'select', options: ['Handgun', 'Rifle', 'Shotgun', 'Antique', 'Other'] },
+            { name: 'firearm_make', label: 'Make / Manufacturer', required: true, placeholder: 'e.g. Smith & Wesson' },
+            { name: 'firearm_model', label: 'Model', required: true, placeholder: 'e.g. M&P Shield 9mm' },
+            { name: 'firearm_caliber', label: 'Caliber / Gauge', placeholder: 'e.g. 9mm, .45 ACP, 12 gauge' },
+            { name: 'firearm_serial_masked', label: 'Serial Number', required: true, type: 'masked', placeholder: 'Serial number — stored securely' },
+            { name: 'firearm_finish', label: 'Finish / Color', placeholder: 'e.g. Blued, Stainless, Matte black' },
+            { name: 'firearm_barrel_length', label: 'Barrel Length', placeholder: 'e.g. 4 inches' },
+            { name: 'firearm_action_type', label: 'Action Type', type: 'select', options: ['Semi-auto', 'Bolt', 'Lever', 'Pump', 'Revolver', 'Single shot'] },
+            { name: 'firearm_year_manufactured', label: 'Year Manufactured', type: 'number', placeholder: 'e.g. 1998' },
+            { name: 'firearm_country_origin', label: 'Country of Origin', placeholder: 'e.g. USA, Germany, Italy' },
+            { name: '__firearm_photo_note', type: 'note', label: 'Photograph both sides, the serial number, and any unique markings.' },
+            { name: '__firearm_storage_header', type: 'header', label: 'Storage & Access' },
+            { name: 'firearm_storage_location', label: 'Storage Location', placeholder: 'e.g. Gun safe in master closet' },
+            { name: 'firearm_safe_code_masked', label: 'Safe Combination / Access Code', type: 'masked', placeholder: 'Combination — stored securely' },
+            { name: 'firearm_who_has_access', label: 'Who Has Access', type: 'textarea', placeholder: 'Names of people who know how to access', rows: 2 },
+            { name: 'firearm_is_loaded', label: 'Is It Loaded?', type: 'select', options: ['No', 'Yes'] },
+            { name: 'firearm_ammunition_location', label: 'Ammunition Storage Location', placeholder: 'Where ammo is kept' },
+            { name: '__firearm_legal_header', type: 'header', label: 'Legal & Ownership' },
+            { name: 'firearm_purchased_from_type', label: 'Purchased From', type: 'select', options: ['Dealer', 'Private sale', 'Auction', 'Inherited', 'Gifted'] },
+            { name: 'firearm_ffl_dealer', label: 'FFL Dealer Name', placeholder: 'If purchased through licensed dealer' },
+            { name: 'firearm_purchase_date', label: 'Date of Purchase', type: 'date' },
+            { name: 'firearm_is_registered', label: 'Is It Registered?', type: 'select', options: ['No', 'Yes'] },
+            { name: 'firearm_registration_state', label: 'Registration State', placeholder: 'State where registered' },
+            { name: 'firearm_transfer_restrictions', label: 'Transfer Restrictions', type: 'textarea', placeholder: 'Any noted transfer restrictions...', rows: 2 },
+            { name: '__firearm_permit_header', type: 'header', label: 'License & Permits' },
+            { name: 'firearm_ccw_permit', label: 'Concealed Carry Permit', type: 'select', options: ['No', 'Yes'] },
+            { name: 'firearm_ccw_state', label: 'Permit State', placeholder: 'State that issued the permit' },
+            { name: 'firearm_ccw_expiration', label: 'Permit Expiration Date', type: 'date' },
+            { name: '__firearm_disposition_header', type: 'header', label: 'Firearm Disposition Instructions' },
+            { name: '__firearm_legal_warning', type: 'warning', label: 'Firearm transfers must comply with federal and state law — consult an attorney before transferring.' },
+            { name: 'firearm_disposition_action', label: 'What Should Happen To This Firearm', type: 'select', options: ['Transfer to family member', 'Sell through licensed dealer', 'Surrender to law enforcement', 'Per my Will'] },
+            { name: 'firearm_disposition_recipient', label: 'Recipient (if transferring)', placeholder: 'Family member name', list: 'family-recipients' },
+            { name: 'firearm_attorney_to_contact', label: 'Attorney to Contact', placeholder: 'Attorney name & phone' },
+            { name: 'firearm_special_instructions', label: 'Special Instructions', type: 'textarea', placeholder: 'Any additional instructions for disposition...', rows: 3 },
+          ];
+          return [...baseFields, ...firearmFields];
+        }
+        return baseFields;
+      }
       case 'pets':
         return [
           { name: 'pet_name', label: 'Pet Name', required: true, placeholder: 'e.g. Buddy' },
