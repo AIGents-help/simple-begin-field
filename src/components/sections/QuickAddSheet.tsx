@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { X, ChevronRight, Upload, Plus, FileText, Users } from 'lucide-react';
+import { X, ChevronRight, Upload, Plus, FileText, Users, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { RECOMMENDATIONS_CONFIG } from '../../config/recommendationsConfig';
 import { SectionId } from '../../config/types';
+import { useAppContext } from '../../context/AppContext';
+import { CustomSectionModal } from './CustomSectionModal';
 
 export const QuickAddSheet = ({ 
   isOpen, 
