@@ -1,11 +1,11 @@
 import React from 'react';
 import { toast } from 'sonner';
 import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
-import { Activity } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { sectionService } from '../services/sectionService';
 import { useAppContext } from '../context/AppContext';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { getCategoryIcon } from '../config/categoryIcons';
 
 export const MedicalSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const { bumpCompletion } = useAppContext();
@@ -42,7 +42,7 @@ export const MedicalSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
               title={record.provider_name || record.title}
               subtitle={buildSubtitle(record.specialty, record.phone)}
               subtitlePlaceholder="No specialty or phone added"
-              icon={Activity}
+              icon={getCategoryIcon('medical', record)}
               badge={record.scope === 'shared' ? 'Shared' : undefined}
               data={record}
               onEdit={() => onAddClick(undefined, record)}
