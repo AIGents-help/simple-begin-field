@@ -11,9 +11,12 @@ import {
   ExternalLink,
   CheckCircle2,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Eye
 } from 'lucide-react';
 import { StatusPill } from './DashboardComponents';
+import { AssignPlanModal } from './AssignPlanModal';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DetailPanelProps {
   title: string;
