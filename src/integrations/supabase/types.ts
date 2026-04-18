@@ -258,6 +258,7 @@ export type Database = {
           account_number_encrypted: string | null
           account_number_masked: string | null
           account_type: string | null
+          approximate_balance: number | null
           beneficiary_notes: string | null
           category: string | null
           contact_info: string | null
@@ -279,6 +280,7 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          approximate_balance?: number | null
           beneficiary_notes?: string | null
           category?: string | null
           contact_info?: string | null
@@ -300,6 +302,7 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          approximate_balance?: number | null
           beneficiary_notes?: string | null
           category?: string | null
           contact_info?: string | null
@@ -648,6 +651,59 @@ export type Database = {
             columns: ["uploaded_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      estate_liabilities: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          interest_rate: number | null
+          lender_name: string | null
+          liability_type: string
+          monthly_payment: number | null
+          notes: string | null
+          packet_id: string
+          payoff_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          interest_rate?: number | null
+          lender_name?: string | null
+          liability_type: string
+          monthly_payment?: number | null
+          notes?: string | null
+          packet_id: string
+          payoff_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          interest_rate?: number | null
+          lender_name?: string | null
+          liability_type?: string
+          monthly_payment?: number | null
+          notes?: string | null
+          packet_id?: string
+          payoff_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estate_liabilities_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
             referencedColumns: ["id"]
           },
         ]
@@ -3290,6 +3346,7 @@ export type Database = {
           account_number_encrypted: string | null
           account_number_masked: string | null
           account_type: string | null
+          approximate_value: number | null
           beneficiary_last_reviewed_date: string | null
           beneficiary_notes: string | null
           category: string | null
@@ -3308,6 +3365,7 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          approximate_value?: number | null
           beneficiary_last_reviewed_date?: string | null
           beneficiary_notes?: string | null
           category?: string | null
@@ -3326,6 +3384,7 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          approximate_value?: number | null
           beneficiary_last_reviewed_date?: string | null
           beneficiary_notes?: string | null
           category?: string | null
@@ -3584,6 +3643,7 @@ export type Database = {
           agent_contact: string | null
           category: string | null
           created_at: string | null
+          estimated_value: number | null
           garaging_address: string | null
           id: string
           inspection_due_date: string | null
@@ -3613,6 +3673,7 @@ export type Database = {
           agent_contact?: string | null
           category?: string | null
           created_at?: string | null
+          estimated_value?: number | null
           garaging_address?: string | null
           id?: string
           inspection_due_date?: string | null
@@ -3642,6 +3703,7 @@ export type Database = {
           agent_contact?: string | null
           category?: string | null
           created_at?: string | null
+          estimated_value?: number | null
           garaging_address?: string | null
           id?: string
           inspection_due_date?: string | null
@@ -3696,6 +3758,7 @@ export type Database = {
         Args: { p_event_id: string }
         Returns: undefined
       }
+      calculate_estate_summary: { Args: { p_packet_id: string }; Returns: Json }
       calculate_health_score: { Args: { p_packet_id: string }; Returns: Json }
       complete_checkin_by_token: {
         Args: { p_token: string }
