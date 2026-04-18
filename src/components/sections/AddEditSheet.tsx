@@ -122,7 +122,7 @@ export const AddEditSheet = ({
               if (fullErr) {
                 console.error(`Failed to hydrate ${activeTab} record ${initialData.id}:`, fullErr);
               } else if (fullRow) {
-                data = { ...fullRow, ...data };
+                data = { ...(fullRow as any), ...data };
               }
             }
           }
