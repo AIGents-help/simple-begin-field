@@ -53,7 +53,7 @@ export const LegacyMedicalRecordCard: React.FC<Props> = ({ record, onMigrated, o
   const handleDelete = async () => {
     const ok = await confirm({
       title: 'Delete legacy record?',
-      message: `“${title}” will be permanently removed.`,
+      description: `“${title}” will be permanently removed.`,
       confirmLabel: 'Delete',
       destructive: true,
     });
