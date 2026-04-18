@@ -15,8 +15,66 @@ import { INFO_CATEGORY_OPTIONS } from '../../config/categories';
 import { LifeStatusToggle, AdvisorStatusToggle } from '../common/LifeStatusToggle';
 import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
 import { RecordDocumentUpload } from '../common/RecordDocumentUpload';
+import { AutoFilledIndicator } from '../common/AutoFilledIndicator';
+import { useFederatedDefaults } from '../../hooks/useFederatedDefaults';
 
-// Per-section document slots — documents are attached to the parent record
+// ---------------------------------------------------------------------------
+// Cross-section federation: snapshot which fields on a source record drive
+// downstream auto-fill. After save, we compare the new value to this snapshot
+// and prompt the user to update dependents.
+// ---------------------------------------------------------------------------
+type SourceKey = 'address' | 'spouseName' | 'attorney' | 'financialAdvisor' | 'primaryDoctor' | 'funeralHome';
+
+const buildSourceSnapshot = (section: string | null | undefined, data: any): Record<SourceKey, any> => {
+  const snap: any = {};
+  if (!section || !data) return snap;
+  if (section === 'real-estate' && (data.property_type === 'Primary Residence' || !data.property_type)) {
+    snap.address = (data.address || '').trim();
+  }
+  if (section === 'family' && String(data.relationship || '').toLowerCase() === 'spouse' && !data.is_deceased) {
+    snap.spouseName = `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.name || '';
+  }
+  if (section === 'advisors') {
+    const t = String(data.advisor_type || '').toLowerCase();
+    if (t === 'attorney') snap.attorney = data.name || '';
+    if (t === 'financial advisor') snap.financialAdvisor = data.name || '';
+  }
+  if (section === 'medical') {
+    snap.primaryDoctor = data.provider_name || '';
+  }
+  if (section === 'funeral') {
+    snap.funeralHome = (data.funeral_home || '').trim();
+  }
+  return snap;
+};
+
+const sourceChangePromptCopy: Record<SourceKey, { title: string; description: (oldV: any, newV: any) => string }> = {
+  address: {
+    title: 'Update home address everywhere?',
+    description: (_o, n) => `Your home address changed to "${n}". Some family member records and vehicle garaging fields may still show the old address. Would you like to review them?`,
+  },
+  spouseName: {
+    title: 'Update spouse name everywhere?',
+    description: (_o, n) => `Your spouse name changed to "${n}". Joint owner, joint account holder and beneficiary fields elsewhere may still show the old name. Review them now?`,
+  },
+  attorney: {
+    title: 'Update attorney everywhere?',
+    description: (_o, n) => `Your attorney is now "${n}". The "attorney to notify" field on Funeral and other legal records may still show the old name. Review them now?`,
+  },
+  financialAdvisor: {
+    title: 'Update financial advisor everywhere?',
+    description: (_o, n) => `Your financial advisor is now "${n}". Banking and Retirement contact fields may still show the old name. Review them now?`,
+  },
+  primaryDoctor: {
+    title: 'Update primary doctor everywhere?',
+    description: (_o, n) => `Your primary doctor is now "${n}". Other medical records that reference your referring physician may still show the old name. Review them now?`,
+  },
+  funeralHome: {
+    title: 'Update funeral home everywhere?',
+    description: (_o, n) => `Your funeral home is now "${n}". Advisor-style references and executor contacts may still show the old name. Review them now?`,
+  },
+};
+
 // instead of existing as standalone entries. Each entry maps to a category
 // stored on the documents row (related_table + related_record_id + category).
 const RECORD_DOC_SLOTS: Record<string, { table: string; slots: { category: string; label: string; description?: string }[] }> = {
@@ -69,9 +127,12 @@ export const AddEditSheet = ({
   categoryOptions?: CategoryOption[];
 }) => {
   const { activeTab, activeScope, currentPacket, profile, bumpCompletion } = useAppContext();
+  const { applyDefaults, sources } = useFederatedDefaults();
   const confirm = useConfirm();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
+  const [autoFilledOrigins, setAutoFilledOrigins] = useState<Record<string, string>>({});
+  const [originalSourceSnapshot, setOriginalSourceSnapshot] = useState<Record<string, any>>({});
   const [isNA, setIsNA] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [initialAttachment, setInitialAttachment] = useState<FileMetadata | null>(null);
@@ -101,6 +162,7 @@ export const AddEditSheet = ({
     const loadData = async () => {
       if (isOpen) {
         setErrors({});
+        setAutoFilledOrigins({});
         if (initialData) {
           let data = { ...initialData };
           if (data.entryOnly && !data.category) {
@@ -127,8 +189,19 @@ export const AddEditSheet = ({
             }
           }
 
+          // Apply cross-section federation defaults (silent pre-fill + chip).
+          // Only fills empty fields; never overwrites existing data.
+          if (activeTab) {
+            const isExisting = !!initialData.id && !initialData.entryOnly;
+            const { data: filled, origins } = applyDefaults(activeTab, data, isExisting);
+            data = filled;
+            setAutoFilledOrigins(origins);
+          }
+
           setFormData(data);
           setIsNA(data.is_na || data.status === 'not_applicable');
+          // Snapshot federated source values so we can detect changes after save
+          setOriginalSourceSnapshot(buildSourceSnapshot(activeTab, data));
           // Fetch existing document if editing
           if (currentPacket && activeTab && initialData.id) {
             const { data: docs } = await documentService.getDocuments(currentPacket.id, activeTab, initialData.id);
@@ -143,11 +216,12 @@ export const AddEditSheet = ({
           setIsNA(false);
           setSelectedFile(null);
           setInitialAttachment(null);
+          setOriginalSourceSnapshot({});
         }
       }
     };
     loadData();
-  }, [initialData, isOpen, currentPacket, activeTab]);
+  }, [initialData, isOpen, currentPacket, activeTab, applyDefaults]);
 
   const config = SECTIONS_CONFIG.find(s => s.id === activeTab);
 
@@ -243,6 +317,7 @@ export const AddEditSheet = ({
           { name: 'provider_name', label: 'Provider Name', required: true, placeholder: 'e.g. Dr. Smith' },
           { name: 'specialty', label: 'Specialty', placeholder: 'e.g. Cardiologist' },
           { name: 'phone', label: 'Phone', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'referring_physician', label: 'Referring Physician', placeholder: 'Dr. who referred you' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'advisors':
@@ -261,7 +336,9 @@ export const AddEditSheet = ({
           { name: 'account_type', label: 'Account Type', type: 'select', options: ['Checking', 'Savings', 'Money Market', 'CD', 'Other'] },
           { name: 'account_number_masked', label: 'Account Number', placeholder: 'Last 4 digits only for security' },
           { name: 'routing_number_masked', label: 'Routing Number', placeholder: 'Last 4 digits only' },
-          { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address or phone' },
+          { name: 'joint_account_holder', label: 'Joint Account Holder', placeholder: 'Spouse or co-owner name' },
+          { name: 'beneficiary_notes', label: 'Beneficiary Notes', type: 'textarea', placeholder: 'Who is the beneficiary?' },
+          { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address, phone or advisor' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'retirement':
@@ -281,6 +358,7 @@ export const AddEditSheet = ({
           { name: 'vin', label: 'VIN', placeholder: '17-character VIN' },
           { name: 'license_plate', label: 'License Plate', placeholder: 'ABC-1234' },
           { name: 'insurance', label: 'Insurance', placeholder: 'Carrier and policy number' },
+          { name: 'garaging_address', label: 'Garaging Address (for insurance)', type: 'textarea', placeholder: 'Where the vehicle is normally parked', rows: 2 },
           { name: 'lien_info', label: 'Lien Info', placeholder: 'Lien holder if any' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
@@ -331,6 +409,7 @@ export const AddEditSheet = ({
           { name: 'religious_cultural_preferences', label: 'Religious / Cultural Preferences', placeholder: 'Any traditions or customs' },
           { name: 'cemetery_plot_details', label: 'Cemetery / Plot Details', placeholder: 'Location and plot info' },
           { name: 'prepaid_arrangements', label: 'Prepaid Arrangements', placeholder: 'Details of prepaid plans' },
+          { name: 'attorney_to_notify', label: 'Attorney to Notify', type: 'textarea', placeholder: 'Attorney name, firm and phone', rows: 2 },
           { name: 'obituary_notes', label: 'Obituary Notes', type: 'textarea', placeholder: 'Key points for obituary' },
           { name: 'additional_instructions', label: 'Additional Instructions', type: 'textarea', placeholder: 'Anything else...' },
         ];
@@ -551,6 +630,31 @@ export const AddEditSheet = ({
 
       toast.success("Information saved successfully!", { icon: <CheckCircle size={18} className="text-emerald-500" />, duration: 3000, position: "bottom-center" });
       bumpCompletion(); // refresh all completion displays (header badge, ring, folder cards)
+
+      // Cross-section sync prompt: if a federated source value changed,
+      // ask the user whether to review the downstream destinations.
+      const newSnap = buildSourceSnapshot(activeTab, savedRecord || recordToSave);
+      const changedKeys = (Object.keys(newSnap) as SourceKey[]).filter((k) => {
+        const newV = String(newSnap[k] ?? '').trim();
+        const oldV = String(originalSourceSnapshot[k] ?? '').trim();
+        return newV && newV !== oldV;
+      });
+      for (const key of changedKeys) {
+        const copy = sourceChangePromptCopy[key];
+        // Fire-and-forget — non-blocking confirm
+        confirm({
+          title: copy.title,
+          description: copy.description(originalSourceSnapshot[key], newSnap[key]),
+          confirmLabel: 'Review now',
+          cancelLabel: 'Not now',
+        }).then((ok) => {
+          if (ok) {
+            toast.info('Open the related sections to review auto-fill suggestions.', { duration: 4000, position: 'bottom-center' });
+          }
+        });
+        break; // one prompt per save to avoid stacking dialogs
+      }
+
       if (onSuccess) onSuccess(savedRecord);
       handleClose();
     } catch (err: any) {
@@ -739,25 +843,42 @@ export const AddEditSheet = ({
                         if (field.type === 'select' && initialData?.[field.name] && formData[field.name]) return false;
                         return true;
                       })
-                      .map((field) => (
+                      .map((field) => {
+                        const origin = autoFilledOrigins[field.name];
+                        const clearOrigin = () => {
+                          if (!origin) return;
+                          setAutoFilledOrigins((prev) => {
+                            const next = { ...prev };
+                            delete next[field.name];
+                            return next;
+                          });
+                        };
+                        const handleChange = (val: any) => {
+                          setFormData({ ...formData, [field.name]: val });
+                          if (origin) clearOrigin();
+                        };
+                        return (
                       <div key={field.name} className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
-                          {field.label} {field.required && <span className="text-red-500">*</span>}
-                        </label>
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
+                            {field.label} {field.required && <span className="text-red-500">*</span>}
+                          </label>
+                          {origin ? <AutoFilledIndicator sourceLabel={origin} onClear={() => { clearOrigin(); setFormData({ ...formData, [field.name]: '' }); }} /> : null}
+                        </div>
                         {field.type === 'textarea' ? (
                           <textarea
                             rows={field.rows || 3}
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm resize-none font-medium"
                             value={formData[field.name] || ''}
-                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            onChange={(e) => handleChange(e.target.value)}
                             disabled={loading}
                           />
                         ) : field.type === 'select' && field.options ? (
                           <select
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium appearance-none"
                             value={formData[field.name] || ''}
-                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            onChange={(e) => handleChange(e.target.value)}
                             disabled={loading}
                           >
                             <option value="">Select {field.label.toLowerCase()}...</option>
@@ -771,7 +892,7 @@ export const AddEditSheet = ({
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium"
                             value={formData[field.name] || ''}
-                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            onChange={(e) => handleChange(e.target.value)}
                             disabled={loading}
                           />
                         )}
@@ -779,7 +900,8 @@ export const AddEditSheet = ({
                           <p className="text-xs font-bold text-red-500 mt-1">{errors[field.name]}</p>
                         )}
                       </div>
-                    ))}
+                        );
+                      })}
 
                     <FileAttachmentField
                       sectionKey={activeTab || ''}
