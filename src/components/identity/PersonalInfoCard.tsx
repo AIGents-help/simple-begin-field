@@ -65,7 +65,7 @@ export const PersonalInfoCard: React.FC = () => {
   }, [user?.id]);
 
   const setField = (name: string, value: any) => {
-    setProfile((p) => ({ ...(p || {}), [name]: value }));
+    setProfile((p) => ({ ...((p as any) || {}), [name]: value } as ProfileLike));
     setDirty(true);
   };
 
@@ -73,7 +73,7 @@ export const PersonalInfoCard: React.FC = () => {
     if (!user?.id || !profile) return;
     setSaving(true);
     try {
-      const payload = { ...profile, id: user.id };
+      const payload: any = { ...profile, id: user.id };
       // Mirror current → mailing if toggle on
       if (payload.mailing_same_as_current) {
         payload.mailing_address_street = payload.current_address_street;
@@ -81,7 +81,7 @@ export const PersonalInfoCard: React.FC = () => {
         payload.mailing_address_state = payload.current_address_state;
         payload.mailing_address_zip = payload.current_address_zip;
       }
-      const { error } = await supabase.from('profiles').upsert(payload, { onConflict: 'id' });
+      const { error } = await (supabase.from('profiles') as any).upsert(payload, { onConflict: 'id' });
       if (error) throw error;
       toast.success('Personal info saved', { position: 'bottom-center' });
       setDirty(false);
