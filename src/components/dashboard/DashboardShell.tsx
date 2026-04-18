@@ -17,7 +17,8 @@ import {
   Scale,
   User,
   Wrench,
-  ShieldAlert
+  ShieldAlert,
+  AlertTriangle
 } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -40,6 +41,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Plans', icon: FileText, path: '/dashboard/plans', roles: ['admin'] },
   { label: 'Activity', icon: Activity, path: '/dashboard/activity', roles: ['admin'] },
   { label: 'Check-Ins', icon: ShieldAlert, path: '/dashboard/checkins', roles: ['admin'] },
+  { label: 'Expirations', icon: AlertTriangle, path: '/dashboard/expirations', roles: ['admin'] },
   { label: 'Tools', icon: Wrench, path: '/dashboard/tools', roles: ['admin'] },
   { label: 'Settings', icon: Settings, path: '/dashboard/settings', roles: ['admin'] },
 
