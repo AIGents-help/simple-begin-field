@@ -187,6 +187,10 @@ export const SectionScreenTemplate = ({
               <Plus size={18} />
               {config.addButtonLabel}
             </button>
+            <FindProfessionalPrompt
+              query={resolveSectionQuery(activeTab)}
+              variant="block"
+            />
           </div>
         )
       )}
