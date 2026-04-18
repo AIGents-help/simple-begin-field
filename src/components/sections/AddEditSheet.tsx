@@ -188,6 +188,8 @@ export const AddEditSheet = ({
       if (isOpen) {
         setErrors({});
         setAutoFilledOrigins({});
+        setProfilePhotoFile(null);
+        setProfilePhotoCleared(false);
         if (initialData) {
           let data = { ...initialData };
           if (data.entryOnly && !data.category) {
