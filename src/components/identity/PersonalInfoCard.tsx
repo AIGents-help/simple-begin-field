@@ -58,7 +58,7 @@ export const PersonalInfoCard: React.FC = () => {
           console.error('Failed to load profile', error);
           toast.error('Could not load your personal info', { position: 'bottom-center' });
         }
-        setProfile(data || { id: user.id });
+        setProfile((data as ProfileLike) || ({ id: user.id } as ProfileLike));
         setLoading(false);
       });
     return () => { cancelled = true; };
