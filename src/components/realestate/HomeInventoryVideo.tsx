@@ -64,10 +64,14 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
     fetchVideos();
   }, [packetId, propertyRecordId]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const validateAndStage = (file: File) => {
     setError(null);
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|m4v|webm)$/i.test(file.name);
+    if (!isVideo) {
+      setError('This file type is not supported. Accepted: video files (MP4, MOV, AVI)');
+      setSelectedFile(null);
+      return;
+    }
     if (file.size > MAX_SIZE) {
       setError('Video must be under 500MB');
       setSelectedFile(null);
@@ -75,6 +79,17 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
     }
     setSelectedFile(file);
   };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) validateAndStage(file);
+  };
+
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: (files) => files[0] && validateAndStage(files[0]),
+    disabled: uploading,
+    multiple: false,
+  });
 
   const handleUpload = async () => {
     if (!selectedFile) return;
