@@ -86,20 +86,25 @@ export const PersonalPropertyCard: React.FC<Props> = ({ record, onEdit, onDelete
             </div>
 
             <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-stone-500">
-              {record.location && (
+              {(isFirearm ? record.firearm_storage_location : record.location) && (
                 <span className="flex items-center gap-1 min-w-0">
                   <MapPin size={10} />
-                  <span className="truncate">{record.location}</span>
+                  <span className="truncate">{isFirearm ? record.firearm_storage_location : record.location}</span>
                 </span>
               )}
-              {record.condition && (
+              {isFirearm && maskedSerial && (
+                <span className="flex items-center gap-1 font-mono">
+                  <Tag size={10} /> S/N {maskedSerial}
+                </span>
+              )}
+              {!isFirearm && record.condition && (
                 <span className="flex items-center gap-1">
                   <Tag size={10} /> {record.condition}
                 </span>
               )}
-              {record.specific_recipient && (
+              {(isFirearm ? record.firearm_disposition_recipient : record.specific_recipient) && (
                 <span className="flex items-center gap-1 truncate">
-                  → {record.specific_recipient}
+                  → {isFirearm ? record.firearm_disposition_recipient : record.specific_recipient}
                 </span>
               )}
             </div>
