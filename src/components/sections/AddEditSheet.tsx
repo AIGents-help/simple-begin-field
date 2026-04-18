@@ -932,6 +932,7 @@ export const AddEditSheet = ({
                         ) : (
                           <input
                             type={field.type || 'text'}
+                            list={field.list}
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium"
                             value={formData[field.name] || ''}
