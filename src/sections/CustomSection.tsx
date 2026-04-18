@@ -320,11 +320,21 @@ const CustomSectionRecordModal: React.FC<{
               className="w-full px-4 py-3 bg-white border border-stone-200 rounded-xl text-navy-muted focus:outline-none focus:border-navy-muted resize-none"
             />
           </div>
+
+          <div className="pt-2 border-t border-stone-200/60">
+            <EntryAttachments
+              packetId={section.packet_id}
+              sectionKey="custom"
+              recordId={existing?.id || savedId}
+              scope={(existing?.scope as any) || 'shared'}
+              subKey={section.id}
+            />
+          </div>
         </div>
 
         <div className="px-6 py-4 border-t border-stone-200/60 flex gap-3 bg-white">
           <button onClick={onClose} className="flex-1 px-4 py-3 rounded-xl border border-stone-200 text-stone-600 font-bold">
-            Cancel
+            {existing || savedId ? 'Done' : 'Cancel'}
           </button>
           <button
             onClick={handleSave}
@@ -332,7 +342,7 @@ const CustomSectionRecordModal: React.FC<{
             className="flex-1 px-4 py-3 rounded-xl bg-navy-muted text-white font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             {saving && <Loader2 size={16} className="animate-spin" />}
-            {existing ? 'Save' : 'Add Entry'}
+            {existing || savedId ? 'Save Changes' : 'Save & Add Attachments'}
           </button>
         </div>
       </div>
