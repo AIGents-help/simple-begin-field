@@ -129,13 +129,16 @@ export const DashboardScreen = () => {
       {/* Packet Health Score */}
       {currentPacket && <PacketHealthScore packetId={currentPacket.id} />}
 
+      {/* Critical Gaps (only shown when score < 75) */}
+      {currentPacket && <CriticalGapsCard packetId={currentPacket.id} />}
+
       {/* Upcoming Expirations */}
       <UpcomingExpirationsCard />
 
       {/* Section Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
         {SECTIONS_CONFIG.map((section) => {
-          const { status, count, percentage } = getSectionStat(section.id);
+          const { status, count, percentage, healthScore: hsScore, healthMax } = getSectionStat(section.id);
           const Icon = section.icon;
           const isPrivate = section.id === 'private';
           const isComplete = status === 'complete';
@@ -191,9 +194,26 @@ export const DashboardScreen = () => {
                   <p className="font-serif italic text-[12px] text-stone-500/80 leading-snug line-clamp-2">
                     {section.description}
                   </p>
-                  <div className="flex items-center gap-1.5 text-stone-500 text-xs font-medium">
-                    <FileText size={14} />
-                    <span>{count} {count === 1 ? 'record' : 'records'}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 text-stone-500 text-xs font-medium">
+                      <FileText size={14} />
+                      <span>{count} {count === 1 ? 'record' : 'records'}</span>
+                    </div>
+                    {hsScore !== null && healthMax !== null && healthMax > 0 && !isPrivate && (() => {
+                      const pct = hsScore / healthMax;
+                      const chipColor =
+                        pct >= 0.75 ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : pct >= 0.4 ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        : 'bg-rose-50 text-rose-700 border-rose-200';
+                      return (
+                        <span
+                          className={`px-2 py-0.5 text-[10px] font-bold rounded-full border ${chipColor}`}
+                          title={`Section health: ${hsScore} of ${healthMax} points`}
+                        >
+                          {hsScore}/{healthMax} pts
+                        </span>
+                      );
+                    })()}
                   </div>
                 </div>
               </button>
