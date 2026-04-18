@@ -31,6 +31,7 @@ import { TrustedContactDashboard } from './components/trust/TrustedContactDashbo
 import { CheckInRedirect } from './pages/CheckInRedirect';
 import { SharedTemplateView } from './components/templates/SharedTemplateView';
 import { CoupleInviteAccept } from './components/couple/CoupleInviteAccept';
+import { EmergencyView } from './components/emergency/EmergencyView';
 import NotFound from "./pages/NotFound.tsx";
 import { InstallPromptBanner } from './components/pwa/InstallPromptBanner';
 
@@ -103,6 +104,7 @@ export default function App() {
               <Route path="/checkin" element={<CheckInRedirect />} />
               <Route path="/template/share/:token" element={<SharedTemplateView />} />
               <Route path="/couple/invite/:token" element={<CoupleInviteAccept />} />
+              <Route path="/emergency/:token" element={<EmergencyView />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>

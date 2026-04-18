@@ -921,6 +921,121 @@ export type Database = {
           },
         ]
       }
+      emergency_access_log: {
+        Row: {
+          accessed_at: string
+          browser: string | null
+          city: string | null
+          country: string | null
+          device_type: string | null
+          id: string
+          ip_address: string | null
+          pin_correct: boolean
+          region: string | null
+          sections_viewed: Json | null
+          token_id: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accessed_at?: string
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          pin_correct?: boolean
+          region?: string | null
+          sections_viewed?: Json | null
+          token_id: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accessed_at?: string
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          pin_correct?: boolean
+          region?: string | null
+          sections_viewed?: Json | null
+          token_id?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_access_log_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_tokens: {
+        Row: {
+          created_at: string
+          custom_field_text: string | null
+          failed_attempts: number
+          id: string
+          is_active: boolean
+          locked_until: string | null
+          packet_id: string
+          pin_hash: string
+          pin_hint: string | null
+          regenerated_at: string | null
+          token: string
+          updated_at: string
+          user_id: string
+          visible_sections: Json
+        }
+        Insert: {
+          created_at?: string
+          custom_field_text?: string | null
+          failed_attempts?: number
+          id?: string
+          is_active?: boolean
+          locked_until?: string | null
+          packet_id: string
+          pin_hash: string
+          pin_hint?: string | null
+          regenerated_at?: string | null
+          token?: string
+          updated_at?: string
+          user_id: string
+          visible_sections?: Json
+        }
+        Update: {
+          created_at?: string
+          custom_field_text?: string | null
+          failed_attempts?: number
+          id?: string
+          is_active?: boolean
+          locked_until?: string | null
+          packet_id?: string
+          pin_hash?: string
+          pin_hint?: string | null
+          regenerated_at?: string | null
+          token?: string
+          updated_at?: string
+          user_id?: string
+          visible_sections?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_tokens_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       estate_liabilities: {
         Row: {
           balance: number
@@ -1856,15 +1971,23 @@ export type Database = {
       medical_records: {
         Row: {
           address: string | null
+          allergies: string | null
+          blood_type: string | null
           category: string | null
+          conditions: string | null
           created_at: string | null
+          dnr_status: string | null
           group_number: string | null
           id: string
+          insurance_group_number: string | null
+          insurance_member_id: string | null
+          insurance_phone: string | null
           insurance_provider: string | null
           insurance_renewal_date: string | null
           is_na: boolean | null
           member_id: string | null
           notes: string | null
+          organ_donor: boolean | null
           packet_id: string | null
           phone: string | null
           provider_name: string
@@ -1876,15 +1999,23 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          allergies?: string | null
+          blood_type?: string | null
           category?: string | null
+          conditions?: string | null
           created_at?: string | null
+          dnr_status?: string | null
           group_number?: string | null
           id?: string
+          insurance_group_number?: string | null
+          insurance_member_id?: string | null
+          insurance_phone?: string | null
           insurance_provider?: string | null
           insurance_renewal_date?: string | null
           is_na?: boolean | null
           member_id?: string | null
           notes?: string | null
+          organ_donor?: boolean | null
           packet_id?: string | null
           phone?: string | null
           provider_name: string
@@ -1896,15 +2027,23 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          allergies?: string | null
+          blood_type?: string | null
           category?: string | null
+          conditions?: string | null
           created_at?: string | null
+          dnr_status?: string | null
           group_number?: string | null
           id?: string
+          insurance_group_number?: string | null
+          insurance_member_id?: string | null
+          insurance_phone?: string | null
           insurance_provider?: string | null
           insurance_renewal_date?: string | null
           is_na?: boolean | null
           member_id?: string | null
           notes?: string | null
+          organ_donor?: boolean | null
           packet_id?: string | null
           phone?: string | null
           provider_name?: string
@@ -4120,6 +4259,7 @@ export type Database = {
         }[]
       }
       get_couple_link_id: { Args: { p_user_id?: string }; Returns: string }
+      get_emergency_pin_hint: { Args: { p_token: string }; Returns: Json }
       get_partner_document_gaps: { Args: { p_user_id?: string }; Returns: Json }
       get_partner_health_score: { Args: { p_user_id?: string }; Returns: Json }
       get_partner_id: { Args: { p_user_id?: string }; Returns: string }
@@ -4143,6 +4283,7 @@ export type Database = {
         Args: { p_packet_id: string; p_section_key: string }
         Returns: boolean
       }
+      hash_emergency_pin: { Args: { p_pin: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       is_member_of_packet_in_path: {
         Args: { file_path: string }
@@ -4196,6 +4337,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      regenerate_emergency_token: { Args: never; Returns: string }
       run_inactivity_release_sweep: {
         Args: never
         Returns: {
@@ -4206,6 +4348,10 @@ export type Database = {
       }
       seed_default_couple_permissions: {
         Args: { p_link_id: string }
+        Returns: undefined
+      }
+      set_emergency_pin: {
+        Args: { p_hint?: string; p_pin: string }
         Returns: undefined
       }
       touch_last_login: { Args: never; Returns: undefined }
@@ -4229,6 +4375,20 @@ export type Database = {
           logo_url: string
           professional_name: string
         }[]
+      }
+      verify_emergency_pin: {
+        Args: {
+          p_browser?: string
+          p_city?: string
+          p_country?: string
+          p_device_type?: string
+          p_ip?: string
+          p_pin: string
+          p_region?: string
+          p_token: string
+          p_user_agent?: string
+        }
+        Returns: Json
       }
       viewer_permitted_sections: {
         Args: { p_packet_id: string }

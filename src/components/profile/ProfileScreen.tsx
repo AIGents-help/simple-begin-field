@@ -8,6 +8,7 @@ import { DownloadHistoryList } from '../download/DownloadHistoryList';
 import { CheckInPreferences } from '../checkin/CheckInPreferences';
 import { InactivityCheckInCard } from '../checkin/InactivityCheckInCard';
 import { AlertPreferences } from '../notifications/AlertPreferences';
+import { EmergencyCardSettings } from '../emergency/EmergencyCardSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -293,6 +294,8 @@ export const ProfileScreen = () => {
         </div>
 
         <AlertPreferences />
+
+        <EmergencyCardSettings />
 
         <CheckInPreferences />
 
