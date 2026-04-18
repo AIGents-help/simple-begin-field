@@ -112,7 +112,7 @@ export const plansAdminService = {
     const subs = await this.listSubscribers();
     const plans = await this.listPlans();
 
-    const planMap = new Map(plans.map((p) => [p.plan_key, p]));
+    const planMap = new Map<string, PlanRow>(plans.map((p) => [p.plan_key, p]));
 
     const buckets = {
       free: { count: 0, revenue: 0 },
