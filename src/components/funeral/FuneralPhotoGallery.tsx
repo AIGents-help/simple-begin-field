@@ -85,8 +85,24 @@ export const FuneralPhotoGallery: React.FC<Props> = ({ packetId, funeralRecordId
     }
   };
 
+  const onFilesArray = (files: File[]) => {
+    const dt = new DataTransfer();
+    files.forEach((f) => dt.items.add(f));
+    onFiles(dt.files);
+  };
+
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: onFilesArray,
+    disabled: uploading,
+  });
+
   return (
-    <div className="rounded-2xl bg-white border border-stone-200 p-4 shadow-sm">
+    <div
+      {...dropzoneProps}
+      className={`relative rounded-2xl bg-white border p-4 shadow-sm transition-all ${
+        isDragging ? 'border-amber-500 border-2 ring-4 ring-amber-200' : 'border-stone-200'
+      }`}
+    >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <ImageIcon size={18} className="text-navy-muted" />
