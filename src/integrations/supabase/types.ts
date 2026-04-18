@@ -1971,15 +1971,23 @@ export type Database = {
       medical_records: {
         Row: {
           address: string | null
+          allergies: string | null
+          blood_type: string | null
           category: string | null
+          conditions: string | null
           created_at: string | null
+          dnr_status: string | null
           group_number: string | null
           id: string
+          insurance_group_number: string | null
+          insurance_member_id: string | null
+          insurance_phone: string | null
           insurance_provider: string | null
           insurance_renewal_date: string | null
           is_na: boolean | null
           member_id: string | null
           notes: string | null
+          organ_donor: boolean | null
           packet_id: string | null
           phone: string | null
           provider_name: string
@@ -1991,15 +1999,23 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          allergies?: string | null
+          blood_type?: string | null
           category?: string | null
+          conditions?: string | null
           created_at?: string | null
+          dnr_status?: string | null
           group_number?: string | null
           id?: string
+          insurance_group_number?: string | null
+          insurance_member_id?: string | null
+          insurance_phone?: string | null
           insurance_provider?: string | null
           insurance_renewal_date?: string | null
           is_na?: boolean | null
           member_id?: string | null
           notes?: string | null
+          organ_donor?: boolean | null
           packet_id?: string | null
           phone?: string | null
           provider_name: string
@@ -2011,15 +2027,23 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          allergies?: string | null
+          blood_type?: string | null
           category?: string | null
+          conditions?: string | null
           created_at?: string | null
+          dnr_status?: string | null
           group_number?: string | null
           id?: string
+          insurance_group_number?: string | null
+          insurance_member_id?: string | null
+          insurance_phone?: string | null
           insurance_provider?: string | null
           insurance_renewal_date?: string | null
           is_na?: boolean | null
           member_id?: string | null
           notes?: string | null
+          organ_donor?: boolean | null
           packet_id?: string | null
           phone?: string | null
           provider_name?: string
