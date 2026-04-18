@@ -55,7 +55,7 @@ export const LegacyMedicalRecordCard: React.FC<Props> = ({ record, onMigrated, o
       title: 'Delete legacy record?',
       description: `“${title}” will be permanently removed.`,
       confirmLabel: 'Delete',
-      destructive: true,
+      variant: 'danger',
     });
     if (!ok) return;
     try {
