@@ -104,6 +104,7 @@ export default function App() {
               <Route path="/checkin" element={<CheckInRedirect />} />
               <Route path="/template/share/:token" element={<SharedTemplateView />} />
               <Route path="/couple/invite/:token" element={<CoupleInviteAccept />} />
+              <Route path="/emergency/:token" element={<EmergencyView />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
