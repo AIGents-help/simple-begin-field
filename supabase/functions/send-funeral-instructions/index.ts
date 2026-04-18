@@ -140,6 +140,7 @@ Deno.serve(async (req) => {
         payload_summary: {
           subject,
           attachment: body.filename,
+          photo_count: photos.length,
           message_length: (body.message || '').length,
           provider_id: resendJson?.id || null,
         },
