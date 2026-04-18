@@ -216,4 +216,92 @@ export const trustedContactPortalService = {
       .eq('id', contactId);
     if (error) throw error;
   },
+
+  // ====== Trusted Contact (viewer) side ======
+
+  /** Look up a pending invite by token (public read uses RPC-safe filter on token). */
+  async getInviteByToken(token: string) {
+    const { data, error } = await supabase
+      .from('trusted_contacts')
+      .select('id, contact_name, contact_email, packet_id, invite_accepted_at, packets(title, person_a_name, owner_user_id)')
+      .eq('invite_token', token)
+      .maybeSingle();
+    return { data, error };
+  },
+
+  /** Link a freshly-registered auth user to the trusted_contacts row matching the token. */
+  async linkInviteToUser(token: string, userId: string) {
+    const { data, error } = await supabase
+      .from('trusted_contacts')
+      .update({
+        user_id: userId,
+        invite_accepted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('invite_token', token)
+      .select('id, packet_id')
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+
+  /** List packets the current viewer (trusted contact) has been released access to. */
+  async listViewerPackets() {
+    // First find trusted_contact rows for the current user
+    const { data: tcRows, error } = await supabase
+      .from('trusted_contacts')
+      .select('id, packet_id, access_released, access_released_at, contact_name, packets(id, title, person_a_name, person_b_name, owner_user_id)')
+      .eq('user_id', (await supabase.auth.getUser()).data.user?.id ?? '');
+    if (error) throw error;
+    return tcRows || [];
+  },
+
+  /** Sections the viewer is permitted to see for a packet. */
+  async listViewerPermittedSections(packetId: string): Promise<string[]> {
+    const { data: tc, error: tcErr } = await supabase
+      .from('trusted_contacts')
+      .select('id')
+      .eq('packet_id', packetId)
+      .maybeSingle();
+    if (tcErr) throw tcErr;
+    if (!tc) return [];
+
+    const { data: perms, error: permErr } = await supabase
+      .from('trusted_contact_permissions')
+      .select('section_key, is_permitted')
+      .eq('trusted_contact_id', (tc as any).id);
+    if (permErr) throw permErr;
+
+    return (perms || [])
+      .filter((p: any) => p.is_permitted)
+      .map((p: any) => p.section_key);
+  },
+
+  /** Record an access-log entry when a trusted contact opens a section. */
+  async logSectionView(packetId: string, sectionKey: string) {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return;
+    const { error } = await supabase.from('trusted_contact_access_log').insert({
+      trusted_contact_user_id: userId,
+      packet_id: packetId,
+      section_key: sectionKey,
+      action: 'view',
+    });
+    if (error) {
+      // Non-blocking — surface in console but do not throw
+      console.error('Failed to log section view:', error);
+    }
+  },
+
+  /** Owner-side: read access log for their packet. */
+  async getAccessLog(packetId: string) {
+    const { data, error } = await supabase
+      .from('trusted_contact_access_log')
+      .select('*')
+      .eq('packet_id', packetId)
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    return data || [];
+  },
 };

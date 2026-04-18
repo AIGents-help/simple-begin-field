@@ -23,6 +23,8 @@ import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
 import { DataUsageSummary } from './pages/legal/DataUsageSummary';
 import { PricingPage } from './components/billing/PricingPage';
 import { CheckoutSuccess } from './components/billing/CheckoutSuccess';
+import { TrustedContactInviteAccept } from './components/trust/TrustedContactInviteAccept';
+import { TrustedContactDashboard } from './components/trust/TrustedContactDashboard';
 import NotFound from "./pages/NotFound.tsx";
 import { InstallPromptBanner } from './components/pwa/InstallPromptBanner';
 
@@ -87,6 +89,8 @@ export default function App() {
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/checkout/cancel" element={<Navigate to="/pricing" replace />} />
+              <Route path="/trusted/invite/:token" element={<TrustedContactInviteAccept />} />
+              <Route path="/trusted" element={<TrustedContactDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
