@@ -103,7 +103,10 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
             }
             onAddClick(file, data, options);
           }}
-          onRefresh={onRefresh}
+          onRefresh={(fn) => {
+            refreshRef.current = fn;
+            if (onRefresh) onRefresh(fn);
+          }}
         >
           {(records, _docs, refresh) => {
             const hasSpouse = records.some((r) => isSpouse(r));
