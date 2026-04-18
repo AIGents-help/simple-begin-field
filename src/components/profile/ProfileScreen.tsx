@@ -184,9 +184,17 @@ export const ProfileScreen = () => {
 
         <Card>
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-navy-muted rounded-2xl flex items-center justify-center text-manila text-2xl font-bold">
-              {userInitials}
-            </div>
+            <button
+              onClick={() => setEditOpen(true)}
+              className="rounded-full active:scale-95 transition-transform"
+              aria-label="Edit profile photo"
+            >
+              <PersonAvatar
+                photoPath={(profile as any)?.avatar_path ?? null}
+                name={userDisplayName}
+                size={64}
+              />
+            </button>
             <div>
               <h3 className="text-xl font-bold text-navy-muted">{userDisplayName}</h3>
               <p className="text-sm text-stone-500">{user?.email}</p>
@@ -396,6 +404,7 @@ export const ProfileScreen = () => {
         onClose={() => setEditOpen(false)}
         userId={user?.id || ''}
         currentName={profile?.full_name || ''}
+        currentAvatarPath={(profile as any)?.avatar_path ?? null}
         email={user?.email || ''}
       />
     </div>
