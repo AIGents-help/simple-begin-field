@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
-import { Check, Star, X, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Home, Star, X, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { PRICING_PLANS, PricingPlan } from '../../config/pricingConfig';
 import { useAppContext } from '../../context/AppContext';
 import { CheckoutButton } from './CheckoutButton';
 
 export const PricingPage = () => {
   const { planKey } = useAppContext();
+  const navigate = useNavigate();
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   const filteredPlans = PRICING_PLANS.filter(plan => 
     plan.id === 'free' || 
