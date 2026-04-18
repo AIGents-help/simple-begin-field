@@ -3,6 +3,7 @@ import { Shield, Lock, EyeOff, AlertCircle, CheckCircle2, Info, UserCheck, Arrow
 import { TrustInfoCard, DataUsageSummaryCard } from './TrustComponents';
 import { TrustedContactsManager } from './TrustedContactsManager';
 import { TrustedContactPortal } from './TrustedContactPortal';
+import { TrustedContactAccessLog } from './TrustedContactAccessLog';
 
 interface TrustScreenProps {
   onBack?: () => void;
@@ -27,6 +28,11 @@ export const TrustScreen: React.FC<TrustScreenProps> = ({ onBack }) => {
 
       {/* Phase 1 — Trusted Contact Access Portal */}
       <TrustedContactPortal />
+
+      <div className="my-10 border-t border-stone-200" />
+
+      {/* Phase 3 — Access activity log */}
+      <TrustedContactAccessLog />
 
       <div className="my-10 border-t border-stone-200" />
 
