@@ -17,6 +17,7 @@ import { MedicalSection } from '../sections/MedicalSection';
 import { PrivateSection } from '../sections/PrivateSection';
 import { AffiliateSection } from '../sections/AffiliateSection';
 import { MemoriesSection } from '../sections/MemoriesSection';
+import { CustomSection } from '../sections/CustomSection';
 import { PrivateLockGate } from '../components/private/PrivateLockGate';
 import { PlanGate } from '../components/billing/PlanGate';
 
@@ -27,9 +28,28 @@ export const GenericSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
 };
 
 export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh: (fn: (newRecord?: any) => void) => void }) => {
-  const { activeTab, activeScope, currentPacket } = useAppContext();
+  const { activeTab, activeScope, currentPacket, activeCustomSectionId, customSections, refreshCustomSections, setActiveCustomSection } = useAppContext();
 
   const renderSection = () => {
+    // Render a custom section if one is active
+    if (activeTab === 'custom' && activeCustomSectionId) {
+      const section = customSections.find((s) => s.id === activeCustomSectionId);
+      if (!section) {
+        return (
+          <div className="text-center py-12 text-stone-500">
+            This custom section no longer exists.
+          </div>
+        );
+      }
+      return (
+        <CustomSection
+          section={section}
+          onSectionUpdated={() => { void refreshCustomSections(); }}
+          onSectionDeleted={() => { setActiveCustomSection(null); void refreshCustomSections(); }}
+        />
+      );
+    }
+
     switch (activeTab) {
       case 'info':
         return <InfoSection onAddClick={onAddClick} onRefresh={onRefresh} />;
@@ -77,8 +97,8 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
   // pb-28 on mobile to clear the BottomNav (BottomNav is ~88px incl. safe area)
   const containerClass = "px-4 pt-36 pb-28 sm:px-6 sm:pt-36 lg:p-8 lg:pt-8 lg:pb-8";
 
-  // Affiliate section is accessible to all logged-in users regardless of plan
-  if (activeTab === 'affiliate') {
+  // Affiliate section and Custom sections are accessible to all logged-in users regardless of plan
+  if (activeTab === 'affiliate' || activeTab === 'custom') {
     return (
       <div className={containerClass}>
         {renderSection()}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { AppState, UserScope, UserMode, SectionId, View } from '../config/types';
 import { supabase } from '@/lib/supabase';
 import { authService } from '../services/authService';
@@ -6,6 +6,7 @@ import { packetService } from '../services/packetService';
 import { User } from '@supabase/supabase-js';
 import { useBilling } from '../hooks/useBilling';
 import { PricingPlan } from '../config/pricingConfig';
+import { customSectionService, CustomSection } from '../services/customSectionService';
 
 interface AppContextType extends AppState {
   user: User | null;
@@ -46,6 +47,11 @@ interface AppContextType extends AppState {
   // Professional" prompt, then the directory clears it after auto-searching.
   directoryQuery: string | null;
   setDirectoryQuery: (q: string | null) => void;
+  // Custom user-created sections (max 3 per packet)
+  customSections: CustomSection[];
+  refreshCustomSections: () => Promise<void>;
+  activeCustomSectionId: string | null;
+  setActiveCustomSection: (id: string | null) => void;
 }
 
 const defaultState: AppState = {
@@ -80,7 +86,26 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [completionVersion, setCompletionVersion] = useState(0);
   const bumpCompletion = React.useCallback(() => setCompletionVersion(v => v + 1), []);
   const [directoryQuery, setDirectoryQuery] = useState<string | null>(null);
+  const [customSections, setCustomSections] = useState<CustomSection[]>([]);
+  const [activeCustomSectionId, setActiveCustomSectionId] = useState<string | null>(null);
   const currentPacketRef = React.useRef<any | null>(null);
+
+  const refreshCustomSections = useCallback(async () => {
+    if (!currentPacketRef.current?.id) {
+      setCustomSections([]);
+      return;
+    }
+    try {
+      const list = await customSectionService.list(currentPacketRef.current.id);
+      setCustomSections(list);
+    } catch (err) {
+      console.error('[AppContext] refreshCustomSections failed', err);
+    }
+  }, []);
+
+  const setActiveCustomSection = useCallback((id: string | null) => {
+    setActiveCustomSectionId(id);
+  }, []);
 
   const {
     loading: billingLoading,
@@ -151,6 +176,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setCurrentPacket(null);
     setState(prev => ({ ...prev, onboarded: false }));
   }, []);
+
+  // Reload custom sections whenever the active packet changes
+  useEffect(() => {
+    if (currentPacket?.id) {
+      void refreshCustomSections();
+    } else {
+      setCustomSections([]);
+    }
+  }, [currentPacket?.id, refreshCustomSections]);
 
   const hydrateUserState = React.useCallback(async (authUser: User | null) => {
     setUser(authUser);
@@ -280,6 +314,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     bumpCompletion,
     directoryQuery,
     setDirectoryQuery,
+    customSections,
+    refreshCustomSections,
+    activeCustomSectionId,
+    setActiveCustomSection,
   }), [
     state, 
     user, 
@@ -303,6 +341,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     completionVersion,
     bumpCompletion,
     directoryQuery,
+    customSections,
+    refreshCustomSections,
+    activeCustomSectionId,
+    setActiveCustomSection,
   ]);
 
 

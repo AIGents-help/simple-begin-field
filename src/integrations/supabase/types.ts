@@ -798,6 +798,104 @@ export type Database = {
           },
         ]
       }
+      custom_section_records: {
+        Row: {
+          created_at: string
+          custom_section_id: string
+          entry_date: string | null
+          id: string
+          notes: string | null
+          packet_id: string
+          scope: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custom_section_id: string
+          entry_date?: string | null
+          id?: string
+          notes?: string | null
+          packet_id: string
+          scope?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custom_section_id?: string
+          entry_date?: string | null
+          id?: string
+          notes?: string | null
+          packet_id?: string
+          scope?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_section_records_custom_section_id_fkey"
+            columns: ["custom_section_id"]
+            isOneToOne: false
+            referencedRelation: "custom_sections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_section_records_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_sections: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          packet_id: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name: string
+          packet_id: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          packet_id?: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_sections_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_billing_profiles: {
         Row: {
           created_at: string | null

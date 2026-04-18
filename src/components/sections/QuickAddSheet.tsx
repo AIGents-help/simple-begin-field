@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { X, ChevronRight, Upload, Plus, FileText, Users } from 'lucide-react';
+import { X, ChevronRight, Upload, Plus, FileText, Users, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { RECOMMENDATIONS_CONFIG } from '../../config/recommendationsConfig';
 import { SectionId } from '../../config/types';
+import { useAppContext } from '../../context/AppContext';
+import { CustomSectionModal } from './CustomSectionModal';
 
 export const QuickAddSheet = ({ 
   isOpen, 
@@ -16,6 +18,8 @@ export const QuickAddSheet = ({
 }) => {
   const [step, setStep] = useState<'section' | 'category'>('section');
   const [selectedSection, setSelectedSection] = useState<SectionId | null>(null);
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const { customSections, refreshCustomSections, setActiveCustomSection, setTab, setView } = useAppContext();
 
   const handleSectionSelect = (sectionId: SectionId) => {
     setSelectedSection(sectionId);
@@ -78,6 +82,24 @@ export const QuickAddSheet = ({
           <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#fdfaf3]">
             {step === 'section' ? (
               <div className="grid grid-cols-1 gap-3">
+                {/* New Custom Section entry */}
+                {customSections.length < 3 && (
+                  <button
+                    onClick={() => setShowCustomModal(true)}
+                    className="w-full p-4 bg-amber-50/60 border-2 border-dashed border-amber-300 rounded-2xl flex items-center justify-between group hover:border-amber-400 hover:bg-amber-50 transition-all active:scale-[0.98]"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-700">
+                        <Sparkles size={20} />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-bold text-navy-muted">New Custom Section</p>
+                        <p className="text-[10px] text-stone-400 font-medium">Create your own folder ({customSections.length}/3)</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="text-amber-400" />
+                  </button>
+                )}
                 {SECTIONS_CONFIG.map(section => (
                   <button
                     key={section.id}
@@ -194,6 +216,18 @@ export const QuickAddSheet = ({
         </motion.div>
         </>
       )}
+
+      <CustomSectionModal
+        isOpen={showCustomModal}
+        onClose={() => setShowCustomModal(false)}
+        onSaved={(s) => {
+          void refreshCustomSections();
+          setActiveCustomSection(s.id);
+          setTab('custom');
+          setView('sections');
+          handleClose();
+        }}
+      />
     </AnimatePresence>
   );
 };

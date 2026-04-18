@@ -16,7 +16,8 @@ export type SectionId =
   | 'funeral' 
   | 'memories'
   | 'private'
-  | 'affiliate';
+  | 'affiliate'
+  | 'custom';
 
 export type UserScope = 'personA' | 'personB' | 'shared';
 export type UserMode = 'single' | 'couple';
