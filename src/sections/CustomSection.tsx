@@ -6,6 +6,8 @@ import { customSectionService, CustomSection as CustomSectionType, CustomSection
 import { getCustomSectionIcon } from '../config/customSectionIcons';
 import { CustomSectionModal } from '../components/sections/CustomSectionModal';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { EntryAttachments } from '../components/upload/EntryAttachments';
+import { EntryAttachmentSummary } from '../components/upload/EntryAttachmentSummary';
 
 interface Props {
   section: CustomSectionType;
@@ -163,6 +165,11 @@ export const CustomSection: React.FC<Props> = ({ section, onSectionUpdated, onSe
                   {record.notes && (
                     <p className="text-sm text-stone-600 mt-2 whitespace-pre-wrap">{record.notes}</p>
                   )}
+                  <EntryAttachmentSummary
+                    packetId={record.packet_id}
+                    sectionKey="custom"
+                    recordId={record.id}
+                  />
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button
@@ -221,12 +228,14 @@ const CustomSectionRecordModal: React.FC<{
   const [notes, setNotes] = useState('');
   const [date, setDate] = useState('');
   const [saving, setSaving] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setTitle(existing?.title ?? '');
       setNotes(existing?.notes ?? '');
       setDate(existing?.entry_date ?? '');
+      setSavedId(existing?.id ?? null);
     }
   }, [isOpen, existing]);
 
@@ -239,8 +248,8 @@ const CustomSectionRecordModal: React.FC<{
     }
     setSaving(true);
     try {
-      const saved = existing
-        ? await customSectionService.updateRecord(existing.id, {
+      const saved = existing || savedId
+        ? await customSectionService.updateRecord((existing?.id || savedId) as string, {
             title: title.trim(),
             notes: notes.trim() || null,
             entry_date: date || null,
@@ -252,9 +261,9 @@ const CustomSectionRecordModal: React.FC<{
             notes,
             entryDate: date || null,
           });
-      toast.success(existing ? 'Entry updated' : 'Entry added');
+      toast.success(existing || savedId ? 'Entry saved' : 'Entry added');
+      setSavedId(saved.id);
       onSaved(saved);
-      onClose();
     } catch (err: any) {
       toast.error(err?.message || 'Failed to save entry');
     } finally {
@@ -311,11 +320,21 @@ const CustomSectionRecordModal: React.FC<{
               className="w-full px-4 py-3 bg-white border border-stone-200 rounded-xl text-navy-muted focus:outline-none focus:border-navy-muted resize-none"
             />
           </div>
+
+          <div className="pt-2 border-t border-stone-200/60">
+            <EntryAttachments
+              packetId={section.packet_id}
+              sectionKey="custom"
+              recordId={existing?.id || savedId}
+              scope={(existing?.scope as any) || 'shared'}
+              subKey={section.id}
+            />
+          </div>
         </div>
 
         <div className="px-6 py-4 border-t border-stone-200/60 flex gap-3 bg-white">
           <button onClick={onClose} className="flex-1 px-4 py-3 rounded-xl border border-stone-200 text-stone-600 font-bold">
-            Cancel
+            {existing || savedId ? 'Done' : 'Cancel'}
           </button>
           <button
             onClick={handleSave}
@@ -323,7 +342,7 @@ const CustomSectionRecordModal: React.FC<{
             className="flex-1 px-4 py-3 rounded-xl bg-navy-muted text-white font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
             {saving && <Loader2 size={16} className="animate-spin" />}
-            {existing ? 'Save' : 'Add Entry'}
+            {existing || savedId ? 'Save Changes' : 'Save & Add Attachments'}
           </button>
         </div>
       </div>

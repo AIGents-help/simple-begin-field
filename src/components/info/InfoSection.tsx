@@ -1,10 +1,12 @@
 // src/components/info/InfoSection.tsx
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useInfoRecords } from '../../hooks/useInfoRecords'
 import { AddInfoForm } from './AddInfoForm'
 import { useConfirm } from '../../context/ConfirmDialogContext'
+import { EntryAttachments } from '../upload/EntryAttachments'
+import { EntryAttachmentSummary } from '../upload/EntryAttachmentSummary'
 
 interface InfoSectionProps {
   packetId: string
@@ -24,6 +26,7 @@ export function InfoSection({ packetId, scope }: InfoSectionProps) {
     clearMessages,
   } = useInfoRecords(packetId, scope)
   const confirm = useConfirm()
+  const [expandedAttachments, setExpandedAttachments] = useState<string | null>(null)
 
   useEffect(() => {
     loadRecords()
@@ -112,7 +115,7 @@ export function InfoSection({ packetId, scope }: InfoSectionProps) {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <span
                     style={{
                       fontSize: 11,
@@ -129,21 +132,48 @@ export function InfoSection({ packetId, scope }: InfoSectionProps) {
                   <p style={{ margin: '4px 0 0', fontSize: 11, color: '#aaa' }}>
                     Saved {new Date(record.created_at).toLocaleDateString()}
                   </p>
+                  <EntryAttachmentSummary
+                    packetId={packetId}
+                    sectionKey="info"
+                    recordId={record.id}
+                  />
                 </div>
-                <button
-                  onClick={async () => {
-                    const ok = await confirm({
-                      title: 'Delete this record?',
-                      description: 'This will also remove any attached documents. This action cannot be undone.',
-                    })
-                    if (ok) deleteRecord(record.id)
-                  }}
-                  style={{ fontSize: 12, color: '#cc0000' }}
-                  aria-label={`Delete ${record.title}`}
-                >
-                  Delete
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
+                  <button
+                    onClick={() =>
+                      setExpandedAttachments((c) => (c === record.id ? null : record.id))
+                    }
+                    style={{ fontSize: 12, color: '#1a3a5c', fontWeight: 600 }}
+                    aria-expanded={expandedAttachments === record.id}
+                  >
+                    {expandedAttachments === record.id ? 'Hide attachments' : 'Manage attachments'}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const ok = await confirm({
+                        title: 'Delete this record?',
+                        description: 'This will also remove any attached documents. This action cannot be undone.',
+                      })
+                      if (ok) deleteRecord(record.id)
+                    }}
+                    style={{ fontSize: 12, color: '#cc0000' }}
+                    aria-label={`Delete ${record.title}`}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
+
+              {expandedAttachments === record.id && (
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #eee' }}>
+                  <EntryAttachments
+                    packetId={packetId}
+                    sectionKey="info"
+                    recordId={record.id}
+                    scope={scope}
+                  />
+                </div>
+              )}
             </li>
           ))}
         </ul>
