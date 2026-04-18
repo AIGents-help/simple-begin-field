@@ -119,6 +119,13 @@ const RECORD_DOC_SLOTS: Record<string, { table: string; slots: { category: strin
   },
 };
 
+// Extra document slots shown only when category = "Firearms & Weapons"
+const FIREARM_DOC_SLOTS: { category: string; label: string; description?: string }[] = [
+  { category: 'firearm_bill_of_sale', label: 'Bill of Sale / Receipt', description: 'Proof of purchase or transfer' },
+  { category: 'firearm_registration', label: 'Registration Certificate', description: 'State or federal registration' },
+  { category: 'firearm_ccw_permit', label: 'Concealed Carry Permit', description: 'CCW or carry license' },
+];
+
 export const AddEditSheet = ({ 
   isOpen, 
   onClose, 
