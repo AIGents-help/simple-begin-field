@@ -100,6 +100,7 @@ export const QuickAddSheet = ({
                     <ChevronRight size={18} className="text-amber-400" />
                   </button>
                 )}
+                {SECTIONS_CONFIG.map(section => (
                   <button
                     key={section.id}
                     onClick={() => handleSectionSelect(section.id)}
