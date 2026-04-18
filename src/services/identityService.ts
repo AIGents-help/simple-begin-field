@@ -44,16 +44,59 @@ export interface IdentityRecord {
 
 export const identityService = {
   async list(packetId: string, scope?: string) {
-    let query = supabase
+    // Pull modern category-tagged records.
+    let modernQ = supabase
       .from('info_records')
       .select('*')
       .eq('packet_id', packetId)
       .in('category', IDENTITY_CATEGORIES as unknown as string[])
       .order('created_at', { ascending: true });
-    if (scope) query = query.eq('scope', scope);
-    const { data, error } = await query;
-    if (error) throw error;
-    return (data || []) as unknown as IdentityRecord[];
+    if (scope) modernQ = modernQ.eq('scope', scope);
+    const { data: modern, error: modernErr } = await modernQ;
+    if (modernErr) throw modernErr;
+
+    // Pull legacy records saved with category='Other' but a recognizable title
+    // (e.g. "Driver's License Details", "Passport Details") so older data still shows
+    // up in the new cards without any data migration.
+    let legacyQ = supabase
+      .from('info_records')
+      .select('*')
+      .eq('packet_id', packetId)
+      .or(
+        [
+          "title.ilike.%driver%license%",
+          "title.ilike.%passport%",
+          "title.ilike.%social security%",
+          "title.ilike.%birth certificate%",
+          "title.ilike.%citizenship%",
+          "title.ilike.%naturalization%",
+          "title.ilike.%global entry%",
+          "title.ilike.%tsa precheck%",
+          "title.ilike.%state id%",
+        ].join(',')
+      )
+      .order('created_at', { ascending: true });
+    if (scope) legacyQ = legacyQ.eq('scope', scope);
+    const { data: legacy } = await legacyQ;
+
+    // Merge, mapping each legacy row's category to the matching IdentityCategory
+    // so the card components render & filter correctly. The DB row is untouched.
+    const byId = new Map<string, IdentityRecord>();
+    for (const row of (modern || []) as unknown as IdentityRecord[]) byId.set(row.id, row);
+    for (const row of (legacy || []) as any[]) {
+      if (byId.has(row.id)) continue;
+      const t = String(row.title || '').toLowerCase();
+      let mapped: IdentityCategory | null = null;
+      if (t.includes('driver') && t.includes('license')) mapped = 'drivers_license';
+      else if (t.includes('passport')) mapped = 'passport';
+      else if (t.includes('social security')) mapped = 'social_security';
+      else if (t.includes('birth certificate')) mapped = 'birth_certificate';
+      else if (t.includes('citizenship') || t.includes('naturalization')) mapped = 'citizenship';
+      else if (t.includes('global entry') || t.includes('tsa precheck') || t.includes('state id')) mapped = 'other_government_id';
+      if (!mapped) continue;
+      byId.set(row.id, { ...row, category: mapped } as IdentityRecord);
+    }
+    return Array.from(byId.values());
   },
 
   async upsert(record: Partial<IdentityRecord> & { packet_id: string; category: string; scope: string }) {
