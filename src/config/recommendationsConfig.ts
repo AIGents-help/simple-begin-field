@@ -119,21 +119,13 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       { label: 'Primary Residence', prefill: { property_label: 'Primary Residence' } },
       { label: 'Vacation Property', prefill: { property_label: 'Vacation Property' } },
       { label: 'Rental Property', prefill: { property_label: 'Rental Property' } },
-      { label: 'Mortgage Information', prefill: { property_label: 'Mortgage Information' } },
-      { label: 'Utilities Account Numbers', prefill: { property_label: 'Utilities Accounts' } },
-      { label: 'Insurance Details', prefill: { property_label: 'Insurance Details' } },
-      { label: 'Security System Info', prefill: { property_label: 'Security System' } },
+      { label: 'Commercial Property', prefill: { property_label: 'Commercial Property' } },
+      { label: 'Land Parcel', prefill: { property_label: 'Land Parcel' } },
     ],
     // Deed, Mortgage, Title, Insurance, Tax, HOA, and Lease docs are attached
     // directly to each property record (see RECORD_DOC_SLOTS in AddEditSheet).
     documents: [],
-    contacts: [
-      { label: 'Realtor', prefill: { name: 'Realtor' } },
-      { label: 'Mortgage Lender', prefill: { name: 'Mortgage Lender' } },
-      { label: 'Property Manager', prefill: { name: 'Property Manager' } },
-      { label: 'Home Insurer', prefill: { name: 'Home Insurer' } },
-      { label: 'Utility Companies', prefill: { name: 'Utility Company' } },
-    ],
+    contacts: [],
     considerations: [
       'Which bills must remain paid?',
       'Alarm / access instructions',
