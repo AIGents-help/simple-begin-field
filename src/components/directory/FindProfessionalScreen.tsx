@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Briefcase, Search, Star, MapPin, Phone, Loader2, ChevronRight } from 'lucide-react';
+import { Briefcase, Search, Star, MapPin, Phone, Loader2, ChevronRight, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useAppContext } from '@/context/AppContext';
@@ -28,7 +28,11 @@ interface ProfessionalResult {
 }
 
 export const FindProfessionalScreen = () => {
-  const { directoryQuery, setDirectoryQuery } = useAppContext() as any;
+  const { directoryQuery, setDirectoryQuery, setView } = useAppContext() as any;
+  const handleBack = () => {
+    if (window.history.length > 1) window.history.back();
+    else setView('dashboard');
+  };
   const [zip, setZip] = useState('');
   const [category, setCategory] = useState('');
   const [results, setResults] = useState<ProfessionalResult[]>([]);
@@ -86,6 +90,15 @@ export const FindProfessionalScreen = () => {
 
   return (
     <div className="p-4 md:p-6 max-w-[800px] mx-auto space-y-6">
+      {/* Back */}
+      <button
+        onClick={handleBack}
+        className="inline-flex items-center gap-2 min-h-[44px] px-3 -ml-3 rounded-xl text-navy-muted hover:bg-stone-100 transition-colors font-bold text-sm"
+      >
+        <ArrowLeft size={18} />
+        <span>Back</span>
+      </button>
+
       {/* Header */}
       <div className="space-y-1">
         <div className="flex items-center gap-3">
