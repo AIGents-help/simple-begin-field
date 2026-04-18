@@ -131,4 +131,108 @@ export const inactivityCheckInService = {
     if (error) throw error;
     return (data as CheckInEvent[]) || [];
   },
+
+  // ============ Admin-only methods ============
+
+  /**
+   * Admin: list every user with check-in settings, joined with profile + computed status.
+   * Requires admin RLS (checkin_settings policy allows is_admin()).
+   */
+  async adminListAll(): Promise<
+    Array<{
+      user_id: string;
+      email: string | null;
+      full_name: string | null;
+      settings: InactivityCheckInSettings;
+      last_checkin_at: string | null;
+      next_due_at: string | null;
+      computed_status: CheckInComputedStatus;
+    }>
+  > {
+    const { data: settingsRows, error } = await supabase
+      .from('checkin_settings')
+      .select('*')
+      .order('updated_at', { ascending: false });
+    if (error) throw error;
+
+    const userIds = (settingsRows || []).map((s: any) => s.user_id);
+    if (userIds.length === 0) return [];
+
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, email, full_name, last_checkin_at, checkin_status')
+      .in('id', userIds);
+
+    const profMap = new Map<string, any>();
+    (profiles || []).forEach((p: any) => profMap.set(p.id, p));
+
+    // Compute next_due_at client-side for display (status RPC requires self/admin)
+    const results = await Promise.all(
+      (settingsRows || []).map(async (s: any) => {
+        let computed: CheckInComputedStatus = 'inactive';
+        let next_due_at: string | null = null;
+        try {
+          const { data } = await supabase.rpc('get_checkin_status', {
+            p_user_id: s.user_id,
+          });
+          const row = (data as any[])?.[0];
+          computed = (row?.status as CheckInComputedStatus) || 'inactive';
+          next_due_at = row?.next_due_at || null;
+        } catch {
+          /* swallow — fall back to inactive */
+        }
+        const prof = profMap.get(s.user_id);
+        return {
+          user_id: s.user_id,
+          email: prof?.email || null,
+          full_name: prof?.full_name || null,
+          settings: s as InactivityCheckInSettings,
+          last_checkin_at: prof?.last_checkin_at || null,
+          next_due_at,
+          computed_status: computed,
+        };
+      }),
+    );
+    return results;
+  },
+
+  /** Admin: full event history for a single user. */
+  async adminListEvents(userId: string, limit = 100): Promise<CheckInEvent[]> {
+    const { data, error } = await supabase
+      .from('checkin_events')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return (data as CheckInEvent[]) || [];
+  },
+
+  /** Admin: trigger fresh check-in email for any user. */
+  async adminSendCheckInNow(targetUserId: string): Promise<void> {
+    const { data, error } = await supabase.functions.invoke(
+      'admin-checkin-action',
+      { body: { action: 'send_now', target_user_id: targetUserId } },
+    );
+    if (error) throw error;
+    if ((data as any)?.error) throw new Error((data as any).error);
+  },
+
+  /** Admin: manually mark user as checked in. */
+  async adminMarkCheckedIn(targetUserId: string): Promise<void> {
+    const { data, error } = await supabase.functions.invoke(
+      'admin-checkin-action',
+      { body: { action: 'mark_checked_in', target_user_id: targetUserId } },
+    );
+    if (error) throw error;
+    if ((data as any)?.error) throw new Error((data as any).error);
+  },
+
+  /** Admin: count users currently in grace or triggered state (for badge). */
+  async adminCountAlerts(): Promise<number> {
+    const all = await this.adminListAll();
+    return all.filter(
+      (r) => r.computed_status === 'grace' || r.computed_status === 'triggered',
+    ).length;
+  },
 };
