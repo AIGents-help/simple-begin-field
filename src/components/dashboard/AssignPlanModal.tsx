@@ -285,17 +285,20 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
               disabled={loadingPlans || submitting}
               className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/10 disabled:opacity-50"
             >
-              {(['free', 'individual', 'couple', 'lifetime', 'comp'] as PlanKeyChoice[]).map((k) => {
-                const plan = findPlanByKey(k === 'comp' ? 'individual' : k);
-                const price = plan && k !== 'free' && k !== 'comp'
-                  ? ` ($${(plan.price_cents / 100).toFixed(0)}${
-                      plan.billing_type === 'monthly'
-                        ? '/mo'
-                        : plan.billing_type === 'annual'
-                        ? '/yr'
-                        : ''
-                    })`
-                  : '';
+              {(['free', 'individual', 'couple', 'lifetime', 'comp', 'comp_couple'] as PlanKeyChoice[]).map((k) => {
+                const lookupKey =
+                  k === 'comp' ? 'individual' : k === 'comp_couple' ? 'couple' : k;
+                const plan = findPlanByKey(lookupKey);
+                const price =
+                  plan && k !== 'free' && k !== 'comp' && k !== 'comp_couple'
+                    ? ` ($${(plan.price_cents / 100).toFixed(0)}${
+                        plan.billing_type === 'monthly'
+                          ? '/mo'
+                          : plan.billing_type === 'annual'
+                          ? '/yr'
+                          : ''
+                      })`
+                    : '';
                 return (
                   <option key={k} value={k}>
                     {PLAN_LABEL[k]}
