@@ -375,9 +375,9 @@ export const TrustedContactsManager: React.FC = () => {
                   value={!!c.is_deceased}
                   onChange={(d) => handleToggleDeceased(c, d)}
                 />
-                {c.is_deceased && currentPacket && (
+                {c.is_deceased && c.packet_id && (
                   <DeathCertificateUpload
-                    packetId={currentPacket.id}
+                    packetId={c.packet_id}
                     relatedTable="trusted_contacts"
                     relatedRecordId={c.id}
                   />
