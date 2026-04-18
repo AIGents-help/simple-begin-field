@@ -62,9 +62,7 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
     return () => { cancelled = true; };
   }, [packetId, relatedTable, relatedRecordId]);
 
-  const handleSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processFile = async (file: File) => {
     if (!relatedRecordId) {
       toast.error('Save the record first, then upload the certificate', {
         duration: 4000, position: 'bottom-center',
@@ -73,7 +71,7 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
     }
     const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
     if (!allowed.includes(file.type)) {
-      toast.error('Only PDF, JPG, or PNG files are allowed', {
+      toast.error('This file type is not supported. Accepted: PDF, JPG, PNG', {
         duration: 4000, position: 'bottom-center',
       });
       return;
@@ -119,6 +117,17 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
       if (inputRef.current) inputRef.current.value = '';
     }
   };
+
+  const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: (files) => files[0] && processFile(files[0]),
+    disabled: busy || !relatedRecordId,
+    multiple: false,
+  });
 
   const handleView = async () => {
     if (!doc) return;
