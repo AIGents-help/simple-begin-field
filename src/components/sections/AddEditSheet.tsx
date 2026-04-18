@@ -12,6 +12,7 @@ import { CategorySelector } from '../upload/CategorySelector';
 import { CategoryOption, FileMetadata } from '../upload/types';
 import { INFO_CATEGORY_OPTIONS } from '../../config/categories';
 import { LifeStatusToggle, AdvisorStatusToggle } from '../common/LifeStatusToggle';
+import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
 
 export const AddEditSheet = ({ 
   isOpen, 
@@ -504,6 +505,13 @@ export const AddEditSheet = ({
                             disabled={loading}
                           />
                         </div>
+                        {currentPacket && (
+                          <DeathCertificateUpload
+                            packetId={currentPacket.id}
+                            relatedTable="family_members"
+                            relatedRecordId={initialData?.id ?? null}
+                          />
+                        )}
                       </div>
                     )}
                   </div>
@@ -523,6 +531,13 @@ export const AddEditSheet = ({
                       onChange={(s) => setFormData({ ...formData, advisor_status: s })}
                       disabled={loading}
                     />
+                    {formData.advisor_status === 'deceased' && currentPacket && (
+                      <DeathCertificateUpload
+                        packetId={currentPacket.id}
+                        relatedTable="advisor_records"
+                        relatedRecordId={initialData?.id ?? null}
+                      />
+                    )}
                   </div>
                 )}
 

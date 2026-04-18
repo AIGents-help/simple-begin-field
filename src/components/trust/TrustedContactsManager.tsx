@@ -7,6 +7,7 @@ import {
   Mail, Phone, Users, Bell, BellOff, CheckCircle2, AlertCircle, Cross
 } from 'lucide-react';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
+import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
 
 interface TrustedContact {
   id: string;
@@ -369,11 +370,18 @@ export const TrustedContactsManager: React.FC = () => {
               </div>
 
               {/* Life status toggle — saves immediately */}
-              <div className="mt-4 pt-3 border-t border-stone-100">
+              <div className="mt-4 pt-3 border-t border-stone-100 space-y-3">
                 <LifeStatusToggle
                   value={!!c.is_deceased}
                   onChange={(d) => handleToggleDeceased(c, d)}
                 />
+                {c.is_deceased && c.packet_id && (
+                  <DeathCertificateUpload
+                    packetId={c.packet_id}
+                    relatedTable="trusted_contacts"
+                    relatedRecordId={c.id}
+                  />
+                )}
               </div>
 
               {/* Bottom controls */}

@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '@/context/AppContext';
 import { uploadService } from '@/services/uploadService';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
+import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
 
 interface Props {
   isOpen: boolean;
@@ -501,6 +502,13 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                         className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20 resize-none"
                       />
                     </div>
+                    {currentPacket && (
+                      <DeathCertificateUpload
+                        packetId={currentPacket.id}
+                        relatedTable="family_members"
+                        relatedRecordId={spouse?.id ?? null}
+                      />
+                    )}
                   </div>
                 )}
               </Section>
