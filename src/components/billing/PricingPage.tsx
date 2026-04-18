@@ -201,6 +201,9 @@ const PricingCard = ({ plan, isCurrent }: { plan: PricingPlan; isCurrent: boolea
 
 const CorporateTab = ({ plans }: { plans: PricingPlan[] }) => {
   const [seats, setSeats] = useState(10);
+  const [companyName, setCompanyName] = useState('');
+  const [billingEmail, setBillingEmail] = useState('');
+  const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const calc = (perSeat: number) => {
@@ -209,30 +212,86 @@ const CorporateTab = ({ plans }: { plans: PricingPlan[] }) => {
     return Math.round(perSeat * seats * (1 - discount));
   };
 
+  const handleCorporateCheckout = async (plan: PricingPlan) => {
+    if (!companyName.trim()) {
+      toast.error('Please enter your company name');
+      return;
+    }
+    setLoadingPlanId(plan.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('corporate-checkout', {
+        body: {
+          planKey: plan.id,
+          seats,
+          companyName: companyName.trim(),
+          billingEmail: billingEmail.trim() || undefined,
+          successUrl: window.location.origin + '/corporate/dashboard?welcome=1',
+          cancelUrl: window.location.origin + '/pricing',
+        },
+      });
+      if (error) throw error;
+      if (data?.url) window.location.href = data.url;
+    } catch (err: any) {
+      toast.error(err.message || 'Could not start checkout');
+      setLoadingPlanId(null);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-2xl border border-stone-100 p-6 mb-8">
-        <label className="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">
-          Number of seats (min 10)
-        </label>
-        <input
-          type="number"
-          min={10}
-          value={seats}
-          onChange={(e) => setSeats(Math.max(10, parseInt(e.target.value || '10', 10)))}
-          className="w-full text-3xl font-bold text-navy-muted bg-stone-50 rounded-xl px-4 py-3 border border-stone-200 focus:border-navy-muted outline-none"
-        />
-        {seats >= 50 && seats < 100 && (
-          <p className="text-xs text-emerald-600 font-bold mt-2">✓ 20% volume discount applied</p>
-        )}
-        {seats >= 100 && (
-          <p className="text-xs text-amber-600 font-bold mt-2">100+ seats — please contact us for a custom quote.</p>
+      <div className="bg-white rounded-2xl border border-stone-100 p-6 mb-8 space-y-4">
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">
+            Number of seats (min 10)
+          </label>
+          <input
+            type="number"
+            min={10}
+            value={seats}
+            onChange={(e) => setSeats(Math.max(10, parseInt(e.target.value || '10', 10)))}
+            className="w-full text-3xl font-bold text-navy-muted bg-stone-50 rounded-xl px-4 py-3 border border-stone-200 focus:border-navy-muted outline-none"
+          />
+          {seats >= 50 && seats < 100 && (
+            <p className="text-xs text-emerald-600 font-bold mt-2">✓ 20% volume discount applied</p>
+          )}
+          {seats >= 100 && (
+            <p className="text-xs text-amber-600 font-bold mt-2">100+ seats — please contact us for a custom quote.</p>
+          )}
+        </div>
+        {seats < 100 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">
+                Company name
+              </label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Acme Inc."
+                className="w-full text-sm text-navy-muted bg-stone-50 rounded-xl px-4 py-3 border border-stone-200 focus:border-navy-muted outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-2">
+                Billing email (optional)
+              </label>
+              <input
+                type="email"
+                value={billingEmail}
+                onChange={(e) => setBillingEmail(e.target.value)}
+                placeholder="billing@acme.com"
+                className="w-full text-sm text-navy-muted bg-stone-50 rounded-xl px-4 py-3 border border-stone-200 focus:border-navy-muted outline-none"
+              />
+            </div>
+          </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {plans.map((plan) => {
           const total = calc(plan.price);
+          const isLoading = loadingPlanId === plan.id;
           return (
             <div key={plan.id} className="bg-white rounded-3xl border border-stone-100 shadow-sm p-8 flex flex-col">
               <h3 className="text-xl font-bold text-navy-muted">{plan.name}</h3>
@@ -257,21 +316,18 @@ const CorporateTab = ({ plans }: { plans: PricingPlan[] }) => {
               {seats >= 100 ? (
                 <button
                   onClick={() => navigate('/contact?topic=enterprise')}
-                  className="mt-6 w-full py-3 rounded-xl bg-navy-muted text-white font-bold text-sm"
+                  className="mt-6 w-full py-3 rounded-xl bg-navy-muted text-white font-bold text-sm hover:bg-navy-muted/90"
                 >
                   Request Enterprise Quote
                 </button>
-              ) : plan.stripePriceId ? (
-                <CheckoutButton
-                  stripePriceId={plan.stripePriceId}
-                  planKey={`${plan.id}_x${seats}`}
-                  className="mt-6 w-full py-3 rounded-xl bg-navy-muted text-white font-bold text-sm hover:bg-navy-muted/90"
-                >
-                  Buy {seats} seats
-                </CheckoutButton>
               ) : (
-                <button disabled className="mt-6 w-full py-3 rounded-xl bg-stone-100 text-stone-400 font-bold text-sm">
-                  Coming Soon
+                <button
+                  onClick={() => handleCorporateCheckout(plan)}
+                  disabled={isLoading}
+                  className="mt-6 w-full py-3 rounded-xl bg-navy-muted text-white font-bold text-sm hover:bg-navy-muted/90 disabled:opacity-60 inline-flex items-center justify-center gap-2"
+                >
+                  {isLoading && <Loader2 size={14} className="animate-spin" />}
+                  Buy {seats} seats
                 </button>
               )}
             </div>
