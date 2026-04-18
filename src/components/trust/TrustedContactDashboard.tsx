@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import {
-  Loader2, ShieldCheck, Lock, Eye, LogOut, AlertCircle, FileText,
+  Loader2, ShieldCheck, Lock, Eye, LogOut, AlertCircle, FileText, Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { trustedContactPortalService } from '@/services/trustedContactPortalService';
+import { generateTrustedContactPDF } from '@/services/trustedContactPdfService';
 import { SECTIONS_CONFIG } from '@/config/sectionsConfig';
 
 /**
@@ -60,6 +61,7 @@ export const TrustedContactDashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [sectionRows, setSectionRows] = useState<any[]>([]);
   const [sectionLoading, setSectionLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   // Auth check
   useEffect(() => {
