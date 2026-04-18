@@ -3,6 +3,7 @@ import { Camera, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { uploadService } from '@/services/uploadService';
 import { PersonAvatar } from './PersonAvatar';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface Props {
   /** Existing storage path (already saved). */
