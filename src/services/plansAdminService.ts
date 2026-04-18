@@ -82,6 +82,7 @@ export const plansAdminService = {
       .select(`
         id, user_id, pricing_plan_id, status, billing_type, current_period_end,
         is_comp, comp_expires_at, admin_note, created_at,
+        stripe_subscription_id, paused_at, pause_resumes_at, pause_note,
         pricing_plans ( id, plan_key, name, price_cents, billing_type, household_mode )
       `)
       .order('created_at', { ascending: false });
@@ -110,6 +111,12 @@ export const plansAdminService = {
         purchase_id: purchase?.id || null,
         admin_note: purchase?.admin_note || null,
         pricing_plan_id: purchase?.pricing_plan_id || null,
+        billing_type: purchase?.billing_type || plan?.billing_type || null,
+        household_mode: plan?.household_mode || null,
+        stripe_subscription_id: purchase?.stripe_subscription_id || null,
+        paused_at: purchase?.paused_at || null,
+        pause_resumes_at: purchase?.pause_resumes_at || null,
+        pause_note: purchase?.pause_note || null,
       } as SubscriberRow;
     });
   },
