@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Upload, ChevronRight, Loader2, Clock, UserPlus, FileText, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Upload, ChevronRight, Loader2, Clock, UserPlus, FileText, Edit2, Trash2, FileDown, HeartPulse } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { ScopeToggle } from '../layout/ScopeToggle';
@@ -10,6 +10,7 @@ import { documentService } from '../../services/documentService';
 import { SectionRecommendations } from './SectionRecommendations';
 import { FindProfessionalPrompt } from '../directory/FindProfessionalPrompt';
 import { resolveSectionQuery, resolveRecordQuery } from '../../config/professionalPromptMap';
+import { QuickDownloadButton } from '../download/QuickDownloadButton';
 
 import { CategoryOption } from '../upload/types';
 
@@ -82,9 +83,32 @@ export const SectionScreenTemplate = ({
 
   return (
     <div className="p-6 pb-32">
-      <div className="mb-6">
-        <h2 className="text-2xl font-serif font-bold text-navy-muted mb-2">{config.label}</h2>
-        <p className="text-sm text-stone-500">{config.description}</p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-2xl font-serif font-bold text-navy-muted mb-2">{config.label}</h2>
+          <p className="text-sm text-stone-500">{config.description}</p>
+        </div>
+        {activeTab !== 'affiliate' && activeTab !== 'funeral' && currentPacket?.id && (
+          <div className="flex flex-wrap items-center gap-2">
+            {activeTab === 'medical' && (
+              <QuickDownloadButton
+                downloadType="emergency_medical"
+                packetId={currentPacket.id}
+                label="Emergency Card"
+                icon={HeartPulse}
+                variant="outline"
+              />
+            )}
+            <QuickDownloadButton
+              downloadType="section"
+              packetId={currentPacket.id}
+              sections={[activeTab]}
+              label="Download Section"
+              icon={FileDown}
+              variant="ghost"
+            />
+          </div>
+        )}
       </div>
 
       <ScopeToggle />

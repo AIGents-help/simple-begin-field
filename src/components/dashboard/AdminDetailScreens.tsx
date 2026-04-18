@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { StatusPill } from './DashboardComponents';
 import { AssignPlanModal } from './AssignPlanModal';
+import { DownloadPacketButton } from '../download/DownloadPacketButton';
 import { supabase } from '@/integrations/supabase/client';
 
 interface DetailPanelProps {
@@ -239,10 +240,17 @@ export const CustomerDetail: React.FC<CustomerDetailProps> = ({ customer, onClos
 export const PacketDetail: React.FC<{ packet: any; onClose: () => void }> = ({ packet, onClose }) => {
   return (
     <div className="space-y-6">
-      <button onClick={onClose} className="flex items-center gap-2 text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Packets
-      </button>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <button onClick={onClose} className="flex items-center gap-2 text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Packets
+        </button>
+        <DownloadPacketButton
+          variant="settings"
+          packetId={packet.id}
+          label="Download Packet (Admin Copy)"
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
