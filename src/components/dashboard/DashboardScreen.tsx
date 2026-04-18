@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PacketHealthScore } from './PacketHealthScore';
+import { CriticalGapsCard } from './CriticalGapsCard';
 import { CheckInBanner } from '../checkin/CheckInBanner';
 import { UpcomingExpirationsCard } from './UpcomingExpirationsCard';
 import { 
@@ -16,6 +17,7 @@ import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
 import { usePacketCompletion } from '../../hooks/usePacketCompletion';
+import { healthScoreService, HealthScore } from '../../services/healthScoreService';
 
 export const DashboardScreen = () => {
   const { setView, setTab, currentPacket, userDisplayName } = useAppContext();
