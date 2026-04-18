@@ -22,6 +22,7 @@ export const AdminCustomers: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [viewingPacket, setViewingPacket] = useState<any>(null);
 
   useEffect(() => {
     adminService.getCustomers().then(data => {
@@ -30,8 +31,23 @@ export const AdminCustomers: React.FC = () => {
     });
   }, []);
 
+  if (viewingPacket) {
+    return (
+      <PacketDetail
+        packet={viewingPacket}
+        onClose={() => setViewingPacket(null)}
+      />
+    );
+  }
+
   if (selectedCustomer) {
-    return <CustomerDetail customer={selectedCustomer} onClose={() => setSelectedCustomer(null)} />;
+    return (
+      <CustomerDetail
+        customer={selectedCustomer}
+        onClose={() => setSelectedCustomer(null)}
+        onViewPacket={(packet) => setViewingPacket(packet)}
+      />
+    );
   }
 
   const columns = [
