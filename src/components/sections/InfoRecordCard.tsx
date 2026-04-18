@@ -3,6 +3,8 @@ import { FileText, Paperclip, ChevronRight, Eye, Edit2, Trash2, ClipboardList } 
 import { getCategoryIcon } from '@/config/categoryIcons';
 import { format } from 'date-fns';
 import { formatHumanDate, isValidDisplayDate } from '@/lib/formatDate';
+import { FindProfessionalPrompt } from '../directory/FindProfessionalPrompt';
+import { resolveRecordQuery } from '@/config/professionalPromptMap';
 
 const DATE_FIELD_KEYS = new Set([
   'dob', 'date_of_birth', 'birthday',
