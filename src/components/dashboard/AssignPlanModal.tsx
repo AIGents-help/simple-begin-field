@@ -86,8 +86,11 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
       // Resolve target plan
       let targetPlan: PlanRow | undefined;
       if (choice === 'comp') {
-        // Comp uses Individual plan as the underlying entitlement by default
+        // Comp Individual uses Individual plan as the underlying entitlement
         targetPlan = findPlanByKey('individual') || findPlanByKey('lifetime');
+      } else if (choice === 'comp_couple') {
+        // Comp Couple uses Couple plan as the underlying entitlement
+        targetPlan = findPlanByKey('couple') || findPlanByKey('individual') || findPlanByKey('lifetime');
       } else {
         targetPlan = findPlanByKey(choice);
       }
@@ -99,8 +102,11 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
       if (choice === 'couple' && !partnerEmail.trim()) {
         throw new Error('Partner email is required for Couple plan');
       }
-      if (choice === 'comp' && !compReason.trim()) {
+      if ((choice === 'comp' || choice === 'comp_couple') && !compReason.trim()) {
         throw new Error('Reason is required for Complimentary plan');
+      }
+      if (grantAdmin && !confirmAdmin) {
+        throw new Error('Please confirm Full Admin Rights grant by checking the confirmation box.');
       }
 
       // Snapshot previous plan for log
