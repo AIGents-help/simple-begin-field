@@ -45,8 +45,8 @@ export const CustomSection: React.FC<Props> = ({ section, onSectionUpdated, onSe
     const ok = await confirm({
       title: 'Delete this custom section?',
       description: 'This will delete all entries inside. This cannot be undone.',
-      confirmText: 'Delete Section',
-      destructive: true,
+      confirmLabel: 'Delete Section',
+      variant: 'danger',
     });
     if (!ok) return;
     try {
@@ -63,8 +63,8 @@ export const CustomSection: React.FC<Props> = ({ section, onSectionUpdated, onSe
     const ok = await confirm({
       title: 'Delete this entry?',
       description: `"${record.title}" will be permanently removed.`,
-      confirmText: 'Delete',
-      destructive: true,
+      confirmLabel: 'Delete',
+      variant: 'danger',
     });
     if (!ok) return;
     try {
