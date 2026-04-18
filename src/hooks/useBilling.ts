@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { PRICING_PLANS, PlanId } from '../config/pricingConfig';
+import { PRICING_PLANS, PlanId, FeatureTier, PlanCategory } from '../config/pricingConfig';
 import { User } from '@supabase/supabase-js';
 
 export const useBilling = (user: User | null) => {
@@ -9,13 +9,15 @@ export const useBilling = (user: User | null) => {
   const [isPaid, setIsPaid] = useState(false);
   const [isCouple, setIsCouple] = useState(false);
   const [isLifetime, setIsLifetime] = useState(false);
+  const [featureTier, setFeatureTier] = useState<FeatureTier>('basic');
+  const [planCategory, setPlanCategory] = useState<PlanCategory>('free');
 
   const fetchBillingStatus = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
     try {
-      // Check profile role first — admins skip purchase lookup entirely
+      // Admins always get full lifetime
       const profileRes = await supabase
         .from('profiles')
         .select('role')
@@ -23,18 +25,19 @@ export const useBilling = (user: User | null) => {
         .maybeSingle();
 
       if (profileRes.data?.role === 'admin') {
-        setPlanId('lifetime');
+        setPlanId('full_single_lifetime');
         setIsPaid(true);
         setIsCouple(true);
         setIsLifetime(true);
+        setFeatureTier('full');
+        setPlanCategory('individual');
         setLoading(false);
         return;
       }
 
-      // Non-admin: check purchases
       const purchaseRes = await supabase
         .from('purchases')
-        .select('status, billing_type, pricing_plan_id, pricing_plans(plan_key)')
+        .select('status, billing_type, pricing_plan_id, pricing_plans(plan_key, feature_tier, plan_category)')
         .eq('user_id', user.id)
         .in('status', ['active', 'one_time_paid'])
         .order('created_at', { ascending: false })
@@ -43,27 +46,37 @@ export const useBilling = (user: User | null) => {
 
       const purchase = purchaseRes.data;
       if (purchase && !purchaseRes.error) {
-        const planKey = (purchase as any).pricing_plans?.plan_key as string | undefined;
-        const matchedPlan = planKey
-          ? PRICING_PLANS.find(p => p.id === planKey)
-          : null;
+        const planRow = (purchase as any).pricing_plans;
+        const planKey = planRow?.plan_key as string | undefined;
+        const matchedPlan = planKey ? PRICING_PLANS.find(p => p.id === planKey) : null;
+
+        // Resolve tier from DB column first, fall back to config, fall back to 'full' for legacy paid plans
+        const dbTier = planRow?.feature_tier as FeatureTier | undefined;
+        const dbCat = planRow?.plan_category as PlanCategory | undefined;
+        const resolvedTier: FeatureTier = dbTier ?? matchedPlan?.featureTier ?? 'full';
+        const resolvedCat: PlanCategory = dbCat ?? matchedPlan?.planCategory ?? 'individual';
 
         if (matchedPlan) {
           setPlanId(matchedPlan.id);
           setIsPaid(matchedPlan.price > 0);
-          setIsCouple(matchedPlan.canInvitePartner);
+          setIsCouple(matchedPlan.canInvitePartner || resolvedCat === 'couple' || resolvedCat === 'family');
           setIsLifetime(matchedPlan.interval === 'one-time');
         } else {
-          setPlanId('individual_monthly');
+          // Unknown plan_key — paid status from purchase
+          setPlanId('full_single_lifetime');
           setIsPaid(true);
           setIsCouple(false);
           setIsLifetime(purchase.billing_type === 'one_time');
         }
+        setFeatureTier(resolvedTier);
+        setPlanCategory(resolvedCat);
       } else {
         setPlanId('free');
         setIsPaid(false);
         setIsCouple(false);
         setIsLifetime(false);
+        setFeatureTier('basic');
+        setPlanCategory('free');
       }
     } catch (err) {
       console.error('Error fetching billing status:', err);
@@ -80,6 +93,8 @@ export const useBilling = (user: User | null) => {
       setIsPaid(false);
       setIsCouple(false);
       setIsLifetime(false);
+      setFeatureTier('basic');
+      setPlanCategory('free');
       setLoading(false);
     }
   }, [user, fetchBillingStatus]);
@@ -93,6 +108,9 @@ export const useBilling = (user: User | null) => {
     isPaid,
     isCouple,
     isLifetime,
+    featureTier,
+    planCategory,
+    isFullFeature: featureTier === 'full',
     currentPlan,
     refreshBilling: fetchBillingStatus
   };

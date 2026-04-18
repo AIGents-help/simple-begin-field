@@ -3085,42 +3085,68 @@ export type Database = {
           billing_type: string | null
           created_at: string | null
           description: string | null
+          display_order: number
+          feature_tier: string
           household_mode: string | null
           id: string
           is_active: boolean | null
+          is_corporate_per_seat: boolean
           name: string
+          plan_category: string
           plan_key: string
           price_cents: number
+          seat_limit: number
           stripe_price_id: string | null
           stripe_product_id: string | null
+          upgrade_target_plan_id: string | null
         }
         Insert: {
           billing_type?: string | null
           created_at?: string | null
           description?: string | null
+          display_order?: number
+          feature_tier?: string
           household_mode?: string | null
           id?: string
           is_active?: boolean | null
+          is_corporate_per_seat?: boolean
           name: string
+          plan_category?: string
           plan_key: string
           price_cents: number
+          seat_limit?: number
           stripe_price_id?: string | null
           stripe_product_id?: string | null
+          upgrade_target_plan_id?: string | null
         }
         Update: {
           billing_type?: string | null
           created_at?: string | null
           description?: string | null
+          display_order?: number
+          feature_tier?: string
           household_mode?: string | null
           id?: string
           is_active?: boolean | null
+          is_corporate_per_seat?: boolean
           name?: string
+          plan_category?: string
           plan_key?: string
           price_cents?: number
+          seat_limit?: number
           stripe_price_id?: string | null
           stripe_product_id?: string | null
+          upgrade_target_plan_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pricing_plans_upgrade_target_plan_id_fkey"
+            columns: ["upgrade_target_plan_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       private_items: {
         Row: {
@@ -4207,6 +4233,27 @@ export type Database = {
           title: string | null
         }
         Relationships: []
+      }
+      v_user_feature_tier: {
+        Row: {
+          created_at: string | null
+          feature_tier: string | null
+          is_comp: boolean | null
+          plan_category: string | null
+          plan_key: string | null
+          seat_limit: number | null
+          status: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
