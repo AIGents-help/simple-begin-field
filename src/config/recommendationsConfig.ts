@@ -74,24 +74,17 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
   },
   medical: {
     entries: [
-      { label: 'Primary Doctor', prefill: { provider_name: 'Primary Care Physician' } },
-      { label: 'Specialists', prefill: { provider_name: 'Specialist' } },
-      { label: 'Pharmacy', prefill: { provider_name: 'Pharmacy' } },
-      { label: 'Medications', prefill: { provider_name: 'Medications' } },
-      { label: 'Allergies', prefill: { provider_name: 'Allergies' } },
-      { label: 'Insurance Info', prefill: { provider_name: 'Insurance Information' } },
-      { label: 'Medical Conditions', prefill: { provider_name: 'Medical Conditions' } },
-      { label: 'Emergency Medical Contacts', prefill: { provider_name: 'Emergency Medical Contacts' } },
-      { label: 'Preferred Hospital', prefill: { provider_name: 'Preferred Hospital' } },
-      { label: 'End-of-life Treatment Wishes', prefill: { provider_name: 'End-of-life Treatment Wishes' } },
+      { label: 'Primary Care Doctor', prefill: { record_type: 'doctor', details: { provider_type: 'Primary Care' } } },
+      { label: 'Specialist', prefill: { record_type: 'doctor', details: { provider_type: 'Other specialist' } } },
+      { label: 'Health Insurance', prefill: { record_type: 'insurance', details: { insurance_type: 'Health' } } },
+      { label: 'Medication', prefill: { record_type: 'medication' } },
+      { label: 'Allergy', prefill: { record_type: 'allergy' } },
+      { label: 'Dental Insurance', prefill: { record_type: 'insurance', details: { insurance_type: 'Dental' } } },
+      { label: 'Vision Insurance', prefill: { record_type: 'insurance', details: { insurance_type: 'Vision' } } },
+      { label: 'Surgical History', prefill: { record_type: 'surgery' } },
     ],
-    // Insurance Card is attached to each medical provider record.
-    // Other clinical documents (Advance Directive, Living Will, HIPAA, Medical POA, DNR)
-    // belong in the Legal section attached to the relevant attorney/agent.
-    documents: [
-      { label: 'Medication List', prefill: { title: 'Medication List' } },
-      { label: 'Recent Care Plan Summary', prefill: { title: 'Care Plan Summary' } },
-    ],
+    // Per-card document uploads attach directly to each card; no standalone document chips.
+    documents: [],
     contacts: [
       { label: 'Primary Doctor', prefill: { name: 'Primary Doctor' } },
       { label: 'Specialists', prefill: { name: 'Specialist' } },
