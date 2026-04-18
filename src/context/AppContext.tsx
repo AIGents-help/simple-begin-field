@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { AppState, UserScope, UserMode, SectionId, View } from '../config/types';
 import { supabase } from '@/lib/supabase';
 import { authService } from '../services/authService';
@@ -6,6 +6,7 @@ import { packetService } from '../services/packetService';
 import { User } from '@supabase/supabase-js';
 import { useBilling } from '../hooks/useBilling';
 import { PricingPlan } from '../config/pricingConfig';
+import { customSectionService, CustomSection } from '../services/customSectionService';
 
 interface AppContextType extends AppState {
   user: User | null;
@@ -46,6 +47,11 @@ interface AppContextType extends AppState {
   // Professional" prompt, then the directory clears it after auto-searching.
   directoryQuery: string | null;
   setDirectoryQuery: (q: string | null) => void;
+  // Custom user-created sections (max 3 per packet)
+  customSections: CustomSection[];
+  refreshCustomSections: () => Promise<void>;
+  activeCustomSectionId: string | null;
+  setActiveCustomSection: (id: string | null) => void;
 }
 
 const defaultState: AppState = {
