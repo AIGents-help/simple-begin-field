@@ -353,6 +353,78 @@ export const AddEditSheet = ({
           { name: 'contact_info', label: 'Contact / Branch Info', placeholder: 'Branch address, phone or advisor' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
+      case 'investments': {
+        const accountType = String(formData.account_type || '').toLowerCase();
+        const isCrypto = accountType === 'crypto exchange';
+        const isPrivate = accountType === 'private equity' || accountType === 'angel / startup investment';
+
+        const baseFields: any[] = [
+          { name: 'institution', label: 'Institution / Brokerage', required: true, placeholder: 'e.g. Fidelity, Coinbase, Schwab' },
+          { name: 'account_type', label: 'Account Type', type: 'select', options: [
+            'Individual Brokerage', 'Joint Brokerage', 'Trust Account', 'Custodial / UTMA',
+            'Crypto Exchange', 'Self-Directed', 'Private Equity', 'Angel / Startup Investment',
+            'Hedge Fund', 'Managed Portfolio', 'Other'
+          ]},
+          { name: 'account_nickname', label: 'Account Nickname', placeholder: 'e.g. "Fidelity Brokerage"' },
+          { name: 'account_number_masked', label: 'Account Number', placeholder: 'Last 4 digits only for security' },
+          { name: 'approximate_value', label: 'Approximate Current Value ($)', type: 'number', placeholder: '0.00' },
+          { name: 'last_statement_date', label: 'Date of Last Statement', type: 'date' },
+          { name: 'is_joint_account', label: 'Joint Account', type: 'select', options: ['No', 'Yes'] },
+          ...(String(formData.is_joint_account) === 'Yes' || formData.is_joint_account === true
+            ? [{ name: 'co_owner_name', label: 'Co-Owner Name', placeholder: 'Joint owner full name' }]
+            : []),
+          // Access
+          { name: 'website_url', label: 'Website / Login URL', placeholder: 'https://...' },
+          { name: 'username_masked', label: 'Username', placeholder: 'Masked username or hint' },
+          { name: 'password_hint', label: 'Password Hint', placeholder: 'See Passwords section — do NOT enter actual password' },
+          { name: 'account_phone', label: 'Account Services Phone', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'branch_address', label: 'Branch Address (if applicable)', type: 'textarea', placeholder: 'Branch address', rows: 2 },
+          // Advisor
+          { name: 'advisor_name', label: 'Financial Advisor Name', placeholder: 'Auto-fills from Advisors if available', list: 'family-recipients' },
+          { name: 'advisor_phone', label: 'Advisor Phone', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'advisor_email', label: 'Advisor Email', type: 'email', placeholder: 'advisor@firm.com' },
+          // Holdings
+          { name: 'primary_holdings_description', label: 'Primary Holdings Description', type: 'textarea', placeholder: 'e.g. Mix of index funds and tech stocks', rows: 2 },
+          { name: 'allocation_stocks_pct', label: 'Stocks %', type: 'number', placeholder: '0' },
+          { name: 'allocation_bonds_pct', label: 'Bonds %', type: 'number', placeholder: '0' },
+          { name: 'allocation_cash_pct', label: 'Cash %', type: 'number', placeholder: '0' },
+          { name: 'allocation_other_pct', label: 'Other %', type: 'number', placeholder: '0' },
+          { name: 'restricted_stock_notes', label: 'Restricted Stock / Vesting Notes', type: 'textarea', placeholder: 'RSU vesting schedule, lockup periods, etc.', rows: 2 },
+          // Beneficiary
+          { name: 'primary_beneficiary', label: 'Primary Beneficiary', placeholder: 'Pulls from family members', list: 'family-recipients' },
+          { name: 'contingent_beneficiary', label: 'Contingent Beneficiary', placeholder: 'Backup beneficiary', list: 'family-recipients' },
+          { name: 'tod_on_file', label: 'TOD (Transfer on Death) On File', type: 'select', options: ['No', 'Yes'] },
+        ];
+
+        const cryptoFields: any[] = isCrypto
+          ? [
+              { name: 'crypto_exchange_name', label: 'Exchange Name', placeholder: 'e.g. Coinbase, Kraken' },
+              { name: 'crypto_wallet_type', label: 'Wallet Type', type: 'select', options: ['Exchange', 'Hardware wallet', 'Software wallet'] },
+              { name: 'crypto_hardware_wallet_location', label: 'Hardware Wallet Location', placeholder: 'Physical location of device' },
+              { name: 'crypto_seed_phrase_location', label: 'Seed Phrase Location (LOCATION ONLY)', type: 'textarea', placeholder: '⚠ Never enter the actual seed phrase. Describe where it is physically stored.', rows: 2 },
+            ]
+          : [];
+
+        const piFields: any[] = isPrivate
+          ? [
+              { name: 'pi_company_name', label: 'Company Name', placeholder: 'Portfolio company' },
+              { name: 'pi_investment_date', label: 'Investment Date', type: 'date' },
+              { name: 'pi_amount_invested', label: 'Amount Invested ($)', type: 'number', placeholder: '0.00' },
+              { name: 'pi_current_value', label: 'Current Estimated Value ($)', type: 'number', placeholder: '0.00' },
+              { name: 'pi_investment_stage', label: 'Investment Stage', type: 'select', options: ['Pre-seed', 'Seed', 'Series A', 'Series B', 'Series C', 'Series D+', 'Growth', 'Pre-IPO', 'Other'] },
+              { name: 'pi_company_contact', label: 'Contact at Company', placeholder: 'Founder, CFO, etc.' },
+              { name: 'pi_shareholder_agreement_notes', label: 'Shareholder Agreement Notes', type: 'textarea', placeholder: 'Key terms, transfer restrictions, etc.', rows: 3 },
+            ]
+          : [];
+
+        const dispositionFields: any[] = [
+          { name: 'disposition_action', label: 'Disposition Action', type: 'select', options: ['Liquidate', 'Transfer', 'Hold'] },
+          { name: 'disposition_instructions', label: 'Specific Instructions for Executor', type: 'textarea', placeholder: 'How should the executor handle this account?', rows: 3 },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
+
+        return [...baseFields, ...cryptoFields, ...piFields, ...dispositionFields];
+      }
       case 'retirement':
         return [
           { name: 'account_type', label: 'Account Type', type: 'select', options: ['401(k)', 'IRA', 'Roth IRA', 'Pension', '403(b)', 'Other'] },
@@ -748,6 +820,7 @@ export const AddEditSheet = ({
                 const sectionTitles: Record<string, string> = {
                   'medical': 'Add Medical Provider',
                   'banking': 'Add Bank Account',
+                  'investments': 'Add Investment Account',
                   'real-estate': 'Add Property',
                   'retirement': 'Add Retirement Account',
                   'vehicles': 'Add Vehicle',
@@ -967,6 +1040,11 @@ export const AddEditSheet = ({
                         <PropertyFamilyDatalist packetId={currentPacket.id} />
                         <PropertyPhotoGallery packetId={currentPacket.id} recordId={initialData?.id ?? null} />
                       </>
+                    )}
+
+                    {/* Investments: family datalist for beneficiary/advisor autocomplete */}
+                    {activeTab === 'investments' && currentPacket && (
+                      <PropertyFamilyDatalist packetId={currentPacket.id} />
                     )}
 
                     {/* Per-record document slots (Vehicles, Real Estate, Medical, Property, etc.) */}

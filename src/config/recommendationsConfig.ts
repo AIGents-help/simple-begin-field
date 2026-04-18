@@ -161,6 +161,34 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       'Who should handle accounts first?',
     ]
   },
+  investments: {
+    entries: [
+      { label: 'Brokerage Account', prefill: { account_type: 'Individual Brokerage' } },
+      { label: 'Crypto Holdings', prefill: { account_type: 'Crypto Exchange' } },
+      { label: 'Stock Options / RSUs', prefill: { account_type: 'Other', account_nickname: 'Stock Options / RSUs' } },
+      { label: 'Private Investment', prefill: { account_type: 'Private Equity' } },
+      { label: 'Angel Investment', prefill: { account_type: 'Angel / Startup Investment' } },
+      { label: 'Managed Portfolio', prefill: { account_type: 'Managed Portfolio' } },
+    ],
+    documents: [
+      { label: 'Most Recent Statement', prefill: { institution: 'Investment Statement' } },
+      { label: 'Account Agreement', prefill: { institution: 'Account Agreement' } },
+      { label: 'Beneficiary Designation Form', prefill: { institution: 'Beneficiary Form' } },
+      { label: 'Shareholder Agreement', prefill: { institution: 'Shareholder Agreement' } },
+    ],
+    contacts: [
+      { label: 'Financial Advisor', prefill: { name: 'Financial Advisor' } },
+      { label: 'Brokerage Support', prefill: { name: 'Brokerage Support' } },
+      { label: 'Crypto Recovery Contact', prefill: { name: 'Crypto Recovery Contact' } },
+    ],
+    considerations: [
+      'Are TOD beneficiaries current?',
+      'Where are crypto seed phrases physically stored?',
+      'Which positions are concentrated risk?',
+      'Liquidate vs transfer-in-kind preferences',
+      'Vesting schedules for restricted stock',
+    ]
+  },
   retirement: {
     entries: [
       { label: 'IRA', prefill: { account_type: 'IRA' } },
