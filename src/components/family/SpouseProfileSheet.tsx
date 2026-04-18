@@ -40,6 +40,53 @@ const maskSsn = (raw: string): string => {
   return `•••-••-${last4}`;
 };
 
+// ---- Module-scope subcomponents (must NOT be redefined per render, or inputs lose focus) ----
+interface SectionProps {
+  id: SectionKey;
+  openSection: SectionKey | '';
+  setOpenSection: (s: SectionKey | '') => void;
+  children: React.ReactNode;
+}
+const Section: React.FC<SectionProps> = ({ id, openSection, setOpenSection, children }) => {
+  const open = openSection === id;
+  return (
+    <div className="border border-stone-200 rounded-2xl bg-white overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpenSection(open ? '' : id)}
+        className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-stone-50 transition-colors"
+      >
+        <span className="font-bold text-navy-muted text-sm">{SECTION_LABELS[id]}</span>
+        {open ? <ChevronUp size={18} className="text-stone-400" /> : <ChevronDown size={18} className="text-stone-400" />}
+      </button>
+      {open && <div className="px-4 pb-4 pt-1 space-y-3">{children}</div>}
+    </div>
+  );
+};
+
+interface FieldProps {
+  label: string;
+  field: string;
+  type?: string;
+  placeholder?: string;
+  form: any;
+  errors: Record<string, string>;
+  onChange: (field: string, value: any) => void;
+}
+const Field: React.FC<FieldProps> = ({ label, field, type = 'text', placeholder, form, errors, onChange }) => (
+  <div>
+    <label className="block text-xs font-bold text-stone-600 mb-1">{label}</label>
+    <input
+      type={type}
+      value={form[field] ?? ''}
+      onChange={(e) => onChange(field, e.target.value)}
+      placeholder={placeholder}
+      className={`w-full px-3 py-2 rounded-lg border ${errors[field] ? 'border-rose-400' : 'border-stone-200'} bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20`}
+    />
+    {errors[field] && <p className="text-xs text-rose-600 mt-1">{errors[field]}</p>}
+  </div>
+);
+
 export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, onSaved }) => {
   const { currentPacket, profile, bumpCompletion } = useAppContext();
   const [form, setForm] = useState<any>({});
@@ -241,39 +288,12 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
     }
   };
 
-  // ---- Local UI helpers ----
-  const Section: React.FC<{ id: SectionKey; children: React.ReactNode }> = ({ id, children }) => {
-    const open = openSection === id;
-    return (
-      <div className="border border-stone-200 rounded-2xl bg-white overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setOpenSection(open ? ('' as any) : id)}
-          className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-stone-50 transition-colors"
-        >
-          <span className="font-bold text-navy-muted text-sm">{SECTION_LABELS[id]}</span>
-          {open ? <ChevronUp size={18} className="text-stone-400" /> : <ChevronDown size={18} className="text-stone-400" />}
-        </button>
-        {open && <div className="px-4 pb-4 pt-1 space-y-3">{children}</div>}
-      </div>
-    );
-  };
-
-  const Field: React.FC<{ label: string; field: string; type?: string; placeholder?: string }> = ({ label, field, type = 'text', placeholder }) => (
-    <div>
-      <label className="block text-xs font-bold text-stone-600 mb-1">{label}</label>
-      <input
-        type={type}
-        value={form[field] ?? ''}
-        onChange={(e) => handleField(field, e.target.value)}
-        placeholder={placeholder}
-        className={`w-full px-3 py-2 rounded-lg border ${errors[field] ? 'border-rose-400' : 'border-stone-200'} bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20`}
-      />
-      {errors[field] && <p className="text-xs text-rose-600 mt-1">{errors[field]}</p>}
-    </div>
-  );
+  // Bind shared props for module-scope subcomponents
+  const sectionProps = { openSection, setOpenSection: (s: SectionKey | '') => setOpenSection(s as SectionKey) };
+  const fieldProps = { form, errors, onChange: handleField };
 
   return (
+
     <AnimatePresence>
       {isOpen && (
         <>
@@ -358,21 +378,21 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                 </div>
               </div>
 
-              <Section id="identity">
-                <Field label="First name *" field="first_name" placeholder="e.g. Jane" />
-                <Field label="Middle name" field="middle_name" />
-                <Field label="Last name" field="last_name" />
+              <Section id="identity" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
+                <Field label="First name *" field="first_name" placeholder="e.g. Jane" form={form} errors={errors} onChange={handleField} />
+                <Field label="Middle name" field="middle_name" form={form} errors={errors} onChange={handleField} />
+                <Field label="Last name" field="last_name" form={form} errors={errors} onChange={handleField} />
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="Suffix" field="suffix" placeholder="Jr., Sr., III" />
-                  <Field label="Preferred name / nickname" field="preferred_name" />
+                  <Field label="Suffix" field="suffix" placeholder="Jr., Sr., III" form={form} errors={errors} onChange={handleField} />
+                  <Field label="Preferred name / nickname" field="preferred_name" form={form} errors={errors} onChange={handleField} />
                 </div>
-                <Field label="Date of birth" field="birthday" type="date" />
-                <Field label="Place of birth" field="place_of_birth" placeholder="City, State" />
+                <Field label="Date of birth" field="birthday" type="date" form={form} errors={errors} onChange={handleField} />
+                <Field label="Place of birth" field="place_of_birth" placeholder="City, State" form={form} errors={errors} onChange={handleField} />
               </Section>
 
-              <Section id="marriage">
-                <Field label="Date of marriage" field="marriage_date" type="date" />
-                <Field label="Place of marriage" field="marriage_place" placeholder="City, State" />
+              <Section id="marriage" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
+                <Field label="Date of marriage" field="marriage_date" type="date" form={form} errors={errors} onChange={handleField} />
+                <Field label="Place of marriage" field="marriage_place" placeholder="City, State" form={form} errors={errors} onChange={handleField} />
                 <div className="flex items-center justify-between p-3 bg-stone-50 border border-stone-200 rounded-xl">
                   <div>
                     <p className="text-xs font-bold text-navy-muted">Marriage certificate on file</p>
@@ -392,9 +412,9 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                 </p>
               </Section>
 
-              <Section id="contact">
-                <Field label="Primary phone" field="phone" type="tel" placeholder="(555) 123-4567" />
-                <Field label="Primary email" field="email" type="email" placeholder="jane@example.com" />
+              <Section id="contact" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
+                <Field label="Primary phone" field="phone" type="tel" placeholder="(555) 123-4567" form={form} errors={errors} onChange={handleField} />
+                <Field label="Primary email" field="email" type="email" placeholder="jane@example.com" form={form} errors={errors} onChange={handleField} />
                 <div className="flex items-center justify-between p-3 bg-stone-50 border border-stone-200 rounded-xl">
                   <div>
                     <p className="text-xs font-bold text-navy-muted">Same as my address</p>
@@ -421,12 +441,12 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                 </div>
               </Section>
 
-              <Section id="work">
-                <Field label="Occupation" field="occupation" placeholder="e.g. Teacher" />
-                <Field label="Employer" field="employer" placeholder="Company / Organization" />
+              <Section id="work" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
+                <Field label="Occupation" field="occupation" placeholder="e.g. Teacher" form={form} errors={errors} onChange={handleField} />
+                <Field label="Employer" field="employer" placeholder="Company / Organization" form={form} errors={errors} onChange={handleField} />
               </Section>
 
-              <Section id="sensitive">
+              <Section id="sensitive" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
                 <div>
                   <label className="block text-xs font-bold text-stone-600 mb-1">Social Security Number</label>
                   <div className="relative">
@@ -461,7 +481,7 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                 </div>
               </Section>
 
-              <Section id="lifecycle">
+              <Section id="lifecycle" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
                 <LifeStatusToggle
                   value={!!form.is_deceased}
                   onChange={(d) => handleField('is_deceased', d)}
@@ -469,8 +489,8 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                 />
                 {form.is_deceased && (
                   <div className="space-y-3 pt-2 border-t border-stone-100">
-                    <Field label="Date of death" field="date_of_death" type="date" />
-                    <Field label="Place of death" field="place_of_death" placeholder="City, State" />
+                    <Field label="Date of death" field="date_of_death" type="date" form={form} errors={errors} onChange={handleField} />
+                    <Field label="Place of death" field="place_of_death" placeholder="City, State" form={form} errors={errors} onChange={handleField} />
                     <div>
                       <label className="block text-xs font-bold text-stone-600 mb-1">Cause of death (private)</label>
                       <textarea
