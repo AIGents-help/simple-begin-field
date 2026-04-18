@@ -55,18 +55,25 @@ export const RecordDocumentUpload: React.FC<Props> = ({
       return;
     }
     setLoading(true);
+    // Broadened lookup: surface ANY document linked to this record_id, regardless of
+    // whether the legacy row was saved with the new related_table/category combo.
+    // Prefer a category-matched row when present, otherwise fall back to the most
+    // recent document tied to the same record.
     supabase
       .from('documents')
-      .select('id, file_name, file_path, mime_type, file_size, created_at, is_private')
+      .select('id, file_name, file_path, mime_type, file_size, created_at, is_private, category, related_table')
       .eq('packet_id', packetId)
-      .eq('related_table', relatedTable)
       .eq('related_record_id', relatedRecordId)
-      .eq('category', category)
       .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled) setDoc(data || null);
+        if (cancelled) return;
+        const rows = (data || []) as any[];
+        // Prefer a strict match first; fall back to ANY doc on this record.
+        const strict = rows.find(
+          (r) => r.related_table === relatedTable && (r.category || '') === category,
+        );
+        const fallback = rows[0] || null;
+        setDoc(strict || fallback);
       })
       .then(() => {
         if (!cancelled) setLoading(false);

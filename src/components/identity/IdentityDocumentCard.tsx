@@ -262,7 +262,7 @@ export const IdentityDocumentCard: React.FC<IdentityDocumentCardProps> = ({
             </button>
           )}
 
-          <Accordion type="multiple" defaultValue={[sections[0]?.id]} className="w-full">
+          <Accordion type="multiple" defaultValue={[sections[0]?.id, 'documents']} className="w-full">
             {sections.map((sec) => (
               <AccordionItem key={sec.id} value={sec.id}>
                 <AccordionTrigger className="text-sm font-bold">{sec.label}</AccordionTrigger>
@@ -287,13 +287,17 @@ export const IdentityDocumentCard: React.FC<IdentityDocumentCardProps> = ({
               </AccordionItem>
             ))}
 
-            {!isDraft(data.id) && (
-              <AccordionItem value="documents">
-                <AccordionTrigger className="text-sm font-bold">Document upload</AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex items-center gap-2 mb-3 text-xs text-stone-500">
-                    <FileText size={14} /> Attach scans or photos. Stored privately in your packet.
+            <AccordionItem value="documents">
+              <AccordionTrigger className="text-sm font-bold">Document upload</AccordionTrigger>
+              <AccordionContent>
+                <div className="flex items-center gap-2 mb-3 text-xs text-stone-500">
+                  <FileText size={14} /> Attach scans or photos. Stored privately in your packet.
+                </div>
+                {isDraft(data.id) ? (
+                  <div className="rounded-lg border border-dashed border-amber-300 bg-amber-50/60 p-3 text-xs text-amber-800">
+                    Save this card first (tap <span className="font-bold">Save</span> below), then return here to attach a scan or photo.
                   </div>
+                ) : (
                   <RecordDocumentUpload
                     packetId={packetId}
                     relatedTable="info_records"
@@ -303,9 +307,9 @@ export const IdentityDocumentCard: React.FC<IdentityDocumentCardProps> = ({
                     description="Upload a scan or photo of this document."
                     isPrivate
                   />
-                </AccordionContent>
-              </AccordionItem>
-            )}
+                )}
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
 
           <div className="flex items-center justify-between pt-3 border-t border-stone-100">
