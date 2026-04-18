@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Upload, ChevronRight, Loader2, Clock, UserPlus, FileText, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Upload, ChevronRight, Loader2, Clock, UserPlus, FileText, Edit2, Trash2, FileDown, HeartPulse } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { ScopeToggle } from '../layout/ScopeToggle';
@@ -10,6 +10,7 @@ import { documentService } from '../../services/documentService';
 import { SectionRecommendations } from './SectionRecommendations';
 import { FindProfessionalPrompt } from '../directory/FindProfessionalPrompt';
 import { resolveSectionQuery, resolveRecordQuery } from '../../config/professionalPromptMap';
+import { QuickDownloadButton } from '../download/QuickDownloadButton';
 
 import { CategoryOption } from '../upload/types';
 
