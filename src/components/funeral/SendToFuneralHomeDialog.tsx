@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Loader2, Send, X, FileDown } from 'lucide-react';
+import { Loader2, Send, X, FileDown, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '@/context/AppContext';
 import { buildFuneralPdfBlob, generateFuneralPdf } from '@/services/funeralPdfService';
+import { funeralPhotoService, FuneralPhoto } from '@/services/funeralPhotoService';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -31,13 +32,16 @@ export const SendToFuneralHomeDialog: React.FC<Props> = ({ isOpen, onClose, reco
   const [email, setEmail] = useState(record.funeral_home_email || '');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [photos, setPhotos] = useState<FuneralPhoto[]>([]);
+  const [includePhotos, setIncludePhotos] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       setEmail(record.funeral_home_email || '');
       setMessage('');
+      funeralPhotoService.list(record.id).then(setPhotos).catch(() => setPhotos([]));
     }
-  }, [isOpen, record.funeral_home_email]);
+  }, [isOpen, record.funeral_home_email, record.id]);
 
   if (!isOpen) return null;
 
@@ -68,6 +72,35 @@ export const SendToFuneralHomeDialog: React.FC<Props> = ({ isOpen, onClose, reco
       const base64 = await blobToBase64(blob);
       const filename = `funeral-instructions-${(personName || 'survivor-packet').replace(/\s+/g, '-').toLowerCase()}.pdf`;
 
+      // Compress photos to JPEG attachments (cap total to keep email under provider limits)
+      let photoAttachments: { filename: string; content: string; mime: string }[] = [];
+      if (includePhotos && photos.length > 0) {
+        const MAX_BYTES = 5_500_000; // ~5.5MB across all photos
+        let total = 0;
+        for (const p of photos) {
+          const compressed = await funeralPhotoService.compressToBase64(p.file_path, {
+            maxDim: 1400,
+            quality: 0.78,
+          });
+          if (!compressed) continue;
+          // Approx decoded byte size (3/4 of base64 length)
+          const bytes = (compressed.base64.length * 3) / 4;
+          if (total + bytes > MAX_BYTES) {
+            toast.message(`Some photos were skipped to stay under the email size limit.`, {
+              duration: 4000,
+              position: 'bottom-center',
+            });
+            break;
+          }
+          total += bytes;
+          photoAttachments.push({
+            filename: compressed.filename,
+            content: compressed.base64,
+            mime: compressed.mime,
+          });
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('send-funeral-instructions', {
         body: {
           to: email,
@@ -77,6 +110,7 @@ export const SendToFuneralHomeDialog: React.FC<Props> = ({ isOpen, onClose, reco
           message,
           pdfBase64: base64,
           filename,
+          photoAttachments,
         },
       });
       if (error) throw error;
