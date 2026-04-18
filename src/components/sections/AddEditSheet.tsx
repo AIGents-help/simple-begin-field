@@ -15,6 +15,8 @@ import { INFO_CATEGORY_OPTIONS } from '../../config/categories';
 import { LifeStatusToggle, AdvisorStatusToggle } from '../common/LifeStatusToggle';
 import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
 import { RecordDocumentUpload } from '../common/RecordDocumentUpload';
+import { AutoFilledIndicator } from '../common/AutoFilledIndicator';
+import { useFederatedDefaults } from '../../hooks/useFederatedDefaults';
 
 // Per-section document slots — documents are attached to the parent record
 // instead of existing as standalone entries. Each entry maps to a category
