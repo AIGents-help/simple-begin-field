@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
-import { Check, Star, X, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Home, Star, X, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { PRICING_PLANS, PricingPlan } from '../../config/pricingConfig';
 import { useAppContext } from '../../context/AppContext';
 import { CheckoutButton } from './CheckoutButton';
 
 export const PricingPage = () => {
   const { planKey } = useAppContext();
+  const navigate = useNavigate();
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   const filteredPlans = PRICING_PLANS.filter(plan => 
     plan.id === 'free' || 
@@ -15,8 +25,19 @@ export const PricingPage = () => {
   );
 
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-stone-50 min-h-screen">
+    <div className="py-6 px-4 sm:px-6 lg:px-8 bg-stone-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <button
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 min-h-[44px] px-3 -ml-3 rounded-xl text-navy-muted hover:bg-stone-100 transition-colors font-bold text-sm"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={18} />
+            <span>Back</span>
+          </button>
+        </div>
+
         <div className="text-center mb-12">
           <h2 className="text-3xl font-serif font-bold text-navy-muted sm:text-4xl">
             Simple, Transparent Pricing
@@ -59,6 +80,23 @@ export const PricingPage = () => {
           {filteredPlans.map((plan) => (
             <PricingCard key={plan.id} plan={plan} isCurrent={planKey === plan.id} />
           ))}
+        </div>
+
+        <div className="mt-16 flex flex-col items-center gap-3 text-center">
+          <button
+            onClick={() => navigate('/')}
+            className="inline-flex items-center justify-center gap-2 min-h-[44px] px-6 py-3 bg-white border-2 border-navy-muted text-navy-muted rounded-2xl font-bold text-sm hover:bg-navy-muted hover:text-white transition-all shadow-sm"
+          >
+            <Home size={16} />
+            <span>Return to My Packet</span>
+            <ArrowRight size={16} />
+          </button>
+          <button
+            onClick={handleBack}
+            className="text-xs text-stone-500 hover:text-navy-muted underline underline-offset-4 font-medium min-h-[44px] px-3"
+          >
+            Or go back to the previous page
+          </button>
         </div>
       </div>
     </div>
