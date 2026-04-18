@@ -21,6 +21,12 @@ import { usePacketCompletion } from '../../hooks/usePacketCompletion';
 import { healthScoreService, HealthScore } from '../../services/healthScoreService';
 import { EstateSummaryCard } from '../estate/EstateSummaryCard';
 import { PartnerStatusCard } from '../couple/PartnerStatusCard';
+import { AnnualReviewBanner } from '../couple/AnnualReviewBanner';
+import { BeneficiaryAlignmentCard } from '../couple/BeneficiaryAlignmentCard';
+import { DocumentGapsCard } from '../couple/DocumentGapsCard';
+import { CombinedFamilyTreeCard } from '../couple/CombinedFamilyTreeCard';
+import { CoupleActivityFeed } from '../couple/CoupleActivityFeed';
+import { FriendlyCompetitionBadge } from '../couple/FriendlyCompetitionBadge';
 
 export const DashboardScreen = () => {
   const { setView, setTab, currentPacket, userDisplayName, completionVersion } = useAppContext();
@@ -129,11 +135,23 @@ export const DashboardScreen = () => {
         </div>
       </div>
 
+      {/* Annual review nudge (only when due) */}
+      <AnnualReviewBanner />
+
       {/* Partner status (only renders when an active couple link exists) */}
       <PartnerStatusCard />
 
+      {/* Friendly competition badge */}
+      <FriendlyCompetitionBadge />
+
       {/* Packet Health Score */}
       {currentPacket && <PacketHealthScore packetId={currentPacket.id} />}
+
+      {/* Beneficiary alignment + document gaps (couple-only, render conditionally) */}
+      <BeneficiaryAlignmentCard />
+      <DocumentGapsCard />
+      <CombinedFamilyTreeCard />
+      <CoupleActivityFeed />
 
       {/* Estate Value Summary Card */}
       {currentPacket && <EstateSummaryCard />}
