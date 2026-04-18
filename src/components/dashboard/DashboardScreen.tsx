@@ -1,5 +1,5 @@
 import React from 'react';
-import { PacketCompletionScore } from './PacketCompletionScore';
+import { PacketHealthScore } from './PacketHealthScore';
 import { CheckInBanner } from '../checkin/CheckInBanner';
 import { UpcomingExpirationsCard } from './UpcomingExpirationsCard';
 import { 
@@ -109,8 +109,8 @@ export const DashboardScreen = () => {
         </div>
       </div>
 
-      {/* Packet Completion Score */}
-      {currentPacket && <PacketCompletionScore packetId={currentPacket.id} />}
+      {/* Packet Health Score */}
+      {currentPacket && <PacketHealthScore packetId={currentPacket.id} />}
 
       {/* Upcoming Expirations */}
       <UpcomingExpirationsCard />
