@@ -216,6 +216,7 @@ export const RecordCard = ({
   subtitle,
   description,
   icon: Icon,
+  avatar,
   onClick,
   onEdit,
   onDelete,
@@ -228,6 +229,8 @@ export const RecordCard = ({
   subtitle?: string;
   description?: string;
   icon?: React.ElementType;
+  /** Optional custom node to render instead of the icon — used for person avatars. */
+  avatar?: React.ReactNode;
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
