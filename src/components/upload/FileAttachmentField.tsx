@@ -3,9 +3,10 @@ import { UploadProps, UploadStatus, FileMetadata } from './types';
 import { SelectedFilePreview } from './SelectedFilePreview';
 import { UploadedFileCard } from './UploadedFileCard';
 import { UploadStatusBadge } from './UploadStatusBadge';
-import { Plus, Loader2, AlertCircle } from 'lucide-react';
+import { Plus, Loader2, AlertCircle, Upload } from 'lucide-react';
 import { documentService } from '../../services/documentService';
 import { PlanGate } from '../billing/PlanGate';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 export const FileAttachmentField = ({
   sectionKey,
@@ -85,18 +86,11 @@ export const FileAttachmentField = ({
 
       {status === 'empty' && (
         <PlanGate feature="upload">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
+          <EmptyDropzone
+            onPick={() => fileInputRef.current?.click()}
+            onFile={handleFileSelect}
             disabled={disabled}
-            className="w-full p-6 border-2 border-dashed border-stone-200 rounded-3xl flex flex-col items-center justify-center gap-2 text-stone-400 bg-white hover:border-stone-300 transition-all disabled:opacity-50"
-          >
-            <div className="w-10 h-10 bg-stone-50 rounded-xl flex items-center justify-center text-stone-300">
-              <Plus size={24} />
-            </div>
-            <span className="font-bold text-sm">Attach a document</span>
-            <span className="text-[10px] uppercase tracking-widest font-bold opacity-60">PDF, DOC, or Image</span>
-          </button>
+          />
         </PlanGate>
       )}
 

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Upload, FileText, Paperclip, AlertCircle } from 'lucide-react';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface FileUploadAreaProps {
   onFileSelected: (file: File) => void;
@@ -21,36 +22,42 @@ export const FileUploadArea = ({
   selectedFile = null,
 }: FileUploadAreaProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const acceptList = acceptedFileTypes
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+
+  const isAccepted = (file: File): boolean => {
+    if (acceptList.length === 0) return true;
+    const name = file.name.toLowerCase();
+    const mime = (file.type || '').toLowerCase();
+    return acceptList.some((tok) => {
+      if (tok.startsWith('.')) return name.endsWith(tok);
+      if (tok.endsWith('/*')) return mime.startsWith(tok.slice(0, -1));
+      return mime === tok;
+    });
+  };
 
   const handleFile = (file: File) => {
     setError(null);
+    if (!isAccepted(file)) {
+      setError(`This file type is not supported. Accepted: ${acceptedFileTypes}`);
+      return;
+    }
     if (maxFileSize && file.size > maxFileSize) {
-      setError(`File is too large. Max size is ${maxFileSize / 1024 / 1024}MB.`);
+      setError(`File is too large. Max size is ${Math.round(maxFileSize / 1024 / 1024)}MB.`);
       return;
     }
     onFileSelected(file);
   };
 
-  const onDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (!disabled) setIsDragging(true);
-  };
-
-  const onDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (disabled) return;
-
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleFile(file);
-  };
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: (files) => files[0] && handleFile(files[0]),
+    disabled,
+    multiple: false,
+  });
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -61,12 +68,12 @@ export const FileUploadArea = ({
     <div className="space-y-2">
       <div
         onClick={() => !disabled && fileInputRef.current?.click()}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
+        {...dropzoneProps}
         className={`
-          relative border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer text-center
-          ${isDragging ? 'border-navy-muted bg-navy-muted/5' : 'border-folder-edge bg-paper hover:border-navy-muted/30'}
+          relative border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer text-center min-h-[112px]
+          ${isDragging
+            ? 'border-solid border-amber-500 bg-amber-50 scale-[1.01]'
+            : 'border-folder-edge bg-paper hover:border-navy-muted/30'}
           ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
@@ -78,11 +85,22 @@ export const FileUploadArea = ({
           onChange={onFileChange}
           disabled={disabled}
         />
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${isDragging ? 'bg-navy-muted text-primary-foreground' : 'bg-manila/60 text-navy-muted'}`}>
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${isDragging ? 'bg-amber-500 text-white' : 'bg-manila/60 text-navy-muted'}`}>
           {selectedFile ? <FileText size={20} /> : <Upload size={20} />}
         </div>
         <div className="text-center">
-          <p className="font-bold text-sm text-navy-muted">{label}</p>
+          {isDragging ? (
+            <p className="font-bold text-sm text-amber-700">Drop to upload</p>
+          ) : (
+            <>
+              <p className="font-bold text-sm text-navy-muted">
+                {isTouch ? label : 'Drag & drop your file here'}
+              </p>
+              <p className="text-[11px] text-stone-500 mt-0.5">
+                {isTouch ? 'Tap to browse' : 'or tap to browse'}
+              </p>
+            </>
+          )}
           <p className="text-[10px] text-stone-400 uppercase font-bold tracking-wider mt-1">{description}</p>
         </div>
       </div>
