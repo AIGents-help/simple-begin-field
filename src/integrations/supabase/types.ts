@@ -427,17 +427,33 @@ export type Database = {
           created_at: string | null
           date_of_death: string | null
           email: string | null
+          employer: string | null
+          first_name: string | null
           id: string
           is_deceased: boolean
           is_na: boolean | null
+          last_name: string | null
+          marital_status: string | null
+          marriage_certificate_on_file: boolean | null
+          marriage_date: string | null
+          marriage_place: string | null
+          middle_name: string | null
           name: string
+          occupation: string | null
           packet_id: string | null
           parent_member_id: string | null
           phone: string | null
+          photo_path: string | null
+          place_of_birth: string | null
+          place_of_death: string | null
+          preferred_name: string | null
           relationship: string | null
           reminder_notes: string | null
           scope: string | null
+          ssn_encrypted: string | null
+          ssn_masked: string | null
           status: string | null
+          suffix: string | null
           updated_at: string | null
         }
         Insert: {
@@ -448,17 +464,33 @@ export type Database = {
           created_at?: string | null
           date_of_death?: string | null
           email?: string | null
+          employer?: string | null
+          first_name?: string | null
           id?: string
           is_deceased?: boolean
           is_na?: boolean | null
+          last_name?: string | null
+          marital_status?: string | null
+          marriage_certificate_on_file?: boolean | null
+          marriage_date?: string | null
+          marriage_place?: string | null
+          middle_name?: string | null
           name: string
+          occupation?: string | null
           packet_id?: string | null
           parent_member_id?: string | null
           phone?: string | null
+          photo_path?: string | null
+          place_of_birth?: string | null
+          place_of_death?: string | null
+          preferred_name?: string | null
           relationship?: string | null
           reminder_notes?: string | null
           scope?: string | null
+          ssn_encrypted?: string | null
+          ssn_masked?: string | null
           status?: string | null
+          suffix?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -469,17 +501,33 @@ export type Database = {
           created_at?: string | null
           date_of_death?: string | null
           email?: string | null
+          employer?: string | null
+          first_name?: string | null
           id?: string
           is_deceased?: boolean
           is_na?: boolean | null
+          last_name?: string | null
+          marital_status?: string | null
+          marriage_certificate_on_file?: boolean | null
+          marriage_date?: string | null
+          marriage_place?: string | null
+          middle_name?: string | null
           name?: string
+          occupation?: string | null
           packet_id?: string | null
           parent_member_id?: string | null
           phone?: string | null
+          photo_path?: string | null
+          place_of_birth?: string | null
+          place_of_death?: string | null
+          preferred_name?: string | null
           relationship?: string | null
           reminder_notes?: string | null
           scope?: string | null
+          ssn_encrypted?: string | null
+          ssn_masked?: string | null
           status?: string | null
+          suffix?: string | null
           updated_at?: string | null
         }
         Relationships: [
