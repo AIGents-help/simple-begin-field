@@ -57,11 +57,16 @@ export const identityService = {
   },
 
   async upsert(record: Partial<IdentityRecord> & { packet_id: string; category: string; scope: string }) {
+    // Guarantee a non-null title — the info_records table has a NOT NULL constraint.
+    // Fall back to the human label for the category so cards never need to set it manually.
+    const fallbackTitle =
+      IDENTITY_CATEGORY_LABELS[record.category as IdentityCategory] || 'Identity Document';
+    const cleanTitle = (record.title ?? '').trim();
     const payload: any = {
       packet_id: record.packet_id,
       scope: record.scope,
       category: record.category,
-      title: record.title ?? null,
+      title: cleanTitle.length > 0 ? cleanTitle : fallbackTitle,
       notes: record.notes ?? null,
       expiry_date: record.expiry_date ?? null,
       details: record.details ?? {},
