@@ -8,6 +8,7 @@ import { uploadService } from '@/services/uploadService';
 import { PetMedicationsEditor, PetMedicationDraft } from './PetMedicationsEditor';
 import { PetDocuments } from './PetDocuments';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
+import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
 
 interface Props {
   isOpen: boolean;
@@ -432,6 +433,13 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
                         className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20 resize-none"
                       />
                     </div>
+                    {currentPacket && (
+                      <DeathCertificateUpload
+                        packetId={currentPacket.id}
+                        relatedTable="pet_records"
+                        relatedRecordId={pet?.id ?? null}
+                      />
+                    )}
                   </div>
                 )}
               </div>
