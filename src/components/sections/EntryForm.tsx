@@ -147,10 +147,10 @@ export const EntryForm = ({ isOpen, onClose, entryLabel, onSuccess }: EntryFormP
           { name: "expiryDate", label: "Expiry Date", required: true, type: "date" },
           { name: "placeOfIssue", label: "Place of Issue", required: false },
         ];
-      case "Social Security Location":
+      case "Social Security Card":
         return [
-          { name: "cardLocation", label: "Where is physical card stored?", required: true },
-          { name: "numberLocation", label: "Where is number documented?", required: true },
+          { name: "cardLocation", label: "Where is physical card stored?", required: false },
+          { name: "numberLocation", label: "Where is number documented?", required: false },
           { name: "whoKnows", label: "Who else knows this?", required: false },
         ];
       case "Marriage Information":
