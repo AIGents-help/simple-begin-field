@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Loader2, Plus, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { Loader2, Plus, AlertTriangle, ShieldAlert, Check } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { cn } from '@/lib/utils';
 import { CategoryOption } from '../components/upload/types';
 import {
   identityService,
@@ -113,12 +114,19 @@ export const InfoSection = ({
 
   const addCard = (category: IdentityCategory, details?: Record<string, any>) => {
     if (!currentPacket?.id) return;
-    if (SINGLETON_CATEGORIES.includes(category) && records.some((r) => r.category === category)) {
-      // already exists — just expand it
+    if (SINGLETON_CATEGORIES.includes(category)) {
       const existing = records.find((r) => r.category === category);
-      if (existing) setExpandedId(existing.id);
-      setShowAddMenu(false);
-      return;
+      if (existing) {
+        // open existing for edit instead of creating a duplicate
+        setExpandedId(existing.id);
+        setShowAddMenu(false);
+        // scroll the existing card into view
+        setTimeout(() => {
+          const el = document.getElementById(`identity-card-${existing.id}`);
+          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 50);
+        return;
+      }
     }
     const draft = createDraft(category, scope, details);
     draft.packet_id = currentPacket.id;
@@ -126,6 +134,49 @@ export const InfoSection = ({
     setExpandedId(draft.id);
     setShowAddMenu(false);
   };
+
+  // Map category -> existing records for chip state
+  const recordsByCategory = useMemo(() => {
+    const map = new Map<IdentityCategory, IdentityRecord[]>();
+    records.forEach((r) => {
+      const cat = r.category as IdentityCategory;
+      const list = map.get(cat) || [];
+      list.push(r);
+      map.set(cat, list);
+    });
+    return map;
+  }, [records]);
+
+  // For other_government_id we further split by id_type so each subtype shows independent state
+  const otherIdsByType = useMemo(() => {
+    const map = new Map<string, IdentityRecord[]>();
+    (recordsByCategory.get('other_government_id') || []).forEach((r) => {
+      const t = String(r.details?.id_type || '').trim().toLowerCase();
+      if (!t) return;
+      const list = map.get(t) || [];
+      list.push(r);
+      map.set(t, list);
+    });
+    return map;
+  }, [recordsByCategory]);
+
+  const getChipState = (item: typeof RECOMMENDED[number]) => {
+    const isSingleton = SINGLETON_CATEGORIES.includes(item.category);
+    let matches: IdentityRecord[] = [];
+    if (item.category === 'other_government_id') {
+      const subtype = String(item.details?.id_type || '').trim().toLowerCase();
+      matches = subtype ? (otherIdsByType.get(subtype) || []) : [];
+    } else {
+      matches = recordsByCategory.get(item.category) || [];
+    }
+    return {
+      isSingleton,
+      count: matches.length,
+      existing: matches[0],
+      added: matches.length > 0,
+    };
+  };
+
 
   const expiringSoon = useMemo(() => {
     return records
@@ -221,15 +272,41 @@ export const InfoSection = ({
           <div className="rounded-xl border border-stone-200 bg-white p-3 space-y-2">
             <p className="text-[10px] font-bold uppercase tracking-widest text-stone-500 px-1">Recommended</p>
             <div className="flex flex-wrap gap-2">
-              {RECOMMENDED.map((r) => (
-                <button
-                  key={r.label}
-                  onClick={() => addCard(r.category, r.details)}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold bg-stone-50 text-navy-muted border border-stone-200 hover:border-navy-muted/40 active:scale-95 transition-transform"
-                >
-                  + {r.label}
-                </button>
-              ))}
+              {RECOMMENDED.map((r) => {
+                const state = getChipState(r);
+                const isAddedSingleton = state.isSingleton && state.added;
+                const showCount = !state.isSingleton && state.count > 0;
+                return (
+                  <button
+                    key={r.label}
+                    onClick={() => addCard(r.category, r.details)}
+                    title={isAddedSingleton ? 'Tap to view or edit' : undefined}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-xs font-bold border active:scale-95 transition-transform inline-flex items-center gap-1.5',
+                      isAddedSingleton
+                        ? 'bg-stone-100 text-stone-500 border-stone-200 hover:border-stone-300'
+                        : 'bg-stone-50 text-navy-muted border-stone-200 hover:border-navy-muted/40',
+                    )}
+                  >
+                    {isAddedSingleton ? (
+                      <>
+                        <Check size={12} className="text-emerald-600" />
+                        <span className="line-through decoration-stone-400">{r.label}</span>
+                        <span className="text-[10px] font-semibold text-emerald-700 ml-0.5">Added</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>+ {r.label}</span>
+                        {showCount && (
+                          <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-navy-muted/10 text-navy-muted text-[10px] font-bold">
+                            {state.count}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
