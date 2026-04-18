@@ -3,6 +3,7 @@ import { X, Send, Loader2 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 import { sectionService } from '@/services/sectionService';
+import { healthScoreService, HealthScore } from '@/services/healthScoreService';
 import { HavenOwlSvg } from './HavenOwlSvg';
 
 interface ChatMessage {

@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { messages, section, sectionData } = await req.json();
+    const { messages, section, sectionData, healthScore } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: 'messages array is required' }), {
@@ -29,7 +29,28 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Build health-score-aware tone guidance
+    let scoreGuidance = '';
+    if (healthScore && typeof healthScore.total_score === 'number') {
+      const s = healthScore.total_score;
+      const weakest = (healthScore.section_scores
+        ? Object.entries(healthScore.section_scores)
+            .map(([k, v]: any) => ({ k, pct: v.max > 0 ? v.score / v.max : 1, max: v.max }))
+            .filter((x) => x.pct < 0.5)
+            .sort((a, b) => b.max - a.max)
+            .slice(0, 3)
+            .map((x) => x.k)
+        : []);
+      const weakList = weakest.length ? weakest.join(', ') : 'none';
+      if (s < 25) scoreGuidance = `The user's Packet Health Score is ${s}/100 (Critical). Their weakest sections are: ${weakList}. Open with empathy and urgency: their packet has critical gaps. Steer them to the highest-impact section first.`;
+      else if (s < 50) scoreGuidance = `The user's Packet Health Score is ${s}/100 (At Risk). Their weakest sections are: ${weakList}. Acknowledge their start and point them to the most important things to add next.`;
+      else if (s < 75) scoreGuidance = `The user's Packet Health Score is ${s}/100 (Good Progress). Their weakest sections are: ${weakList}. Affirm their progress and suggest a few specific items that will make a big difference.`;
+      else scoreGuidance = `The user's Packet Health Score is ${s}/100 (Strong/Excellent). Offer finishing-touch suggestions and confirm they're well prepared.`;
+    }
+
     const systemPrompt = `You are Haven, the wise and calm guide for Survivor Packet. Your role is to help users complete their life document packet so their loved ones are protected. You are warm, clear, and never morbid. You speak in short, direct sentences. You never say "I cannot" — instead, you guide. Never use markdown headers or bullet lists — respond in natural conversational sentences only.
+
+${scoreGuidance}
 
 The user is currently in the ${section || 'dashboard'} section. Their current data is: ${JSON.stringify(sectionData || {})}. Identify what is missing and guide them to complete it step by step.`;
 
