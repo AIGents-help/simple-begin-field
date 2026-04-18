@@ -153,7 +153,7 @@ export const DashboardScreen = () => {
               {/* Folder Body */}
               <button
                 onClick={() => { setView('sections'); setTab(section.id); }}
-                className={`relative w-full text-left bg-[#F5F0E8] p-6 rounded-tr-2xl rounded-bl-2xl rounded-br-2xl border border-folder-edge shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between h-44 z-10`}
+                className={`relative w-full text-left bg-[#F5F0E8] p-6 rounded-tr-2xl rounded-bl-2xl rounded-br-2xl border border-folder-edge shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between h-52 z-10`}
               >
                 <div className="flex justify-between items-start">
                   <div className={`p-3 rounded-xl bg-white/60 text-navy-muted border border-folder-edge/20 shadow-inner`}>
@@ -163,10 +163,13 @@ export const DashboardScreen = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-serif font-bold text-lg text-navy-muted">{section.label}</h3>
-                    <ChevronRight size={18} className="text-stone-400 group-hover:text-navy-muted transition-colors" />
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-serif font-bold text-lg text-navy-muted leading-tight">{section.label}</h3>
+                    <ChevronRight size={18} className="text-stone-400 group-hover:text-navy-muted transition-colors shrink-0" />
                   </div>
+                  <p className="font-serif italic text-[12px] text-stone-500/80 leading-snug line-clamp-2">
+                    {section.description}
+                  </p>
                   <div className="flex items-center gap-1.5 text-stone-500 text-xs font-medium">
                     <FileText size={14} />
                     <span>{count} {count === 1 ? 'record' : 'records'}</span>
