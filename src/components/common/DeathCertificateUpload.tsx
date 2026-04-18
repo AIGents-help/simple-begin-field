@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadService } from '@/services/uploadService';
 import { useConfirm } from '@/context/ConfirmDialogContext';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface DeathCertificateUploadProps {
   packetId: string;
@@ -61,9 +62,7 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
     return () => { cancelled = true; };
   }, [packetId, relatedTable, relatedRecordId]);
 
-  const handleSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processFile = async (file: File) => {
     if (!relatedRecordId) {
       toast.error('Save the record first, then upload the certificate', {
         duration: 4000, position: 'bottom-center',
@@ -72,7 +71,7 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
     }
     const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
     if (!allowed.includes(file.type)) {
-      toast.error('Only PDF, JPG, or PNG files are allowed', {
+      toast.error('This file type is not supported. Accepted: PDF, JPG, PNG', {
         duration: 4000, position: 'bottom-center',
       });
       return;
@@ -118,6 +117,17 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
       if (inputRef.current) inputRef.current.value = '';
     }
   };
+
+  const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: (files) => files[0] && processFile(files[0]),
+    disabled: busy || !relatedRecordId,
+    multiple: false,
+  });
 
   const handleView = async () => {
     if (!doc) return;
@@ -208,10 +218,26 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 border-dashed border-stone-300 text-xs font-bold text-navy-muted hover:bg-white transition-colors disabled:opacity-50"
+          {...dropzoneProps}
+          className={`w-full flex flex-col items-center justify-center gap-1.5 px-3 py-4 rounded-lg border-2 border-dashed text-xs font-bold transition-all disabled:opacity-50 min-h-[88px] ${
+            isDragging
+              ? 'border-solid border-amber-500 bg-amber-50 text-amber-700 scale-[1.01]'
+              : 'border-stone-300 text-navy-muted hover:bg-white'
+          }`}
         >
-          {busy ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-          {busy ? 'Uploading…' : 'Upload Death Certificate'}
+          {busy ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+          <span>
+            {busy
+              ? 'Uploading…'
+              : isDragging
+                ? 'Drop to upload'
+                : isTouch
+                  ? 'Tap to upload Death Certificate'
+                  : 'Drag & drop or tap to upload'}
+          </span>
+          {!busy && !isDragging && (
+            <span className="text-[9px] uppercase tracking-wider text-stone-400 font-bold">PDF, JPG, PNG · Max 20MB</span>
+          )}
         </button>
       )}
 

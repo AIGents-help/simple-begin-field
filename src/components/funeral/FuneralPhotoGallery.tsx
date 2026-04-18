@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Loader2, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Image as ImageIcon, Plus, Trash2, Upload } from 'lucide-react';
 import { funeralPhotoService, FuneralPhoto } from '@/services/funeralPhotoService';
 import { supabase } from '@/integrations/supabase/client';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface Props {
   packetId: string;
@@ -84,8 +85,30 @@ export const FuneralPhotoGallery: React.FC<Props> = ({ packetId, funeralRecordId
     }
   };
 
+  const onFilesArray = (files: File[]) => {
+    const dt = new DataTransfer();
+    files.forEach((f) => dt.items.add(f));
+    onFiles(dt.files);
+  };
+
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: onFilesArray,
+    disabled: uploading,
+  });
+
   return (
-    <div className="rounded-2xl bg-white border border-stone-200 p-4 shadow-sm">
+    <div
+      {...dropzoneProps}
+      className={`relative rounded-2xl bg-white border p-4 shadow-sm transition-all ${
+        isDragging ? 'border-amber-500 border-2 ring-4 ring-amber-200' : 'border-stone-200'
+      }`}
+    >
+      {isDragging && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-amber-50/95 rounded-2xl pointer-events-none">
+          <Upload size={32} className="text-amber-600" />
+          <p className="font-bold text-amber-700">Drop photos to upload</p>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <ImageIcon size={18} className="text-navy-muted" />
@@ -112,7 +135,7 @@ export const FuneralPhotoGallery: React.FC<Props> = ({ packetId, funeralRecordId
 
       <p className="text-xs text-stone-500 mb-3">
         Add photos for slideshows, programs, or memorial display. Images are compressed before
-        emailing to the funeral home.
+        emailing to the funeral home.{!isTouch && ' Drag & drop multiple files anywhere here.'}
       </p>
 
       {loading ? (

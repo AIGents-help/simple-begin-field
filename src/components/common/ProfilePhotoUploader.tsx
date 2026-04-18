@@ -3,6 +3,7 @@ import { Camera, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { uploadService } from '@/services/uploadService';
 import { PersonAvatar } from './PersonAvatar';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface Props {
   /** Existing storage path (already saved). */
@@ -69,10 +70,7 @@ export const ProfilePhotoUploader: React.FC<Props> = ({
 
   const previewUrl = pendingPreview || signedUrl;
 
-  const handlePick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = ''; // allow re-picking same file
-    if (!file) return;
+  const validateAndForward = (file: File) => {
     const isImage =
       file.type.startsWith('image/') ||
       /\.(jpe?g|png|heic|heif|webp)$/i.test(file.name);
@@ -93,17 +91,32 @@ export const ProfilePhotoUploader: React.FC<Props> = ({
     onFileSelected(file);
   };
 
+  const handlePick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-picking same file
+    if (!file) return;
+    validateAndForward(file);
+  };
+
+  const { isDragging, dropzoneProps } = useFileDropzone({
+    onFiles: (files) => files[0] && validateAndForward(files[0]),
+    disabled,
+    multiple: false,
+  });
+
   const grayClass = isDeceased ? 'grayscale opacity-90' : '';
   const cameraBadge = Math.max(28, Math.round(size * 0.32));
 
   return (
     <div className="flex flex-col items-center gap-2 py-2">
-      <div className="relative">
+      <div className="relative" {...dropzoneProps}>
         <button
           type="button"
           onClick={() => !disabled && inputRef.current?.click()}
           disabled={disabled}
-          className={`relative rounded-full overflow-hidden ${grayClass} active:scale-95 transition-transform disabled:opacity-50`}
+          className={`relative rounded-full overflow-hidden ${grayClass} active:scale-95 transition-all disabled:opacity-50 ${
+            isDragging ? 'ring-4 ring-amber-400 ring-offset-2 scale-105' : ''
+          }`}
           style={{ width: size, height: size }}
           aria-label="Upload profile photo"
         >

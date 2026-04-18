@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
 import { useAppContext } from '@/context/AppContext';
 import { useConfirm } from '@/context/ConfirmDialogContext';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface HomeInventoryVideoProps {
   packetId: string;
@@ -63,10 +64,14 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
     fetchVideos();
   }, [packetId, propertyRecordId]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const validateAndStage = (file: File) => {
     setError(null);
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|m4v|webm)$/i.test(file.name);
+    if (!isVideo) {
+      setError('This file type is not supported. Accepted: video files (MP4, MOV, AVI)');
+      setSelectedFile(null);
+      return;
+    }
     if (file.size > MAX_SIZE) {
       setError('Video must be under 500MB');
       setSelectedFile(null);
@@ -74,6 +79,17 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
     }
     setSelectedFile(file);
   };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) validateAndStage(file);
+  };
+
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: (files) => files[0] && validateAndStage(files[0]),
+    disabled: uploading,
+    multiple: false,
+  });
 
   const handleUpload = async () => {
     if (!selectedFile) return;
@@ -179,7 +195,18 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
       <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">Home Inventory Video</h3>
 
       {/* Prompt Card */}
-      <div className="p-5 bg-white rounded-2xl border border-stone-200 shadow-sm space-y-3">
+      <div
+        {...dropzoneProps}
+        className={`relative p-5 bg-white rounded-2xl border shadow-sm space-y-3 transition-all ${
+          isDragging ? 'border-amber-500 border-2 ring-4 ring-amber-200' : 'border-stone-200'
+        }`}
+      >
+        {isDragging && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-amber-50/95 rounded-2xl pointer-events-none">
+            <Upload size={32} className="text-amber-600" />
+            <p className="font-bold text-amber-700">Drop video to upload</p>
+          </div>
+        )}
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
             <Video size={20} />
@@ -191,6 +218,7 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
             </p>
             <p className="text-[10px] text-stone-400 italic leading-relaxed">
               Tip: Open every drawer, closet, and cabinet. State brand names and approximate values aloud.
+              {!isTouch && ' You can also drag & drop the video file anywhere on this card.'}
             </p>
           </div>
         </div>
