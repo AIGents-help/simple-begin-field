@@ -163,6 +163,24 @@ export const TrustedContactDashboard: React.FC = () => {
     navigate('/', { replace: true });
   };
 
+  const handleDownload = async () => {
+    if (!activePacketId || permittedSections.length === 0) {
+      toast.error('No permitted sections to export');
+      return;
+    }
+    setDownloading(true);
+    try {
+      const ownerName = activePacket?.packets?.person_a_name || 'Owner';
+      await generateTrustedContactPDF(activePacketId, ownerName, permittedSections);
+      toast.success('Packet PDF downloaded');
+    } catch (err: any) {
+      console.error('PDF export:', err);
+      toast.error(err?.message || 'Failed to generate PDF');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (!authChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fdfaf3]">
