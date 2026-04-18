@@ -15,6 +15,8 @@ export interface CoupleLink {
   linked_at: string | null;
   unlinked_at: string | null;
   unlinked_by: string | null;
+  last_review_at: string | null;
+  email_notifications_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -38,6 +40,50 @@ export interface CoupleActivityEntry {
   record_table: string | null;
   description: string | null;
   created_at: string;
+}
+
+export interface CoupleNotification {
+  id: string;
+  couple_link_id: string;
+  recipient_user_id: string;
+  actor_user_id: string;
+  notification_type: string;
+  title: string;
+  body: string | null;
+  link_to: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface BeneficiaryAlignment {
+  linked: boolean;
+  mismatches: Array<{
+    severity: 'warn' | 'critical';
+    section: string;
+    side: 'me' | 'partner';
+    count: number;
+    message: string;
+  }>;
+}
+
+export interface DocumentGap {
+  section: string;
+  label: string;
+  cta: string;
+}
+
+export interface CombinedFamilyMember {
+  id: string;
+  packet_id: string;
+  owner_side: 'me' | 'partner';
+  name: string;
+  relationship: string | null;
+  is_deceased: boolean;
+  birthday: string | null;
+  email: string | null;
+  phone: string | null;
+  photo_path: string | null;
+  parent_member_id: string | null;
 }
 
 // Sections that can be shared. Passwords + Private are intentionally excluded — they are hard-blocked at the DB layer.
@@ -112,6 +158,16 @@ export const coupleService = {
     return data;
   },
 
+  async getMyHealthScore(userId: string) {
+    const { data, error } = await supabase
+      .from('health_scores')
+      .select('total_score')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (error) return null;
+    return data;
+  },
+
   async getPermissions(linkId: string, grantingUserId: string): Promise<CouplePermission[]> {
     const { data, error } = await (supabase as any)
       .from('couple_permissions')
@@ -145,6 +201,18 @@ export const coupleService = {
         { onConflict: 'couple_link_id,granting_user_id,section_key' },
       );
     if (error) throw error;
+
+    // Notify partner of permission change (best-effort; ignore failures)
+    try {
+      await (supabase as any).rpc('notify_partner', {
+        p_notification_type: 'permission_changed',
+        p_title: 'Sharing settings updated',
+        p_body: `${sectionKey} → ${level}`,
+        p_link_to: '/profile',
+      });
+    } catch (e) {
+      console.warn('notify_partner failed (non-fatal):', e);
+    }
   },
 
   async getRecentActivity(linkId: string, limit = 10): Promise<CoupleActivityEntry[]> {
@@ -197,6 +265,94 @@ export const coupleService = {
       .delete()
       .eq('id', linkId)
       .eq('status', 'pending');
+    if (error) throw error;
+  },
+
+  // ========== NEW: Phase 2 ==========
+
+  async getCombinedFamilyTree(): Promise<CombinedFamilyMember[]> {
+    const { data, error } = await (supabase as any).rpc('get_combined_family_tree');
+    if (error) {
+      console.error('getCombinedFamilyTree error:', error);
+      return [];
+    }
+    return (data || []) as CombinedFamilyMember[];
+  },
+
+  async checkBeneficiaryAlignment(): Promise<BeneficiaryAlignment> {
+    const { data, error } = await (supabase as any).rpc('check_beneficiary_alignment');
+    if (error) {
+      console.error('checkBeneficiaryAlignment error:', error);
+      return { linked: false, mismatches: [] };
+    }
+    return (data as BeneficiaryAlignment) || { linked: false, mismatches: [] };
+  },
+
+  async getDocumentGaps(): Promise<DocumentGap[]> {
+    const { data, error } = await (supabase as any).rpc('get_partner_document_gaps');
+    if (error) {
+      console.error('getDocumentGaps error:', error);
+      return [];
+    }
+    return (data || []) as DocumentGap[];
+  },
+
+  async getNotifications(userId: string, limit = 20): Promise<CoupleNotification[]> {
+    const { data, error } = await (supabase as any)
+      .from('couple_notifications')
+      .select('*')
+      .eq('recipient_user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (error) {
+      console.error('getNotifications error:', error);
+      return [];
+    }
+    return (data || []) as CoupleNotification[];
+  },
+
+  async getUnreadNotificationCount(userId: string): Promise<number> {
+    const { count, error } = await (supabase as any)
+      .from('couple_notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('recipient_user_id', userId)
+      .eq('is_read', false);
+    if (error) {
+      console.error('getUnreadNotificationCount error:', error);
+      return 0;
+    }
+    return count ?? 0;
+  },
+
+  async markNotificationRead(notificationId: string) {
+    const { error } = await (supabase as any)
+      .from('couple_notifications')
+      .update({ is_read: true })
+      .eq('id', notificationId);
+    if (error) throw error;
+  },
+
+  async markAllNotificationsRead(userId: string) {
+    const { error } = await (supabase as any)
+      .from('couple_notifications')
+      .update({ is_read: true })
+      .eq('recipient_user_id', userId)
+      .eq('is_read', false);
+    if (error) throw error;
+  },
+
+  async markReviewCompleted(notes?: string) {
+    const { error } = await (supabase as any).rpc('mark_couple_review_completed', {
+      p_notes: notes ?? null,
+    });
+    if (error) throw error;
+  },
+
+  async setEmailNotifications(linkId: string, enabled: boolean) {
+    const { error } = await (supabase as any)
+      .from('couple_links')
+      .update({ email_notifications_enabled: enabled })
+      .eq('id', linkId);
     if (error) throw error;
   },
 };

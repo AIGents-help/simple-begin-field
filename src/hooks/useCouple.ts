@@ -21,6 +21,7 @@ export interface UseCoupleResult {
   partnerPacketId: string | null;
   partnerHealthScore: number | null;
   partnerScoreChange: number | null;
+  myHealthScore: number | null;
   myPermissions: CouplePermission[];     // permissions I'm granting (granting_user_id = me)
   partnerPermissions: CouplePermission[]; // permissions partner is granting to me
   activity: CoupleActivityEntry[];
@@ -36,6 +37,7 @@ export const useCouple = (): UseCoupleResult => {
     partnerPacketId: null,
     partnerHealthScore: null,
     partnerScoreChange: null,
+    myHealthScore: null,
     myPermissions: [],
     partnerPermissions: [],
     activity: [],
@@ -57,6 +59,7 @@ export const useCouple = (): UseCoupleResult => {
         partnerPacketId: null,
         partnerHealthScore: null,
         partnerScoreChange: null,
+        myHealthScore: null,
         myPermissions: [],
         partnerPermissions: [],
         activity: [],
@@ -66,13 +69,14 @@ export const useCouple = (): UseCoupleResult => {
 
     const partnerId = link.user_id_1 === user.id ? link.user_id_2 : link.user_id_1;
 
-    const [partner, partnerPacket, partnerHealth, myPerms, partnerPerms, activity] = await Promise.all([
+    const [partner, partnerPacket, partnerHealth, myHealth, myPerms, partnerPerms, activity] = await Promise.all([
       coupleService.getPartnerProfile(partnerId),
       coupleService.getPartnerPacket(partnerId),
       coupleService.getPartnerHealthScore(partnerId),
+      coupleService.getMyHealthScore(user.id),
       coupleService.getPermissions(link.id, user.id),
       coupleService.getPermissions(link.id, partnerId),
-      coupleService.getRecentActivity(link.id, 15),
+      coupleService.getRecentActivity(link.id, 25),
     ]);
 
     setState({
@@ -82,6 +86,7 @@ export const useCouple = (): UseCoupleResult => {
       partnerPacketId: partnerPacket?.id ?? null,
       partnerHealthScore: (partnerHealth as any)?.total_score ?? null,
       partnerScoreChange: (partnerHealth as any)?.score_change ?? null,
+      myHealthScore: (myHealth as any)?.total_score ?? null,
       myPermissions: myPerms,
       partnerPermissions: partnerPerms,
       activity,
