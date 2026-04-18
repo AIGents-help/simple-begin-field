@@ -70,10 +70,7 @@ export const ProfilePhotoUploader: React.FC<Props> = ({
 
   const previewUrl = pendingPreview || signedUrl;
 
-  const handlePick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = ''; // allow re-picking same file
-    if (!file) return;
+  const validateAndForward = (file: File) => {
     const isImage =
       file.type.startsWith('image/') ||
       /\.(jpe?g|png|heic|heif|webp)$/i.test(file.name);
@@ -93,6 +90,19 @@ export const ProfilePhotoUploader: React.FC<Props> = ({
     }
     onFileSelected(file);
   };
+
+  const handlePick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-picking same file
+    if (!file) return;
+    validateAndForward(file);
+  };
+
+  const { isDragging, dropzoneProps } = useFileDropzone({
+    onFiles: (files) => files[0] && validateAndForward(files[0]),
+    disabled,
+    multiple: false,
+  });
 
   const grayClass = isDeceased ? 'grayscale opacity-90' : '';
   const cameraBadge = Math.max(28, Math.round(size * 0.32));
