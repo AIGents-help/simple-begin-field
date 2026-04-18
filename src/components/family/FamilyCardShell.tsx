@@ -18,6 +18,7 @@ import { LifeStatusToggle } from '@/components/common/LifeStatusToggle';
 import { DeathCertificateUpload } from '@/components/common/DeathCertificateUpload';
 import { RecordDocumentUpload } from '@/components/common/RecordDocumentUpload';
 import { PersonAvatar } from '@/components/common/PersonAvatar';
+import { GenderSelect } from '@/components/common/GenderSelect';
 
 const isDraft = (id?: string) => !!id && String(id).startsWith('draft-');
 
@@ -391,7 +392,10 @@ export const FamilyCardShell: React.FC<FamilyCardShellProps> = ({
                   <FamilyField field={{ name: 'last_name', label: 'Last name *', placeholder: 'Doe' }} value={form.last_name} onChange={(v) => setField('last_name', v)} />
                   <FamilyField field={{ name: 'suffix', label: 'Suffix', placeholder: 'Jr., Sr., III' }} value={form.suffix} onChange={(v) => setField('suffix', v)} />
                   <FamilyField field={{ name: 'preferred_name', label: 'Preferred name / nickname' }} value={form.preferred_name} onChange={(v) => setField('preferred_name', v)} />
-                  <FamilyField field={{ name: 'gender', label: 'Gender', type: 'select', options: ['Female', 'Male', 'Non-binary', 'Other', 'Prefer not to say'] }} value={form.gender} onChange={(v) => setField('gender', v)} />
+                  <label className="block">
+                    <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-stone-500">Gender</span>
+                    <GenderSelect value={form.gender ?? ''} onChange={(v) => setField('gender', v)} />
+                  </label>
                   <FamilyField field={{ name: 'birthday', label: 'Date of birth', type: 'date' }} value={form.birthday} onChange={(v) => setField('birthday', v)} />
                   <FamilyField field={{ name: 'place_of_birth', label: 'Place of birth', placeholder: 'City, State' }} value={form.place_of_birth} onChange={(v) => setField('place_of_birth', v)} />
                 </div>

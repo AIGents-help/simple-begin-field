@@ -23,6 +23,7 @@ import { MaskedInput } from '../common/MaskedInput';
 import { ProfilePhotoUploader } from '../common/ProfilePhotoUploader';
 import { uploadService } from '../../services/uploadService';
 import { AIValuationPanel } from '../common/AIValuationPanel';
+import { GenderSelect } from '../common/GenderSelect';
 
 // ---------------------------------------------------------------------------
 // Cross-section federation: snapshot which fields on a source record drive
@@ -269,7 +270,7 @@ export const AddEditSheet = ({
           { name: 'preferred_name', label: 'Preferred Name / Nickname', placeholder: 'What they go by' },
           { name: 'birthday', label: 'Date of Birth', type: 'date' },
           { name: 'place_of_birth', label: 'Place of Birth', placeholder: 'City, State' },
-          { name: 'gender', label: 'Gender', type: 'select', options: ['Female', 'Male', 'Non-binary', 'Prefer not to say', 'Other'] },
+          { name: 'gender', label: 'Gender', type: 'gender' },
           { name: 'phone', label: 'Primary Phone', type: 'tel', placeholder: '(555) 123-4567' },
           { name: 'email', label: 'Primary Email', type: 'email', placeholder: 'jane@example.com' },
           { name: 'address', label: 'Current Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
@@ -1122,6 +1123,11 @@ export const AddEditSheet = ({
                               <option key={opt} value={opt}>{opt}</option>
                             ))}
                           </select>
+                        ) : field.type === 'gender' ? (
+                          <GenderSelect
+                            value={formData[field.name] || ''}
+                            onChange={(v) => handleChange(v)}
+                          />
                         ) : field.type === 'masked' ? (
                           <MaskedInput
                             value={formData[field.name] || ''}

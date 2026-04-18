@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '@/context/AppContext';
 import { Loader2, Save, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { GenderSelect } from '@/components/common/GenderSelect';
 
 const FIELDS_BASIC = [
   { name: 'first_name', label: 'First name', placeholder: 'Jane' },
@@ -19,7 +20,6 @@ const FIELDS_BASIC = [
 const FIELDS_BIRTH = [
   { name: 'date_of_birth', label: 'Date of birth', type: 'date' },
   { name: 'place_of_birth', label: 'Place of birth (city, state, country)', placeholder: 'Boston, MA, USA' },
-  { name: 'gender', label: 'Gender', placeholder: '' },
 ];
 
 const FIELDS_CONTACT = [
@@ -155,6 +155,12 @@ export const PersonalInfoCard: React.FC = () => {
                           />
                         </Field>
                       ))}
+                      <Field label="Gender">
+                        <GenderSelect
+                          value={profile?.gender ?? ''}
+                          onChange={(v) => setField('gender', v)}
+                        />
+                      </Field>
                       <Field label="Nationality / citizenship">
                         <Input value={profile?.nationality ?? ''} onChange={(e) => setField('nationality', e.target.value)} />
                       </Field>
