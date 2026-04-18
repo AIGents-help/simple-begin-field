@@ -664,6 +664,22 @@ export const AddEditSheet = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Authentication required");
 
+      // 0a. Upload profile photo if a new one was selected (family/advisors)
+      let profilePhotoPath: string | null | undefined = undefined;
+      if (activeTab === 'family' || activeTab === 'advisors') {
+        if (profilePhotoFile && currentPacket) {
+          const safe = profilePhotoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+          const ts = Date.now();
+          const recIdHint = initialData?.id || 'new';
+          const path = `${currentPacket.id}/${activeTab}/${recIdHint}/profile_${ts}_${safe}`;
+          const { error: photoErr } = await uploadService.uploadFile('packet-documents', path, profilePhotoFile);
+          if (photoErr) throw new Error(photoErr.message || 'Profile photo upload failed');
+          profilePhotoPath = path;
+        } else if (profilePhotoCleared) {
+          profilePhotoPath = null;
+        }
+      }
+
       // 1. Create or Update the record metadata
       let recordToSave: any;
       
