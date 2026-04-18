@@ -4,8 +4,29 @@ import { MedicalCardShell, MedicalSection, daysUntil, expiryTone } from './Medic
 import { medicalService, MedicalRecord } from '@/services/medicalService';
 
 const PROVIDER_TYPES = [
-  'Primary Care','Cardiologist','Dermatologist','Neurologist','Oncologist','Orthopedic',
-  'Psychiatrist','Therapist','OB-GYN','Dentist','Ophthalmologist','Other specialist',
+  'Primary Care Physician',
+  'Cardiologist',
+  'Dermatologist',
+  'Endocrinologist',
+  'Gastroenterologist',
+  'Neurologist',
+  'Oncologist',
+  'Orthopedic Surgeon',
+  'OB-GYN',
+  'Ophthalmologist',
+  'Psychiatrist',
+  'Psychologist / Therapist',
+  'Pulmonologist',
+  'Rheumatologist',
+  'Urologist',
+  'Dentist',
+  'Orthodontist',
+  'Oral Surgeon',
+  'Chiropractor',
+  'Physical Therapist',
+  'Urgent Care',
+  'Hospital / ER',
+  'Specialist (Other)',
 ];
 
 interface Props {
