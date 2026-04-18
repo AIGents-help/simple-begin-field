@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { StorageImage } from '@/components/common/StorageImage';
 import { vehiclePhotoService, type VehiclePhoto } from '@/services/vehiclePhotoService';
 import { VehiclePhotoGallery } from './VehiclePhotoGallery';
+import { AIValuationPanel } from '@/components/common/AIValuationPanel';
 
 type VehicleRecord = Record<string, any> & {
   id: string;
@@ -509,13 +510,16 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
       if (result.error) throw result.error;
 
       const savedRecord = normalizeVehicle(result.data as VehicleRecord);
+      const wasNewRecord = isDraftId(vehicle.id);
       setFormData(savedRecord);
       setHasChanges(false);
-      onSaved(savedRecord, isDraftId(vehicle.id) ? vehicle.id : undefined);
+      onSaved(savedRecord, wasNewRecord ? vehicle.id : undefined);
       bumpCompletion();
       toast.success(`${buildTitle(savedRecord)} saved.`, {
         duration: 3000, position: 'bottom-center',
       });
+      // Collapse on save for new records (return to list view); keep open when editing existing.
+      if (wasNewRecord && expanded) onToggle();
     } catch (error: any) {
       console.error('Failed to save vehicle', error);
       toast.error(`Failed to save vehicle: ${error?.message || 'Unknown error'}`, {
@@ -658,6 +662,25 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
             <AccordionItem value="valuation" className="rounded-2xl border border-border bg-background px-4">
               <AccordionTrigger className="text-sm font-semibold text-foreground hover:no-underline">Valuation</AccordionTrigger>
               <AccordionContent className="space-y-4 pb-4">
+                <AIValuationPanel
+                  variant="vehicle"
+                  enabled={Boolean(
+                    String(formData.year || '').trim() &&
+                    String(formData.make || '').trim() &&
+                    String(formData.model || '').trim() &&
+                    formData.odometer_reading != null && formData.odometer_reading !== ''
+                  )}
+                  disabledHint="Enter Year, Make, Model, and Odometer (Basic Info) to use AI estimation."
+                  input={() => ({
+                    year: formData.year ?? '',
+                    make: formData.make ?? '',
+                    model: formData.model ?? '',
+                    trim: formData.trim_package ?? undefined,
+                    mileage: formData.odometer_reading ?? '',
+                    condition: formData.condition_notes ? String(formData.condition_notes).slice(0, 80) : 'good',
+                  })}
+                  onAccept={(v) => setFieldValue('estimated_value', v)}
+                />
                 <FieldGrid fields={VALUATION_FIELDS} formData={formData} onChange={setFieldValue} revealedFields={revealedFields} onToggleReveal={toggleReveal} />
                 <RecordDocumentUpload packetId={packetId} relatedTable={TABLE_NAME} relatedRecordId={savedVehicleId} category="vehicle_appraisal" label="Appraisal document" />
               </AccordionContent>
