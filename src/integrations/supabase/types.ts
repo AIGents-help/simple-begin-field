@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_log: {
+        Row: {
+          action: string
+          admin_email: string | null
+          admin_user_id: string | null
+          created_at: string
+          id: string
+          new_value: Json | null
+          note: string | null
+          old_value: Json | null
+          target_user_email: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_email?: string | null
+          admin_user_id?: string | null
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          note?: string | null
+          old_value?: Json | null
+          target_user_email?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_email?: string | null
+          admin_user_id?: string | null
+          created_at?: string
+          id?: string
+          new_value?: Json | null
+          note?: string | null
+          old_value?: Json | null
+          target_user_email?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       advisor_records: {
         Row: {
           address: string | null
@@ -2448,6 +2487,10 @@ export type Database = {
           id: string
           is_comp: boolean
           packet_id: string | null
+          pause_note: string | null
+          pause_resumes_at: string | null
+          paused_at: string | null
+          paused_by: string | null
           pricing_plan_id: string | null
           status: string | null
           stripe_checkout_session_id: string | null
@@ -2468,6 +2511,10 @@ export type Database = {
           id?: string
           is_comp?: boolean
           packet_id?: string | null
+          pause_note?: string | null
+          pause_resumes_at?: string | null
+          paused_at?: string | null
+          paused_by?: string | null
           pricing_plan_id?: string | null
           status?: string | null
           stripe_checkout_session_id?: string | null
@@ -2488,6 +2535,10 @@ export type Database = {
           id?: string
           is_comp?: boolean
           packet_id?: string | null
+          pause_note?: string | null
+          pause_resumes_at?: string | null
+          paused_at?: string | null
+          paused_by?: string | null
           pricing_plan_id?: string | null
           status?: string | null
           stripe_checkout_session_id?: string | null

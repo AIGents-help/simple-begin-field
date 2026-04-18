@@ -49,6 +49,12 @@ export interface SubscriberRow {
   purchase_id: string | null;
   admin_note: string | null;
   pricing_plan_id: string | null;
+  billing_type: string | null;
+  household_mode: string | null;
+  stripe_subscription_id: string | null;
+  paused_at: string | null;
+  pause_resumes_at: string | null;
+  pause_note: string | null;
 }
 
 export const plansAdminService = {
@@ -76,6 +82,7 @@ export const plansAdminService = {
       .select(`
         id, user_id, pricing_plan_id, status, billing_type, current_period_end,
         is_comp, comp_expires_at, admin_note, created_at,
+        stripe_subscription_id, paused_at, pause_resumes_at, pause_note,
         pricing_plans ( id, plan_key, name, price_cents, billing_type, household_mode )
       `)
       .order('created_at', { ascending: false });
@@ -104,6 +111,12 @@ export const plansAdminService = {
         purchase_id: purchase?.id || null,
         admin_note: purchase?.admin_note || null,
         pricing_plan_id: purchase?.pricing_plan_id || null,
+        billing_type: purchase?.billing_type || plan?.billing_type || null,
+        household_mode: plan?.household_mode || null,
+        stripe_subscription_id: purchase?.stripe_subscription_id || null,
+        paused_at: purchase?.paused_at || null,
+        pause_resumes_at: purchase?.pause_resumes_at || null,
+        pause_note: purchase?.pause_note || null,
       } as SubscriberRow;
     });
   },
@@ -162,12 +175,22 @@ export const plansAdminService = {
     grantedBy: string;
     note?: string;
   }) {
+    // Get current state for log
+    const { data: prev } = await supabase
+      .from('purchases')
+      .select('status, pricing_plan_id, pricing_plans(plan_key, name)')
+      .eq('user_id', args.userId)
+      .in('status', ['active', 'one_time_paid', 'paused'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
     // Cancel any existing active purchase for this user
     await supabase
       .from('purchases')
       .update({ status: 'canceled' })
       .eq('user_id', args.userId)
-      .in('status', ['active', 'one_time_paid']);
+      .in('status', ['active', 'one_time_paid', 'paused']);
 
     const { data, error } = await supabase
       .from('purchases')
@@ -183,6 +206,43 @@ export const plansAdminService = {
       .select()
       .single();
     if (error) throw error;
+
+    // Log
+    const { data: newPlan } = await supabase
+      .from('pricing_plans')
+      .select('plan_key, name')
+      .eq('id', args.pricingPlanId)
+      .maybeSingle();
+    const { data: targetProfile } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('id', args.userId)
+      .maybeSingle();
+    const { data: adminProfile } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('id', args.grantedBy)
+      .maybeSingle();
+    await supabase.from('admin_activity_log' as any).insert({
+      admin_user_id: args.grantedBy,
+      admin_email: adminProfile?.email || null,
+      target_user_id: args.userId,
+      target_user_email: targetProfile?.email || null,
+      action: 'grant_comp',
+      old_value: prev
+        ? {
+            plan_key: (prev as any).pricing_plans?.plan_key || 'free',
+            plan_name: (prev as any).pricing_plans?.name || 'Free',
+          }
+        : { plan_key: 'free', plan_name: 'Free' },
+      new_value: {
+        plan_key: newPlan?.plan_key,
+        plan_name: newPlan?.name,
+        comp_expires_at: args.expiresAt,
+      },
+      note: args.note || null,
+    });
+
     return data;
   },
 
@@ -203,32 +263,64 @@ export const plansAdminService = {
     return this.grantComp({ ...args, userId: profile.id });
   },
 
-  async changePlan(purchaseId: string | null, userId: string, pricingPlanId: string) {
-    if (purchaseId) {
-      const { error } = await supabase
-        .from('purchases')
-        .update({ pricing_plan_id: pricingPlanId, status: 'active' })
-        .eq('id', purchaseId);
-      if (error) throw error;
-      return;
-    }
-    const { error } = await supabase
-      .from('purchases')
-      .insert({
-        user_id: userId,
-        pricing_plan_id: pricingPlanId,
-        status: 'active',
-        is_comp: false,
-      });
-    if (error) throw error;
+  async changePlan(args: {
+    purchaseId: string | null;
+    userId: string;
+    pricingPlanId: string;
+    note?: string;
+  }) {
+    const { data, error } = await supabase.functions.invoke('admin-manage-subscription', {
+      body: {
+        action: 'change_plan',
+        purchaseId: args.purchaseId,
+        userId: args.userId,
+        newPricingPlanId: args.pricingPlanId,
+        note: args.note || null,
+      },
+    });
+    if (error) throw new Error(error.message || 'Failed to change plan');
+    if ((data as any)?.error) throw new Error((data as any).error);
+    return data;
   },
 
-  async cancelSubscription(purchaseId: string) {
-    const { error } = await supabase
-      .from('purchases')
-      .update({ status: 'canceled' })
-      .eq('id', purchaseId);
-    if (error) throw error;
+  async pauseSubscription(args: {
+    purchaseId: string;
+    resumesAt: string | null;
+    note?: string;
+  }) {
+    const { data, error } = await supabase.functions.invoke('admin-manage-subscription', {
+      body: {
+        action: 'pause',
+        purchaseId: args.purchaseId,
+        resumesAt: args.resumesAt,
+        note: args.note || null,
+      },
+    });
+    if (error) throw new Error(error.message || 'Failed to pause');
+    if ((data as any)?.error) throw new Error((data as any).error);
+    return data;
+  },
+
+  async resumeSubscription(args: { purchaseId: string; note?: string }) {
+    const { data, error } = await supabase.functions.invoke('admin-manage-subscription', {
+      body: {
+        action: 'resume',
+        purchaseId: args.purchaseId,
+        note: args.note || null,
+      },
+    });
+    if (error) throw new Error(error.message || 'Failed to resume');
+    if ((data as any)?.error) throw new Error((data as any).error);
+    return data;
+  },
+
+  async cancelSubscription(purchaseId: string, note?: string) {
+    const { data, error } = await supabase.functions.invoke('admin-manage-subscription', {
+      body: { action: 'cancel', purchaseId, note: note || null },
+    });
+    if (error) throw new Error(error.message || 'Failed to cancel');
+    if ((data as any)?.error) throw new Error((data as any).error);
+    return data;
   },
 
   async updateNote(purchaseId: string | null, userId: string, note: string) {
