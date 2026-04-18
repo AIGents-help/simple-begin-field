@@ -469,6 +469,17 @@ export const TrustedContactsManager: React.FC = () => {
             </div>
 
             <div className="space-y-3">
+              <div className="flex justify-center">
+                <ProfilePhotoUploader
+                  photoPath={photoCleared ? null : editingPhotoPath}
+                  pendingFile={photoFile}
+                  name={form.contact_name}
+                  onFileSelected={(f) => { setPhotoFile(f); setPhotoCleared(false); }}
+                  onRemove={() => { setPhotoFile(null); setPhotoCleared(true); setEditingPhotoPath(null); }}
+                  disabled={saving}
+                  size={88}
+                />
+              </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Full Name *</label>
                 <input type="text" value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))}

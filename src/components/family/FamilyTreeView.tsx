@@ -3,6 +3,7 @@ import { Loader2, Pencil, Plus, Heart, Minus, Maximize2 } from 'lucide-react';
 import { HavenOwlSvg } from '@/components/haven/HavenOwlSvg';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
+import { uploadService } from '@/services/uploadService';
 
 interface FamilyMember {
   id: string;
