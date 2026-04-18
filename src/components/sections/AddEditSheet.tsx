@@ -17,6 +17,8 @@ import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
 import { RecordDocumentUpload } from '../common/RecordDocumentUpload';
 import { AutoFilledIndicator } from '../common/AutoFilledIndicator';
 import { useFederatedDefaults } from '../../hooks/useFederatedDefaults';
+import { PropertyPhotoGallery } from '../property/PropertyPhotoGallery';
+import { PropertyFamilyDatalist } from '../property/PropertyFamilyDatalist';
 
 // ---------------------------------------------------------------------------
 // Cross-section federation: snapshot which fields on a source record drive
@@ -959,7 +961,15 @@ export const AddEditSheet = ({
                       isPrivate={activeTab === 'private'}
                     />
 
-                    {/* Per-record document slots (Vehicles, Real Estate, Medical, etc.) */}
+                    {/* Property: photo gallery + family datalist for recipient */}
+                    {activeTab === 'property' && currentPacket && (
+                      <>
+                        <PropertyFamilyDatalist packetId={currentPacket.id} />
+                        <PropertyPhotoGallery packetId={currentPacket.id} recordId={initialData?.id ?? null} />
+                      </>
+                    )}
+
+                    {/* Per-record document slots (Vehicles, Real Estate, Medical, Property, etc.) */}
                     {activeTab && currentPacket && RECORD_DOC_SLOTS[activeTab] && (
                       <div className="space-y-3 pt-2">
                         <div>
