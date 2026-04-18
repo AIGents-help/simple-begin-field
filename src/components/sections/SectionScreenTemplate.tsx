@@ -349,6 +349,9 @@ export const RecordCard = ({
           <ChevronRight size={18} className="text-stone-300 group-hover:text-navy-muted transition-colors" />
         </div>
       </button>
+      {proQuery && (
+        <FindProfessionalPrompt query={proQuery} variant="inline" />
+      )}
     </div>
   );
 };
