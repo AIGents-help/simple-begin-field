@@ -40,6 +40,53 @@ const maskSsn = (raw: string): string => {
   return `•••-••-${last4}`;
 };
 
+// ---- Module-scope subcomponents (must NOT be redefined per render, or inputs lose focus) ----
+interface SectionProps {
+  id: SectionKey;
+  openSection: SectionKey | '';
+  setOpenSection: (s: SectionKey | '') => void;
+  children: React.ReactNode;
+}
+const Section: React.FC<SectionProps> = ({ id, openSection, setOpenSection, children }) => {
+  const open = openSection === id;
+  return (
+    <div className="border border-stone-200 rounded-2xl bg-white overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpenSection(open ? '' : id)}
+        className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-stone-50 transition-colors"
+      >
+        <span className="font-bold text-navy-muted text-sm">{SECTION_LABELS[id]}</span>
+        {open ? <ChevronUp size={18} className="text-stone-400" /> : <ChevronDown size={18} className="text-stone-400" />}
+      </button>
+      {open && <div className="px-4 pb-4 pt-1 space-y-3">{children}</div>}
+    </div>
+  );
+};
+
+interface FieldProps {
+  label: string;
+  field: string;
+  type?: string;
+  placeholder?: string;
+  form: any;
+  errors: Record<string, string>;
+  onChange: (field: string, value: any) => void;
+}
+const Field: React.FC<FieldProps> = ({ label, field, type = 'text', placeholder, form, errors, onChange }) => (
+  <div>
+    <label className="block text-xs font-bold text-stone-600 mb-1">{label}</label>
+    <input
+      type={type}
+      value={form[field] ?? ''}
+      onChange={(e) => onChange(field, e.target.value)}
+      placeholder={placeholder}
+      className={`w-full px-3 py-2 rounded-lg border ${errors[field] ? 'border-rose-400' : 'border-stone-200'} bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20`}
+    />
+    {errors[field] && <p className="text-xs text-rose-600 mt-1">{errors[field]}</p>}
+  </div>
+);
+
 export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, onSaved }) => {
   const { currentPacket, profile, bumpCompletion } = useAppContext();
   const [form, setForm] = useState<any>({});
