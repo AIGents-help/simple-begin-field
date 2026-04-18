@@ -2,6 +2,7 @@ import React from 'react';
 import { Shield, Lock, EyeOff, AlertCircle, CheckCircle2, Info, UserCheck, ArrowLeft } from 'lucide-react';
 import { TrustInfoCard, DataUsageSummaryCard } from './TrustComponents';
 import { TrustedContactsManager } from './TrustedContactsManager';
+import { TrustedContactPortal } from './TrustedContactPortal';
 
 interface TrustScreenProps {
   onBack?: () => void;
@@ -24,7 +25,12 @@ export const TrustScreen: React.FC<TrustScreenProps> = ({ onBack }) => {
         <p className="text-sm text-stone-500 mt-1">Manage who can access your Survivor Packet</p>
       </div>
 
-      {/* Trusted Contacts — the core feature */}
+      {/* Phase 1 — Trusted Contact Access Portal */}
+      <TrustedContactPortal />
+
+      <div className="my-10 border-t border-stone-200" />
+
+      {/* Legacy Trusted Contacts Manager — kept for existing data */}
       <TrustedContactsManager />
 
       {/* Trust info cards below */}
