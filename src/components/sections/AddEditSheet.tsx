@@ -1012,6 +1012,31 @@ export const AddEditSheet = ({
                         return true;
                       })
                       .map((field) => {
+                        // Render section header within the field stream
+                        if (field.type === 'header') {
+                          return (
+                            <div key={field.name} className="pt-4 pb-1 border-t border-stone-200 first:border-t-0 first:pt-2">
+                              <h3 className="text-xs font-bold uppercase tracking-widest text-navy-muted">{field.label}</h3>
+                            </div>
+                          );
+                        }
+                        // Render an inline informational note (e.g. photo prompt)
+                        if (field.type === 'note') {
+                          return (
+                            <div key={field.name} className="text-[11px] text-stone-500 italic px-1 -mt-1">
+                              {field.label}
+                            </div>
+                          );
+                        }
+                        // Render a legal/safety warning callout
+                        if (field.type === 'warning') {
+                          return (
+                            <div key={field.name} className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] font-semibold text-amber-800 leading-snug">
+                              ⚠️ {field.label}
+                            </div>
+                          );
+                        }
+
                         const origin = autoFilledOrigins[field.name];
                         const clearOrigin = () => {
                           if (!origin) return;
@@ -1054,6 +1079,13 @@ export const AddEditSheet = ({
                               <option key={opt} value={opt}>{opt}</option>
                             ))}
                           </select>
+                        ) : field.type === 'masked' ? (
+                          <MaskedInput
+                            value={formData[field.name] || ''}
+                            onChange={handleChange}
+                            placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
+                            disabled={loading}
+                          />
                         ) : (
                           <input
                             type={field.type || 'text'}
