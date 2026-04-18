@@ -104,9 +104,25 @@ export const PropertyPhotoGallery: React.FC<Props> = ({ packetId, recordId }) =>
   }
 
   return (
-    <div className="space-y-3">
+    <div
+      {...dropzoneProps}
+      className={`relative space-y-3 rounded-2xl transition-all ${
+        isDragging ? 'ring-4 ring-amber-300 ring-offset-2 bg-amber-50/30 p-2' : ''
+      }`}
+    >
+      {isDragging && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-amber-50/95 rounded-2xl pointer-events-none">
+          <Upload size={32} className="text-amber-600" />
+          <p className="font-bold text-amber-700">Drop photos to upload</p>
+        </div>
+      )}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">Photos</h3>
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">Photos</h3>
+          {!isTouch && (
+            <p className="text-[10px] text-stone-400 mt-0.5">Drag & drop multiple files anywhere here</p>
+          )}
+        </div>
         <label className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-navy-muted text-white rounded-lg text-xs font-semibold hover:opacity-90 transition">
           {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
           Add photos
@@ -126,6 +142,7 @@ export const PropertyPhotoGallery: React.FC<Props> = ({ packetId, recordId }) =>
       ) : photos.length === 0 ? (
         <div className="p-6 bg-stone-50 border border-dashed border-stone-200 rounded-2xl text-center text-xs text-stone-400">
           No photos yet. Add at least one — the first photo becomes the hero image.
+          {!isTouch && <div className="mt-1">Drag & drop images, or tap "Add photos".</div>}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
