@@ -16,6 +16,7 @@ import { AdminPlans } from './components/dashboard/AdminPlans';
 import { AdminActivityLog } from './components/dashboard/AdminActivityLog';
 import { AdminCheckIns } from './components/dashboard/AdminCheckIns';
 import { AdminExpirationAlerts } from './components/dashboard/AdminExpirationAlerts';
+import { AdminHealthScores } from './components/dashboard/AdminHealthScores';
 import { AdminSettings } from './components/dashboard/AdminSettings';
 import { MyReferrals, MyLinks, MyPayouts } from './components/dashboard/ProfessionalScreens';
 import { AttorneyPortal } from './components/dashboard/AttorneyPortal';
@@ -53,6 +54,7 @@ const DashboardRoutes = () => {
             <Route path="activity" element={<AdminActivityLog />} />
             <Route path="checkins" element={<AdminCheckIns />} />
             <Route path="expirations" element={<AdminExpirationAlerts />} />
+            <Route path="health-scores" element={<AdminHealthScores />} />
             <Route path="tools" element={<AdminTools />} />
             <Route path="settings" element={<AdminSettings />} />
           </>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PacketHealthScore } from './PacketHealthScore';
 import { CriticalGapsCard } from './CriticalGapsCard';
+import { ScoreHistorySparkline } from './ScoreHistorySparkline';
 import { CheckInBanner } from '../checkin/CheckInBanner';
 import { UpcomingExpirationsCard } from './UpcomingExpirationsCard';
 import { 
@@ -128,6 +129,9 @@ export const DashboardScreen = () => {
 
       {/* Packet Health Score */}
       {currentPacket && <PacketHealthScore packetId={currentPacket.id} />}
+
+      {/* Score History Sparkline */}
+      {currentPacket && <ScoreHistorySparkline packetId={currentPacket.id} />}
 
       {/* Critical Gaps (only shown when score < 75) */}
       {currentPacket && <CriticalGapsCard packetId={currentPacket.id} />}
