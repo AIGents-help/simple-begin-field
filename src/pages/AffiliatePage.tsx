@@ -3,6 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import { supabase } from '@/lib/supabase';
 import { Share2, Copy, Check, TrendingUp, Users, DollarSign, AlertTriangle, Loader2, Info, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { BackButton } from '../components/common/BackButton';
 
 const generateCode = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -205,6 +206,7 @@ export const AffiliatePage = () => {
   if (!affiliate) {
     return (
       <div className="p-6 max-w-lg mx-auto space-y-8 text-center">
+        <div className="text-left"><BackButton /></div>
         <div className="w-16 h-16 bg-navy-muted/10 rounded-2xl flex items-center justify-center mx-auto">
           <Share2 size={28} className="text-navy-muted" />
         </div>
@@ -229,6 +231,7 @@ export const AffiliatePage = () => {
   if ((affiliate as any).status === 'pending') {
     return (
       <div className="p-6 max-w-lg mx-auto space-y-6 text-center">
+        <div className="text-left"><BackButton /></div>
         <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto">
           <AlertTriangle size={28} className="text-amber-500" />
         </div>
@@ -249,6 +252,7 @@ export const AffiliatePage = () => {
   if ((affiliate as any).status === 'rejected') {
     return (
       <div className="p-6 max-w-lg mx-auto space-y-6 text-center">
+        <div className="text-left"><BackButton /></div>
         <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto">
           <AlertTriangle size={28} className="text-rose-500" />
         </div>
@@ -269,6 +273,7 @@ export const AffiliatePage = () => {
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-8">
+      <BackButton />
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-navy-muted rounded-xl flex items-center justify-center text-white">

@@ -5,6 +5,7 @@ import { Pencil, Trash2, Plus, Shield, Loader2, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useAppContext } from '@/context/AppContext';
 import { useConfirm } from '@/context/ConfirmDialogContext';
+import { BackButton } from '@/components/common/BackButton';
 
 const PROFESSION_TYPES = [
   'Estate Planning Attorney',
@@ -195,6 +196,7 @@ export const AdminFeaturedProfessionals = () => {
 
   return (
     <div className="p-6 max-w-[1280px] mx-auto pb-32">
+      <div className="mb-4"><BackButton /></div>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
