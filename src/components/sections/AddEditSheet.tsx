@@ -102,12 +102,33 @@ export const AddEditSheet = ({
       if (isOpen) {
         setErrors({});
         if (initialData) {
-          const data = { ...initialData };
+          let data = { ...initialData };
           if (data.entryOnly && !data.category) {
             data.category = 'Other';
           }
+
+          // If editing an existing record, hydrate with the FULL row from the
+          // database so every field pre-populates — callers (like the family
+          // tree) sometimes pass only a lite projection (id, name, relationship…),
+          // which would otherwise leave most form fields visually blank.
+          if (currentPacket && activeTab && initialData.id && !initialData.entryOnly) {
+            const tableName = sectionService.tableMap[activeTab];
+            if (tableName) {
+              const { data: fullRow, error: fullErr } = await supabase
+                .from(tableName)
+                .select('*')
+                .eq('id', initialData.id)
+                .maybeSingle();
+              if (fullErr) {
+                console.error(`Failed to hydrate ${activeTab} record ${initialData.id}:`, fullErr);
+              } else if (fullRow) {
+                data = { ...fullRow, ...data };
+              }
+            }
+          }
+
           setFormData(data);
-          setIsNA(initialData.is_na || initialData.status === 'not_applicable');
+          setIsNA(data.is_na || data.status === 'not_applicable');
           // Fetch existing document if editing
           if (currentPacket && activeTab && initialData.id) {
             const { data: docs } = await documentService.getDocuments(currentPacket.id, activeTab, initialData.id);
