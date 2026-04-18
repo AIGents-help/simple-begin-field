@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { trustedContactPortalService } from '@/services/trustedContactPortalService';
 import { packetPdfService } from '@/services/packetPdfService';
 import { SECTIONS_CONFIG } from '@/config/sectionsConfig';
+import { EstateSummaryReadOnly } from '@/components/estate/EstateSummaryReadOnly';
 
 /**
  * Trusted Contact Dashboard — read-only viewer experience.

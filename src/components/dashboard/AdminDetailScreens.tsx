@@ -17,6 +17,7 @@ import {
 import { StatusPill } from './DashboardComponents';
 import { AssignPlanModal } from './AssignPlanModal';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
+import { EstateSummaryReadOnly } from '../estate/EstateSummaryReadOnly';
 import { supabase } from '@/integrations/supabase/client';
 
 interface DetailPanelProps {
