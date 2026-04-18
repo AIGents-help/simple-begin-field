@@ -20,7 +20,7 @@ import { usePacketCompletion } from '../../hooks/usePacketCompletion';
 import { healthScoreService, HealthScore } from '../../services/healthScoreService';
 
 export const DashboardScreen = () => {
-  const { setView, setTab, currentPacket, userDisplayName } = useAppContext();
+  const { setView, setTab, currentPacket, userDisplayName, completionVersion } = useAppContext();
 
   // SINGLE SOURCE OF TRUTH for completion (header badge, progress bar,
   // ring, AND each folder card all read from this hook).
@@ -30,14 +30,29 @@ export const DashboardScreen = () => {
     sectionStatus,
   } = usePacketCompletion(currentPacket?.id);
 
+  // Health score (for per-section chips)
+  const [healthScore, setHealthScore] = useState<HealthScore | null>(null);
+  useEffect(() => {
+    if (!currentPacket?.id) return;
+    let cancelled = false;
+    healthScoreService
+      .getCurrent(currentPacket.id)
+      .then((s) => !cancelled && setHealthScore(s))
+      .catch((err) => console.error('[DashboardScreen] health score load failed', err));
+    return () => { cancelled = true; };
+  }, [currentPacket?.id, completionVersion]);
+
   const getSectionStat = (sectionId: string) => {
     const s = sectionStatus[sectionId];
     const count = s?.count ?? 0;
     const hasContent = s?.hasContent ?? false;
+    const hs = healthScore?.section_scores?.[sectionId];
     return {
       status: hasContent ? 'in_progress' : 'empty',
       count,
       percentage: s?.percent ?? 0,
+      healthScore: hs?.score ?? null,
+      healthMax: hs?.max ?? null,
     };
   };
 
