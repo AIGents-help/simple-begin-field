@@ -7,6 +7,7 @@ import { CategoryOption } from '../components/upload/types';
 import { FuneralWishesEditor } from '../components/funeral/FuneralWishesEditor';
 import { FuneralMusicList } from '../components/funeral/FuneralMusicList';
 import { FuneralReadings } from '../components/funeral/FuneralReadings';
+import { FuneralPhotoGallery } from '../components/funeral/FuneralPhotoGallery';
 import { SendToFuneralHomeDialog } from '../components/funeral/SendToFuneralHomeDialog';
 
 /**
@@ -126,6 +127,7 @@ export const FuneralSection = ({
 
       <FuneralMusicList packetId={currentPacket!.id} funeralRecordId={record.id} />
       <FuneralReadings packetId={currentPacket!.id} funeralRecordId={record.id} />
+      <FuneralPhotoGallery packetId={currentPacket!.id} funeralRecordId={record.id} />
 
       <SendToFuneralHomeDialog
         isOpen={sendOpen}

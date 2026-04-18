@@ -688,6 +688,67 @@ export type Database = {
           },
         ]
       }
+      funeral_photos: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          display_order: number | null
+          file_path: string
+          funeral_record_id: string
+          id: string
+          is_hero: boolean | null
+          packet_id: string
+          updated_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          file_path: string
+          funeral_record_id: string
+          id?: string
+          is_hero?: boolean | null
+          packet_id: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          file_path?: string
+          funeral_record_id?: string
+          id?: string
+          is_hero?: boolean | null
+          packet_id?: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funeral_photos_funeral_record_id_fkey"
+            columns: ["funeral_record_id"]
+            isOneToOne: false
+            referencedRelation: "funeral_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funeral_photos_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "funeral_photos_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       funeral_readings: {
         Row: {
           author: string | null
