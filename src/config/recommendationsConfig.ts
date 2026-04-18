@@ -30,8 +30,6 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       { label: 'Passport', prefill: { title: 'Passport', category: 'Identity' } },
       { label: 'Birth Certificate', prefill: { title: 'Birth Certificate', category: 'Identity' } },
       { label: 'Social Security Card', prefill: { title: 'Social Security Card', category: 'Identity' } },
-      { label: 'Marriage Certificate', prefill: { title: 'Marriage Certificate', category: 'Legal' } },
-      { label: 'Divorce Decree', prefill: { title: 'Divorce Decree', category: 'Legal' } },
       { label: 'Citizenship Papers', prefill: { title: 'Citizenship Papers', category: 'Legal' } },
       { label: 'Will', prefill: { title: 'Will', category: 'Legal' } },
       { label: 'Living Will', prefill: { title: 'Living Will', category: 'Legal' } },
