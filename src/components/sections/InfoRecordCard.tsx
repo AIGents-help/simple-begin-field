@@ -99,10 +99,13 @@ export const InfoRecordCard = ({ record, hasFile, onClick, onEdit, onDelete, onV
   // but the user specifically asked to fix the "Untitled Record" showing at the top.
   if (isNA && !displayTitle) return null;
 
+  const proQuery = isNA ? resolveRecordQuery('info', record) : null;
+
   return (
+    <div className="paper-sheet relative overflow-hidden">
     <button 
       onClick={onClick}
-      className={`w-full text-left paper-sheet p-5 group active:scale-[0.98] transition-all relative overflow-hidden ${isNA ? 'opacity-60 bg-stone-50/50' : ''}`}
+      className={`w-full text-left p-5 group active:scale-[0.98] transition-all ${isNA ? 'opacity-60 bg-stone-50/50' : ''}`}
     >
       <div className="flex justify-between items-start mb-3">
         <div className="flex flex-wrap gap-2">
