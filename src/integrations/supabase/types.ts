@@ -3885,6 +3885,10 @@ export type Database = {
         Args: { p_token: string }
         Returns: Json
       }
+      get_template_for_share: {
+        Args: { p_template_type: string; p_version: string }
+        Returns: Json
+      }
       has_trusted_access: {
         Args: { p_packet_id: string; p_section_key: string }
         Returns: boolean
