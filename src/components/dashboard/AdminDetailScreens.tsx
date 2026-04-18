@@ -277,6 +277,10 @@ export const PacketDetail: React.FC<{ packet: any; onClose: () => void }> = ({ p
             </div>
           </DetailPanel>
 
+          <DetailPanel title="Estate Value Summary">
+            <EstateSummaryReadOnly packetId={packet.id} />
+          </DetailPanel>
+
           <DetailPanel title="Section Completion">
             <div className="space-y-4">
               {['Identity', 'Financial', 'Legal', 'Medical', 'Digital', 'Final Wishes'].map((section) => (

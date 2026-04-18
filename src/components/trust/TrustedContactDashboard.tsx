@@ -334,7 +334,13 @@ export const TrustedContactDashboard: React.FC = () => {
         {/* Main content */}
         <main className="flex-1 p-6">
           {!activeSection ? (
-            <div className="text-stone-500 text-sm">Select a section to view.</div>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-lg font-serif font-bold text-navy-muted mb-3">Estate Snapshot</h2>
+                <EstateSummaryReadOnly packetId={activePacket.packet_id} viewerMode />
+              </div>
+              <div className="text-stone-500 text-sm">Select a section to view its details.</div>
+            </div>
           ) : sectionLoading ? (
             <div className="flex items-center justify-center py-16">
               <Loader2 className="w-6 h-6 animate-spin text-stone-400" />
