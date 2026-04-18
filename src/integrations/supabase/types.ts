@@ -467,11 +467,13 @@ export type Database = {
       couple_links: {
         Row: {
           created_at: string
+          email_notifications_enabled: boolean
           id: string
           initiated_by: string
           invite_email: string | null
           invite_expires_at: string | null
           invite_token: string | null
+          last_review_at: string | null
           linked_at: string | null
           status: Database["public"]["Enums"]["couple_link_status"]
           unlinked_at: string | null
@@ -482,11 +484,13 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email_notifications_enabled?: boolean
           id?: string
           initiated_by: string
           invite_email?: string | null
           invite_expires_at?: string | null
           invite_token?: string | null
+          last_review_at?: string | null
           linked_at?: string | null
           status?: Database["public"]["Enums"]["couple_link_status"]
           unlinked_at?: string | null
@@ -497,11 +501,13 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email_notifications_enabled?: boolean
           id?: string
           initiated_by?: string
           invite_email?: string | null
           invite_expires_at?: string | null
           invite_token?: string | null
+          last_review_at?: string | null
           linked_at?: string | null
           status?: Database["public"]["Enums"]["couple_link_status"]
           unlinked_at?: string | null
@@ -511,6 +517,53 @@ export type Database = {
           user_id_2?: string | null
         }
         Relationships: []
+      }
+      couple_notifications: {
+        Row: {
+          actor_user_id: string
+          body: string | null
+          couple_link_id: string
+          created_at: string
+          id: string
+          is_read: boolean
+          link_to: string | null
+          notification_type: string
+          recipient_user_id: string
+          title: string
+        }
+        Insert: {
+          actor_user_id: string
+          body?: string | null
+          couple_link_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link_to?: string | null
+          notification_type: string
+          recipient_user_id: string
+          title: string
+        }
+        Update: {
+          actor_user_id?: string
+          body?: string | null
+          couple_link_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link_to?: string | null
+          notification_type?: string
+          recipient_user_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couple_notifications_couple_link_id_fkey"
+            columns: ["couple_link_id"]
+            isOneToOne: false
+            referencedRelation: "couple_links"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       couple_permissions: {
         Row: {
@@ -546,6 +599,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "couple_permissions_couple_link_id_fkey"
+            columns: ["couple_link_id"]
+            isOneToOne: false
+            referencedRelation: "couple_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couple_review_log: {
+        Row: {
+          completed_by: string
+          couple_link_id: string
+          created_at: string
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          completed_by: string
+          couple_link_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          completed_by?: string
+          couple_link_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couple_review_log_couple_link_id_fkey"
             columns: ["couple_link_id"]
             isOneToOne: false
             referencedRelation: "couple_links"
@@ -3996,6 +4081,10 @@ export type Database = {
         Returns: Json
       }
       calculate_health_score: { Args: { p_packet_id: string }; Returns: Json }
+      check_beneficiary_alignment: {
+        Args: { p_user_id?: string }
+        Returns: Json
+      }
       complete_checkin_by_token: {
         Args: { p_token: string }
         Returns: {
@@ -4014,7 +4103,25 @@ export type Database = {
           status: string
         }[]
       }
+      get_combined_family_tree: {
+        Args: { p_user_id?: string }
+        Returns: {
+          birthday: string
+          email: string
+          id: string
+          is_deceased: boolean
+          name: string
+          owner_side: string
+          packet_id: string
+          parent_member_id: string
+          phone: string
+          photo_path: string
+          relationship: string
+        }[]
+      }
       get_couple_link_id: { Args: { p_user_id?: string }; Returns: string }
+      get_partner_document_gaps: { Args: { p_user_id?: string }; Returns: Json }
+      get_partner_health_score: { Args: { p_user_id?: string }; Returns: Json }
       get_partner_id: { Args: { p_user_id?: string }; Returns: string }
       get_template_draft_by_share_token: {
         Args: { p_token: string }
@@ -4066,6 +4173,19 @@ export type Database = {
       mark_checkin_triggered: {
         Args: { p_event_id: string }
         Returns: undefined
+      }
+      mark_couple_review_completed: {
+        Args: { p_notes?: string }
+        Returns: undefined
+      }
+      notify_partner: {
+        Args: {
+          p_body?: string
+          p_link_to?: string
+          p_notification_type: string
+          p_title: string
+        }
+        Returns: string
       }
       packet_owner: { Args: { p_packet_id: string }; Returns: string }
       partner_can_access_packet_section: {
