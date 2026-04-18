@@ -25,8 +25,19 @@ export const PricingPage = () => {
   );
 
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-stone-50 min-h-screen">
+    <div className="py-6 px-4 sm:px-6 lg:px-8 bg-stone-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <button
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 min-h-[44px] px-3 -ml-3 rounded-xl text-navy-muted hover:bg-stone-100 transition-colors font-bold text-sm"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={18} />
+            <span>Back</span>
+          </button>
+        </div>
+
         <div className="text-center mb-12">
           <h2 className="text-3xl font-serif font-bold text-navy-muted sm:text-4xl">
             Simple, Transparent Pricing
