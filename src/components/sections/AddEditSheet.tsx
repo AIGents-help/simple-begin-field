@@ -35,6 +35,7 @@ export const AddEditSheet = ({
   categoryOptions?: CategoryOption[];
 }) => {
   const { activeTab, activeScope, currentPacket, profile, bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [isNA, setIsNA] = useState(false);
@@ -718,7 +719,11 @@ export const AddEditSheet = ({
             {initialData?.id && activeTab && (
               <button
                 onClick={async () => {
-                  if (!window.confirm('Delete this record? This cannot be undone.')) return;
+                  const ok = await confirm({
+                    title: 'Delete this record?',
+                    description: 'This action cannot be undone.',
+                  });
+                  if (!ok) return;
                   setLoading(true);
                   const { error } = await sectionService.deleteRecord(activeTab, initialData.id);
                   setLoading(false);

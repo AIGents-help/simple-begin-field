@@ -10,6 +10,7 @@ import { sectionService } from '../services/sectionService';
 import { documentService } from '../services/documentService';
 import { CategoryOption } from '../components/upload/types';
 import { INFO_CATEGORY_OPTIONS } from '../config/categories';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 const CATEGORY_GROUPS: Record<string, string[]> = {
   'Legal': ['Will', 'Living Will', 'HCPOA', 'Financial POA', 'Trust', 'Special Needs Trust', 'Medical Directive'],
@@ -24,6 +25,7 @@ const FILTERS = ['All', 'Legal', 'Identity', 'Medical', 'Financial', 'Insurance'
 
 export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: (newRecord?: any) => void) => void }) => {
   const { activeScope, currentPacket } = useAppContext();
+  const confirm = useConfirm();
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -59,7 +61,11 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
   const handleDelete = async (refresh: () => void) => {
     if (!selectedRecord) return;
     
-    if (window.confirm("Are you sure you want to delete this record? This will also remove any attached documents.")) {
+    const ok = await confirm({
+      title: 'Delete this record?',
+      description: 'This will also remove any attached documents. This action cannot be undone.',
+    });
+    if (ok) {
       setIsDeleting(true);
       try {
         const { error } = await sectionService.deleteRecord('info', selectedRecord.id);
@@ -172,7 +178,11 @@ export const InfoSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: Fil
                       }}
                       onDelete={async (e) => {
                         e.stopPropagation();
-                        if (confirm("Are you sure you want to delete this record?")) {
+                        const ok = await confirm({
+                          title: 'Delete this record?',
+                          description: 'This action cannot be undone.',
+                        });
+                        if (ok) {
                           await sectionService.deleteRecord('info', record.id);
                           refresh();
                         }
