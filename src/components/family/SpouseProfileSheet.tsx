@@ -502,6 +502,13 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                         className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20 resize-none"
                       />
                     </div>
+                    {currentPacket && (
+                      <DeathCertificateUpload
+                        packetId={currentPacket.id}
+                        relatedTable="family_members"
+                        relatedRecordId={spouse?.id ?? null}
+                      />
+                    )}
                   </div>
                 )}
               </Section>
