@@ -1040,6 +1040,36 @@ export const AddEditSheet = ({
                   </div>
                 )}
 
+                {/* Profile photo for person records (non-spouse family + advisors) */}
+                {!isNA && (activeTab === 'family' || activeTab === 'advisors') && (
+                  <div className="flex justify-center -mb-2">
+                    <ProfilePhotoUploader
+                      photoPath={profilePhotoCleared ? null : (formData.photo_path || null)}
+                      pendingFile={profilePhotoFile}
+                      name={
+                        activeTab === 'advisors'
+                          ? formData.name
+                          : [formData.first_name, formData.last_name].filter(Boolean).join(' ') || formData.name
+                      }
+                      isDeceased={
+                        activeTab === 'family'
+                          ? !!formData.is_deceased
+                          : formData.advisor_status === 'deceased'
+                      }
+                      onFileSelected={(file) => {
+                        setProfilePhotoFile(file);
+                        setProfilePhotoCleared(false);
+                      }}
+                      onRemove={() => {
+                        setProfilePhotoFile(null);
+                        setProfilePhotoCleared(true);
+                      }}
+                      disabled={loading}
+                      size={96}
+                    />
+                  </div>
+                )}
+
                 {!isNA && hasSectionFields && sectionFields && (
                   <>
                     {/* Show read-only label for pre-filled select fields */}
