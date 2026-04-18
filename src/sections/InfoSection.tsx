@@ -113,12 +113,19 @@ export const InfoSection = ({
 
   const addCard = (category: IdentityCategory, details?: Record<string, any>) => {
     if (!currentPacket?.id) return;
-    if (SINGLETON_CATEGORIES.includes(category) && records.some((r) => r.category === category)) {
-      // already exists — just expand it
+    if (SINGLETON_CATEGORIES.includes(category)) {
       const existing = records.find((r) => r.category === category);
-      if (existing) setExpandedId(existing.id);
-      setShowAddMenu(false);
-      return;
+      if (existing) {
+        // open existing for edit instead of creating a duplicate
+        setExpandedId(existing.id);
+        setShowAddMenu(false);
+        // scroll the existing card into view
+        setTimeout(() => {
+          const el = document.getElementById(`identity-card-${existing.id}`);
+          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 50);
+        return;
+      }
     }
     const draft = createDraft(category, scope, details);
     draft.packet_id = currentPacket.id;
@@ -126,6 +133,48 @@ export const InfoSection = ({
     setExpandedId(draft.id);
     setShowAddMenu(false);
   };
+
+  // Map category -> existing records for chip state
+  const recordsByCategory = useMemo(() => {
+    const map = new Map<IdentityCategory, IdentityRecord[]>();
+    records.forEach((r) => {
+      const list = map.get(r.category) || [];
+      list.push(r);
+      map.set(r.category, list);
+    });
+    return map;
+  }, [records]);
+
+  // For other_government_id we further split by id_type so each subtype shows independent state
+  const otherIdsByType = useMemo(() => {
+    const map = new Map<string, IdentityRecord[]>();
+    (recordsByCategory.get('other_government_id') || []).forEach((r) => {
+      const t = String(r.details?.id_type || '').trim().toLowerCase();
+      if (!t) return;
+      const list = map.get(t) || [];
+      list.push(r);
+      map.set(t, list);
+    });
+    return map;
+  }, [recordsByCategory]);
+
+  const getChipState = (item: typeof RECOMMENDED[number]) => {
+    const isSingleton = SINGLETON_CATEGORIES.includes(item.category);
+    let matches: IdentityRecord[] = [];
+    if (item.category === 'other_government_id') {
+      const subtype = String(item.details?.id_type || '').trim().toLowerCase();
+      matches = subtype ? (otherIdsByType.get(subtype) || []) : [];
+    } else {
+      matches = recordsByCategory.get(item.category) || [];
+    }
+    return {
+      isSingleton,
+      count: matches.length,
+      existing: matches[0],
+      added: matches.length > 0,
+    };
+  };
+
 
   const expiringSoon = useMemo(() => {
     return records
