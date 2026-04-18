@@ -1180,6 +1180,75 @@ export type Database = {
           },
         ]
       }
+      health_score_history: {
+        Row: {
+          id: string
+          packet_id: string
+          recorded_at: string
+          section_scores: Json
+          total_score: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          packet_id: string
+          recorded_at?: string
+          section_scores?: Json
+          total_score: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          packet_id?: string
+          recorded_at?: string
+          section_scores?: Json
+          total_score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      health_scores: {
+        Row: {
+          calculated_at: string
+          created_at: string
+          critical_gaps: Json
+          id: string
+          packet_id: string
+          previous_score: number
+          score_change: number
+          section_scores: Json
+          total_score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calculated_at?: string
+          created_at?: string
+          critical_gaps?: Json
+          id?: string
+          packet_id: string
+          previous_score?: number
+          score_change?: number
+          section_scores?: Json
+          total_score?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calculated_at?: string
+          created_at?: string
+          critical_gaps?: Json
+          id?: string
+          packet_id?: string
+          previous_score?: number
+          score_change?: number
+          section_scores?: Json
+          total_score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       info_records: {
         Row: {
           category: string
@@ -3567,6 +3636,7 @@ export type Database = {
         Args: { p_event_id: string }
         Returns: undefined
       }
+      calculate_health_score: { Args: { p_packet_id: string }; Returns: Json }
       complete_checkin_by_token: {
         Args: { p_token: string }
         Returns: {
