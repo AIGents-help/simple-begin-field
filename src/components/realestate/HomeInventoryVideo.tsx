@@ -218,6 +218,7 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
             </p>
             <p className="text-[10px] text-stone-400 italic leading-relaxed">
               Tip: Open every drawer, closet, and cabinet. State brand names and approximate values aloud.
+              {!isTouch && ' You can also drag & drop the video file anywhere on this card.'}
             </p>
           </div>
         </div>
