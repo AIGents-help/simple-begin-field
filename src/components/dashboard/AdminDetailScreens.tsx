@@ -227,6 +227,7 @@ export const CustomerDetail: React.FC<CustomerDetailProps> = ({ customer, onClos
           id: customer.id,
           full_name: customer.full_name,
           email: customer.email,
+          role: customer.role,
           purchases: livePurchase ? [livePurchase] : [],
         }}
         onSuccess={handlePlanAssigned}

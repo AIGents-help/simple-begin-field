@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { X, Loader2, AlertTriangle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { plansAdminService, PlanRow } from '@/services/plansAdminService';
 import { toast } from 'sonner';
@@ -11,19 +11,21 @@ interface AssignPlanModalProps {
     id: string;
     full_name: string | null;
     email: string | null;
+    role?: string | null;
     purchases?: any[];
   };
   onSuccess: (newPlan: { plan_key: string; plan_name: string; status: string }) => void;
 }
 
-type PlanKeyChoice = 'free' | 'individual' | 'couple' | 'lifetime' | 'comp';
+type PlanKeyChoice = 'free' | 'individual' | 'couple' | 'lifetime' | 'comp' | 'comp_couple';
 
 const PLAN_LABEL: Record<PlanKeyChoice, string> = {
   free: 'Free',
   individual: 'Individual',
   couple: 'Couple',
   lifetime: 'Lifetime (one-time)',
-  comp: 'Complimentary (no charge)',
+  comp: 'Complimentary Individual (no charge)',
+  comp_couple: 'Complimentary Couple (no charge)',
 };
 
 export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
@@ -41,10 +43,13 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
   const [adminNote, setAdminNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [grantAdmin, setGrantAdmin] = useState(false);
+  const [confirmAdmin, setConfirmAdmin] = useState(false);
 
   const currentPurchase = customer.purchases?.[0];
   const currentPlanName = currentPurchase?.pricing_plans?.name || 'Free';
   const hasStripeSub = Boolean(currentPurchase?.stripe_subscription_id);
+  const isCurrentlyAdmin = customer.role === 'admin';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -54,6 +59,8 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
     setCompReason('');
     setCompExpiry('');
     setAdminNote('');
+    setGrantAdmin(false);
+    setConfirmAdmin(false);
     setLoadingPlans(true);
     plansAdminService
       .listPlans()
@@ -79,8 +86,11 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
       // Resolve target plan
       let targetPlan: PlanRow | undefined;
       if (choice === 'comp') {
-        // Comp uses Individual plan as the underlying entitlement by default
+        // Comp Individual uses Individual plan as the underlying entitlement
         targetPlan = findPlanByKey('individual') || findPlanByKey('lifetime');
+      } else if (choice === 'comp_couple') {
+        // Comp Couple uses Couple plan as the underlying entitlement
+        targetPlan = findPlanByKey('couple') || findPlanByKey('individual') || findPlanByKey('lifetime');
       } else {
         targetPlan = findPlanByKey(choice);
       }
@@ -92,8 +102,11 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
       if (choice === 'couple' && !partnerEmail.trim()) {
         throw new Error('Partner email is required for Couple plan');
       }
-      if (choice === 'comp' && !compReason.trim()) {
+      if ((choice === 'comp' || choice === 'comp_couple') && !compReason.trim()) {
         throw new Error('Reason is required for Complimentary plan');
+      }
+      if (grantAdmin && !confirmAdmin) {
+        throw new Error('Please confirm Full Admin Rights grant by checking the confirmation box.');
       }
 
       // Snapshot previous plan for log
@@ -116,7 +129,7 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
         if (cancelErr) throw cancelErr;
         newStatus = 'free';
         newValue = { plan_key: 'free', plan_name: 'Free', status: 'free' };
-      } else if (choice === 'comp') {
+      } else if (choice === 'comp' || choice === 'comp_couple') {
         await plansAdminService.grantComp({
           userId: customer.id,
           pricingPlanId: targetPlan!.id,
@@ -129,6 +142,7 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
           plan_name: targetPlan!.name,
           status: 'active',
           is_comp: true,
+          comp_tier: choice === 'comp_couple' ? 'couple' : 'individual',
           comp_expires_at: compExpiry || null,
         };
       } else {
@@ -162,7 +176,7 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
       }
 
       // Log admin activity (skip if comp — grantComp already logs)
-      if (choice !== 'comp') {
+      if (choice !== 'comp' && choice !== 'comp_couple') {
         const { error: logErr } = await supabase.from('admin_activity_log').insert({
           admin_user_id: adminId,
           admin_email: adminEmail,
@@ -176,12 +190,34 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
         if (logErr) console.warn('Activity log insert failed:', logErr.message);
       }
 
+      // Optionally grant full admin role
+      if (grantAdmin && !isCurrentlyAdmin) {
+        const { error: roleErr } = await supabase
+          .from('profiles')
+          .update({ role: 'admin' })
+          .eq('id', customer.id);
+        if (roleErr) throw new Error(`Failed to grant admin role: ${roleErr.message}`);
+
+        const { error: roleLogErr } = await supabase.from('admin_activity_log').insert({
+          admin_user_id: adminId,
+          admin_email: adminEmail,
+          target_user_id: customer.id,
+          target_user_email: customer.email,
+          action: 'grant_admin_role',
+          old_value: { role: customer.role || 'customer' },
+          new_value: { role: 'admin' },
+          note: adminNote.trim() || null,
+        });
+        if (roleLogErr) console.warn('Admin role log insert failed:', roleLogErr.message);
+        toast.success('Full Admin Rights granted.');
+      }
+
       const planKey = choice === 'free' ? 'free' : targetPlan!.plan_key;
       const planName = choice === 'free' ? 'Free' : targetPlan!.name;
       toast.success(`Plan assigned: ${planName} — ${new Date().toLocaleTimeString()}`);
       onSuccess({ plan_key: planKey, plan_name: planName, status: newStatus });
 
-      if (hasStripeSub && choice !== 'comp') {
+      if (hasStripeSub && choice !== 'comp' && choice !== 'comp_couple') {
         toast.warning(
           'This user may have an active Stripe subscription. Visit Billing to cancel it separately.',
           { duration: 8000 }
@@ -249,17 +285,20 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
               disabled={loadingPlans || submitting}
               className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/10 disabled:opacity-50"
             >
-              {(['free', 'individual', 'couple', 'lifetime', 'comp'] as PlanKeyChoice[]).map((k) => {
-                const plan = findPlanByKey(k === 'comp' ? 'individual' : k);
-                const price = plan && k !== 'free' && k !== 'comp'
-                  ? ` ($${(plan.price_cents / 100).toFixed(0)}${
-                      plan.billing_type === 'monthly'
-                        ? '/mo'
-                        : plan.billing_type === 'annual'
-                        ? '/yr'
-                        : ''
-                    })`
-                  : '';
+              {(['free', 'individual', 'couple', 'lifetime', 'comp', 'comp_couple'] as PlanKeyChoice[]).map((k) => {
+                const lookupKey =
+                  k === 'comp' ? 'individual' : k === 'comp_couple' ? 'couple' : k;
+                const plan = findPlanByKey(lookupKey);
+                const price =
+                  plan && k !== 'free' && k !== 'comp' && k !== 'comp_couple'
+                    ? ` ($${(plan.price_cents / 100).toFixed(0)}${
+                        plan.billing_type === 'monthly'
+                          ? '/mo'
+                          : plan.billing_type === 'annual'
+                          ? '/yr'
+                          : ''
+                      })`
+                    : '';
                 return (
                   <option key={k} value={k}>
                     {PLAN_LABEL[k]}
@@ -289,7 +328,7 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
             </div>
           )}
 
-          {choice === 'comp' && (
+          {(choice === 'comp' || choice === 'comp_couple') && (
             <>
               <div>
                 <label className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block mb-1.5">
@@ -316,6 +355,11 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
                   className="w-full px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-stone-900/10"
                 />
               </div>
+              {choice === 'comp_couple' && (
+                <p className="text-[10px] text-stone-500 -mt-2">
+                  Grants couple-tier access (partner can be invited from the user's settings).
+                </p>
+              )}
             </>
           )}
 
@@ -327,6 +371,50 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
               </p>
             </div>
           )}
+
+          {/* Full Admin Rights */}
+          <div className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 space-y-2">
+            <div className="flex items-start gap-2">
+              <ShieldAlert className="w-4 h-4 text-stone-700 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-stone-900">Full Admin Rights</p>
+                <p className="text-[11px] text-stone-500">
+                  {isCurrentlyAdmin
+                    ? 'This user already has the admin role.'
+                    : 'Grants this user complete access to the Admin Dashboard, all customer data, billing, and audit logs.'}
+                </p>
+              </div>
+            </div>
+            {!isCurrentlyAdmin && (
+              <>
+                <label className="flex items-center gap-2 text-xs text-stone-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={grantAdmin}
+                    onChange={(e) => {
+                      setGrantAdmin(e.target.checked);
+                      if (!e.target.checked) setConfirmAdmin(false);
+                    }}
+                    disabled={submitting}
+                    className="w-4 h-4"
+                  />
+                  Grant Full Admin Rights to this user
+                </label>
+                {grantAdmin && (
+                  <label className="flex items-start gap-2 text-[11px] text-rose-700 cursor-pointer pl-1">
+                    <input
+                      type="checkbox"
+                      checked={confirmAdmin}
+                      onChange={(e) => setConfirmAdmin(e.target.checked)}
+                      disabled={submitting}
+                      className="w-4 h-4 mt-0.5"
+                    />
+                    I understand this gives full admin access and is logged in the audit trail.
+                  </label>
+                )}
+              </>
+            )}
+          </div>
 
           <div>
             <label className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block mb-1.5">
