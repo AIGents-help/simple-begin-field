@@ -6,6 +6,8 @@ import { customSectionService, CustomSection as CustomSectionType, CustomSection
 import { getCustomSectionIcon } from '../config/customSectionIcons';
 import { CustomSectionModal } from '../components/sections/CustomSectionModal';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { EntryAttachments } from '../components/upload/EntryAttachments';
+import { EntryAttachmentSummary } from '../components/upload/EntryAttachmentSummary';
 
 interface Props {
   section: CustomSectionType;
@@ -163,6 +165,11 @@ export const CustomSection: React.FC<Props> = ({ section, onSectionUpdated, onSe
                   {record.notes && (
                     <p className="text-sm text-stone-600 mt-2 whitespace-pre-wrap">{record.notes}</p>
                   )}
+                  <EntryAttachmentSummary
+                    packetId={record.packet_id}
+                    sectionKey="custom"
+                    recordId={record.id}
+                  />
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button
