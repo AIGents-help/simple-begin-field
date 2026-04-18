@@ -51,12 +51,14 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
       setSpouseSheetOpen(true);
       return;
     }
-    // Adding new — enforce single-active-spouse rule
-    const activeSpouse = records.find(
-      (r) => isSpouse(r) && !r.is_deceased && !['divorced', 'separated'].includes((r.marital_status || '').toLowerCase())
+    // Adding new — only block if there is already an ACTIVE (currently married) spouse.
+    // Past marriages (divorced/separated/widowed) are allowed alongside a current spouse,
+    // and a person may have multiple historical spouse records.
+    const activeMarriedSpouse = records.find(
+      (r) => isSpouse(r) && !r.is_deceased && (r.marital_status || 'married').toLowerCase() === 'married'
     );
-    if (activeSpouse) {
-      toast.error('You already have an active spouse on file. Mark them as divorced, separated, widowed, or deceased before adding another.', {
+    if (activeMarriedSpouse) {
+      toast.error('You already have a current spouse on file. Mark them as divorced, separated, widowed, or deceased before adding a new current spouse. Past marriages can still be added with a non-married status.', {
         duration: 6000,
         position: 'bottom-center',
       });
