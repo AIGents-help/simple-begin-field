@@ -7,6 +7,7 @@ import { useAppContext } from '@/context/AppContext';
 import { uploadService } from '@/services/uploadService';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
 import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 
 interface Props {
   isOpen: boolean;
@@ -90,6 +91,7 @@ const Field: React.FC<FieldProps> = ({ label, field, type = 'text', placeholder,
 
 export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, onSaved }) => {
   const { currentPacket, profile, bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
   const [form, setForm] = useState<any>({});
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -287,7 +289,11 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
 
   const handleDelete = async () => {
     if (!spouse?.id) return;
-    if (!window.confirm(`Delete ${spouse.name || 'this spouse'}? This cannot be undone.`)) return;
+    const ok = await confirm({
+      title: 'Delete this spouse record?',
+      description: `Delete ${spouse.name || 'this spouse'}? This action cannot be undone.`,
+    });
+    if (!ok) return;
     setSaving(true);
     try {
       const { error } = await supabase.from('family_members').delete().eq('id', spouse.id);

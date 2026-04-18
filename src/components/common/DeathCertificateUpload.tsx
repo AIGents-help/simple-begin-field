@@ -3,6 +3,7 @@ import { Upload, FileText, Trash2, Loader2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadService } from '@/services/uploadService';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 
 interface DeathCertificateUploadProps {
   packetId: string;
@@ -31,6 +32,7 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const confirm = useConfirm();
 
   // Load existing certificate, if any
   useEffect(() => {
@@ -129,7 +131,12 @@ export const DeathCertificateUpload: React.FC<DeathCertificateUploadProps> = ({
 
   const handleDelete = async () => {
     if (!doc) return;
-    if (!window.confirm('Remove this death certificate? The file will be permanently deleted.')) return;
+    const ok = await confirm({
+      title: 'Remove this death certificate?',
+      description: 'The file will be permanently deleted. This action cannot be undone.',
+      confirmLabel: 'Remove',
+    });
+    if (!ok) return;
     setBusy(true);
     try {
       await uploadService.deleteFile('packet-documents', doc.file_path);

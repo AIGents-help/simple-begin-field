@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Pencil, Trash2, Plus, Shield, Loader2, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useAppContext } from '@/context/AppContext';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 
 const PROFESSION_TYPES = [
   'Estate Planning Attorney',
@@ -51,6 +52,7 @@ const emptyForm = {
 
 export const AdminFeaturedProfessionals = () => {
   const { profile } = useAppContext();
+  const confirm = useConfirm();
   const [professionals, setProfessionals] = useState<FeaturedProfessional[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -149,7 +151,11 @@ export const AdminFeaturedProfessionals = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to remove this professional?')) return;
+    const ok = await confirm({
+      title: 'Remove this professional?',
+      description: 'They will be removed from the public directory. This action cannot be undone.',
+    });
+    if (!ok) return;
     setDeletingId(id);
     const { error } = await supabase.from('featured_professionals').delete().eq('id', id);
     if (error) {

@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
 import { useAppContext } from '@/context/AppContext';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 
 interface HomeInventoryVideoProps {
   packetId: string;
@@ -31,6 +32,7 @@ const formatSize = (bytes: number) => {
 
 export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId, propertyRecordId, scope }) => {
   const { bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
   const [videos, setVideos] = useState<VideoDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -142,7 +144,11 @@ export const HomeInventoryVideo: React.FC<HomeInventoryVideoProps> = ({ packetId
   };
 
   const handleDelete = async (video: VideoDoc) => {
-    if (!confirm(`Delete "${video.file_name}"? This cannot be undone.`)) return;
+    const ok = await confirm({
+      title: 'Delete this video?',
+      description: `Delete "${video.file_name}"? This action cannot be undone.`,
+    });
+    if (!ok) return;
     setDeletingId(video.id);
 
     try {

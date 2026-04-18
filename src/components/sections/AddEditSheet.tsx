@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { sectionService } from '../../services/sectionService';
+import { useConfirm } from '../../context/ConfirmDialogContext';
 import { documentService } from '../../services/documentService';
 import { FileAttachmentField } from '../upload/FileAttachmentField';
 import { CategorySelector } from '../upload/CategorySelector';

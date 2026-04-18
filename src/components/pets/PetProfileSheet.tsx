@@ -9,6 +9,7 @@ import { PetMedicationsEditor, PetMedicationDraft } from './PetMedicationsEditor
 import { PetDocuments } from './PetDocuments';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
 import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 
 interface Props {
   isOpen: boolean;
@@ -34,6 +35,7 @@ const SECTION_LABELS: Record<SectionKey, string> = {
 
 export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved }) => {
   const { currentPacket, bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
   const [form, setForm] = useState<any>({});
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -253,7 +255,11 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
 
   const handleDelete = async () => {
     if (!pet?.id) return;
-    if (!window.confirm(`Delete ${pet.pet_name || 'this pet'}? This cannot be undone.`)) return;
+    const ok = await confirm({
+      title: 'Delete this pet record?',
+      description: `Delete ${pet.pet_name || 'this pet'}? This action cannot be undone.`,
+    });
+    if (!ok) return;
     setSaving(true);
     try {
       const { error } = await supabase.from('pet_records').delete().eq('id', pet.id);

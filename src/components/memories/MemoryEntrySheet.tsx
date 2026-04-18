@@ -8,6 +8,7 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAppContext } from '@/context/AppContext';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 import { MEMORY_TYPE_BY_ID, type MemoryEntryType } from '@/config/memoryTypes';
 import { Loader2, Trash2, Upload, Plus, X, Check } from 'lucide-react';
 
@@ -25,6 +26,7 @@ const MAX_AUDIO = 100 * 1024 * 1024; // 100 MB
 
 export const MemoryEntrySheet: React.FC<Props> = ({ isOpen, onClose, memory, entryType, onSaved }) => {
   const { currentPacket } = useAppContext();
+  const confirm = useConfirm();
   const effectiveType: MemoryEntryType | null = (memory?.entry_type as MemoryEntryType) || entryType;
   const meta = effectiveType ? MEMORY_TYPE_BY_ID[effectiveType] : null;
 
@@ -184,7 +186,11 @@ export const MemoryEntrySheet: React.FC<Props> = ({ isOpen, onClose, memory, ent
 
   const handleDelete = async () => {
     if (!memory?.id) return;
-    if (!confirm('Delete this memory? This cannot be undone.')) return;
+    const ok = await confirm({
+      title: 'Delete this memory?',
+      description: 'This action cannot be undone.',
+    });
+    if (!ok) return;
     setSaving(true);
     try {
       const { error } = await (supabase as any).from('memories').delete().eq('id', memory.id);
