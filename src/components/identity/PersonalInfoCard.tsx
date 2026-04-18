@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '@/context/AppContext';
 import { Loader2, Save, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { GenderSelect } from '@/components/common/GenderSelect';
 
 const FIELDS_BASIC = [
   { name: 'first_name', label: 'First name', placeholder: 'Jane' },
