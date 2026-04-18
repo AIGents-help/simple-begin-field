@@ -295,6 +295,8 @@ export const ProfileScreen = () => {
 
         <AlertPreferences />
 
+        <EmergencyCardSettings />
+
         <CheckInPreferences />
 
         <InactivityCheckInCard />
