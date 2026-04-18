@@ -153,7 +153,7 @@ export const DashboardScreen = () => {
               {/* Folder Body */}
               <button
                 onClick={() => { setView('sections'); setTab(section.id); }}
-                className={`relative w-full text-left bg-[#F5F0E8] p-6 rounded-tr-2xl rounded-bl-2xl rounded-br-2xl border border-folder-edge shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between h-44 z-10`}
+                className={`relative w-full text-left bg-[#F5F0E8] p-6 rounded-tr-2xl rounded-bl-2xl rounded-br-2xl border border-folder-edge shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between h-52 z-10`}
               >
                 <div className="flex justify-between items-start">
                   <div className={`p-3 rounded-xl bg-white/60 text-navy-muted border border-folder-edge/20 shadow-inner`}>
