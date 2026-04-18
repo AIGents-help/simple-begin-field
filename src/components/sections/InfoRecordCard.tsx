@@ -234,5 +234,11 @@ export const InfoRecordCard = ({ record, hasFile, onClick, onEdit, onDelete, onV
         <ChevronRight size={20} className="text-stone-300 group-hover:text-navy-muted transition-colors shrink-0" />
       </div>
     </button>
+    {proQuery && (
+      <div className="px-5 pb-4">
+        <FindProfessionalPrompt query={proQuery} variant="inline" />
+      </div>
+    )}
+    </div>
   );
 };
