@@ -109,12 +109,14 @@ export const ProfilePhotoUploader: React.FC<Props> = ({
 
   return (
     <div className="flex flex-col items-center gap-2 py-2">
-      <div className="relative">
+      <div className="relative" {...dropzoneProps}>
         <button
           type="button"
           onClick={() => !disabled && inputRef.current?.click()}
           disabled={disabled}
-          className={`relative rounded-full overflow-hidden ${grayClass} active:scale-95 transition-transform disabled:opacity-50`}
+          className={`relative rounded-full overflow-hidden ${grayClass} active:scale-95 transition-all disabled:opacity-50 ${
+            isDragging ? 'ring-4 ring-amber-400 ring-offset-2 scale-105' : ''
+          }`}
           style={{ width: size, height: size }}
           aria-label="Upload profile photo"
         >
