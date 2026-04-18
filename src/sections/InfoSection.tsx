@@ -271,15 +271,41 @@ export const InfoSection = ({
           <div className="rounded-xl border border-stone-200 bg-white p-3 space-y-2">
             <p className="text-[10px] font-bold uppercase tracking-widest text-stone-500 px-1">Recommended</p>
             <div className="flex flex-wrap gap-2">
-              {RECOMMENDED.map((r) => (
-                <button
-                  key={r.label}
-                  onClick={() => addCard(r.category, r.details)}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold bg-stone-50 text-navy-muted border border-stone-200 hover:border-navy-muted/40 active:scale-95 transition-transform"
-                >
-                  + {r.label}
-                </button>
-              ))}
+              {RECOMMENDED.map((r) => {
+                const state = getChipState(r);
+                const isAddedSingleton = state.isSingleton && state.added;
+                const showCount = !state.isSingleton && state.count > 0;
+                return (
+                  <button
+                    key={r.label}
+                    onClick={() => addCard(r.category, r.details)}
+                    title={isAddedSingleton ? 'Tap to view or edit' : undefined}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-xs font-bold border active:scale-95 transition-transform inline-flex items-center gap-1.5',
+                      isAddedSingleton
+                        ? 'bg-stone-100 text-stone-500 border-stone-200 hover:border-stone-300'
+                        : 'bg-stone-50 text-navy-muted border-stone-200 hover:border-navy-muted/40',
+                    )}
+                  >
+                    {isAddedSingleton ? (
+                      <>
+                        <Check size={12} className="text-emerald-600" />
+                        <span className="line-through decoration-stone-400">{r.label}</span>
+                        <span className="text-[10px] font-semibold text-emerald-700 ml-0.5">Added</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>+ {r.label}</span>
+                        {showCount && (
+                          <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-navy-muted/10 text-navy-muted text-[10px] font-bold">
+                            {state.count}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
