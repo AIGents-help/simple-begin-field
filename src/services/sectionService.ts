@@ -33,7 +33,11 @@ export const sectionService = {
       .eq('packet_id', packetId);
     
     if (scope) {
-      query = query.eq('scope', scope);
+      if (sectionKey === 'family' && scope !== 'shared') {
+        query = query.or(`scope.eq.${scope},scope.eq.shared`);
+      } else {
+        query = query.eq('scope', scope);
+      }
     }
 
     const { data, error } = await query;

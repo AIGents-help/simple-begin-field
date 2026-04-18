@@ -187,7 +187,14 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
   };
 
   const handleSave = async () => {
-    if (!currentPacket) return;
+    if (!currentPacket) {
+      toast.error('Unable to save: missing packet context.', {
+        duration: 5000,
+        position: 'bottom-center',
+      });
+      console.error('Spouse save failed: missing currentPacket context');
+      return;
+    }
     if (!validate()) return;
     setSaving(true);
     try {
@@ -236,6 +243,8 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
         status: 'completed',
       };
 
+      console.log('Spouse save payload:', payload);
+
       let recordId = spouse?.id;
       if (recordId) {
         const { error } = await supabase.from('family_members').update(payload).eq('id', recordId);
@@ -250,6 +259,8 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
         recordId = data.id;
       }
 
+      console.log('Spouse save succeeded', { recordId, marital_status: payload.marital_status });
+
       toast.success(spouse ? 'Spouse updated' : 'Spouse added', {
         duration: 3000,
         position: 'bottom-center',
@@ -258,7 +269,13 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
       onSaved();
       onClose();
     } catch (err: any) {
-      console.error('Spouse save failed', err);
+      console.error('Spouse save failed', {
+        message: err?.message,
+        details: err?.details,
+        hint: err?.hint,
+        code: err?.code,
+        error: err,
+      });
       toast.error(`Save failed: ${err?.message || 'Unknown error'}`, {
         duration: 5000,
         position: 'bottom-center',
@@ -288,10 +305,6 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
       setSaving(false);
     }
   };
-
-  // Bind shared props for module-scope subcomponents
-  const sectionProps = { openSection, setOpenSection: (s: SectionKey | '') => setOpenSection(s as SectionKey) };
-  const fieldProps = { form, errors, onChange: handleField };
 
   return (
 
