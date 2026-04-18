@@ -18,7 +18,63 @@ import { RecordDocumentUpload } from '../common/RecordDocumentUpload';
 import { AutoFilledIndicator } from '../common/AutoFilledIndicator';
 import { useFederatedDefaults } from '../../hooks/useFederatedDefaults';
 
-// Per-section document slots — documents are attached to the parent record
+// ---------------------------------------------------------------------------
+// Cross-section federation: snapshot which fields on a source record drive
+// downstream auto-fill. After save, we compare the new value to this snapshot
+// and prompt the user to update dependents.
+// ---------------------------------------------------------------------------
+type SourceKey = 'address' | 'spouseName' | 'attorney' | 'financialAdvisor' | 'primaryDoctor' | 'funeralHome';
+
+const buildSourceSnapshot = (section: string | null | undefined, data: any): Record<SourceKey, any> => {
+  const snap: any = {};
+  if (!section || !data) return snap;
+  if (section === 'real-estate' && (data.property_type === 'Primary Residence' || !data.property_type)) {
+    snap.address = (data.address || '').trim();
+  }
+  if (section === 'family' && String(data.relationship || '').toLowerCase() === 'spouse' && !data.is_deceased) {
+    snap.spouseName = `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.name || '';
+  }
+  if (section === 'advisors') {
+    const t = String(data.advisor_type || '').toLowerCase();
+    if (t === 'attorney') snap.attorney = data.name || '';
+    if (t === 'financial advisor') snap.financialAdvisor = data.name || '';
+  }
+  if (section === 'medical') {
+    snap.primaryDoctor = data.provider_name || '';
+  }
+  if (section === 'funeral') {
+    snap.funeralHome = (data.funeral_home || '').trim();
+  }
+  return snap;
+};
+
+const sourceChangePromptCopy: Record<SourceKey, { title: string; description: (oldV: any, newV: any) => string }> = {
+  address: {
+    title: 'Update home address everywhere?',
+    description: (_o, n) => `Your home address changed to "${n}". Some family member records and vehicle garaging fields may still show the old address. Would you like to review them?`,
+  },
+  spouseName: {
+    title: 'Update spouse name everywhere?',
+    description: (_o, n) => `Your spouse name changed to "${n}". Joint owner, joint account holder and beneficiary fields elsewhere may still show the old name. Review them now?`,
+  },
+  attorney: {
+    title: 'Update attorney everywhere?',
+    description: (_o, n) => `Your attorney is now "${n}". The "attorney to notify" field on Funeral and other legal records may still show the old name. Review them now?`,
+  },
+  financialAdvisor: {
+    title: 'Update financial advisor everywhere?',
+    description: (_o, n) => `Your financial advisor is now "${n}". Banking and Retirement contact fields may still show the old name. Review them now?`,
+  },
+  primaryDoctor: {
+    title: 'Update primary doctor everywhere?',
+    description: (_o, n) => `Your primary doctor is now "${n}". Other medical records that reference your referring physician may still show the old name. Review them now?`,
+  },
+  funeralHome: {
+    title: 'Update funeral home everywhere?',
+    description: (_o, n) => `Your funeral home is now "${n}". Advisor-style references and executor contacts may still show the old name. Review them now?`,
+  },
+};
+
 // instead of existing as standalone entries. Each entry maps to a category
 // stored on the documents row (related_table + related_record_id + category).
 const RECORD_DOC_SLOTS: Record<string, { table: string; slots: { category: string; label: string; description?: string }[] }> = {
