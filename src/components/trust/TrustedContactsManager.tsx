@@ -8,6 +8,9 @@ import {
 } from 'lucide-react';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
 import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
+import { PersonAvatar } from '../common/PersonAvatar';
+import { ProfilePhotoUploader } from '../common/ProfilePhotoUploader';
+import { uploadService } from '@/services/uploadService';
 
 interface TrustedContact {
   id: string;
@@ -28,6 +31,7 @@ interface TrustedContact {
   notify_on_updates: boolean;
   is_deceased?: boolean | null;
   date_of_death?: string | null;
+  photo_path?: string | null;
 }
 
 const SECTION_OPTIONS = [
@@ -74,6 +78,9 @@ export const TrustedContactsManager: React.FC = () => {
   const [grantingId, setGrantingId] = useState<string | null>(null);
   const [confirmGrantId, setConfirmGrantId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoCleared, setPhotoCleared] = useState(false);
+  const [editingPhotoPath, setEditingPhotoPath] = useState<string | null>(null);
 
   const loadContacts = useCallback(async () => {
     if (!user) return;
@@ -117,46 +124,71 @@ export const TrustedContactsManager: React.FC = () => {
     }
     setSaving(true);
     try {
+      // Determine the packet id we will use for the photo path
+      const targetPacketId = editingId
+        ? (contacts.find((c) => c.id === editingId)?.packet_id || (await getPacketId()))
+        : await getPacketId();
+
+      // Upload new photo if one was selected
+      let nextPhotoPath: string | null | undefined = undefined;
+      if (photoFile && targetPacketId) {
+        const safe = photoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const ts = Date.now();
+        const recIdHint = editingId || 'new';
+        const path = `${targetPacketId}/trusted-contacts/${recIdHint}/profile_${ts}_${safe}`;
+        const { error: upErr } = await uploadService.uploadFile('packet-documents', path, photoFile);
+        if (upErr) throw new Error(upErr.message || 'Photo upload failed');
+        nextPhotoPath = path;
+      } else if (photoCleared) {
+        nextPhotoPath = null;
+      }
+
       if (editingId) {
+        const updatePayload: any = {
+          contact_name: form.contact_name.trim(),
+          contact_email: form.contact_email.trim(),
+          contact_phone: form.contact_phone.trim() || null,
+          relationship: form.relationship || null,
+          access_level: form.access_level,
+          notes: form.notes.trim() || null,
+          assigned_sections: form.assigned_sections,
+          notify_on_updates: form.notify_on_updates,
+          updated_at: new Date().toISOString(),
+        };
+        if (nextPhotoPath !== undefined) updatePayload.photo_path = nextPhotoPath;
         const { error } = await supabase
           .from('trusted_contacts')
-          .update({
-            contact_name: form.contact_name.trim(),
-            contact_email: form.contact_email.trim(),
-            contact_phone: form.contact_phone.trim() || null,
-            relationship: form.relationship || null,
-            access_level: form.access_level,
-            notes: form.notes.trim() || null,
-            assigned_sections: form.assigned_sections,
-            notify_on_updates: form.notify_on_updates,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updatePayload)
           .eq('id', editingId);
         if (error) throw error;
         toast.success('Contact updated');
       } else {
-        const packetId = await getPacketId();
-        if (!packetId) return;
+        if (!targetPacketId) return;
+        const insertPayload: any = {
+          packet_id: targetPacketId,
+          user_id: user!.id,
+          contact_name: form.contact_name.trim(),
+          contact_email: form.contact_email.trim(),
+          contact_phone: form.contact_phone.trim() || null,
+          relationship: form.relationship || null,
+          access_level: form.access_level,
+          notes: form.notes.trim() || null,
+          assigned_sections: form.assigned_sections,
+          notify_on_updates: form.notify_on_updates,
+        };
+        if (nextPhotoPath) insertPayload.photo_path = nextPhotoPath;
         const { error } = await supabase
           .from('trusted_contacts')
-          .insert({
-            packet_id: packetId,
-            user_id: user!.id,
-            contact_name: form.contact_name.trim(),
-            contact_email: form.contact_email.trim(),
-            contact_phone: form.contact_phone.trim() || null,
-            relationship: form.relationship || null,
-            access_level: form.access_level,
-            notes: form.notes.trim() || null,
-            assigned_sections: form.assigned_sections,
-            notify_on_updates: form.notify_on_updates,
-          });
+          .insert(insertPayload);
         if (error) throw error;
         toast.success('Trusted contact added');
       }
       setModalOpen(false);
       setEditingId(null);
       setForm(emptyForm);
+      setPhotoFile(null);
+      setPhotoCleared(false);
+      setEditingPhotoPath(null);
       await loadContacts();
     } catch (err: any) {
       console.error('Save trusted contact error:', err);
@@ -178,6 +210,9 @@ export const TrustedContactsManager: React.FC = () => {
       assigned_sections: c.assigned_sections || [],
       notify_on_updates: c.notify_on_updates !== false,
     });
+    setPhotoFile(null);
+    setPhotoCleared(false);
+    setEditingPhotoPath(c.photo_path || null);
     setModalOpen(true);
   };
 
@@ -270,7 +305,7 @@ export const TrustedContactsManager: React.FC = () => {
           <p className="text-xs text-stone-500 mt-1">People you trust to access your Survivor Packet</p>
         </div>
         <button
-          onClick={() => { setEditingId(null); setForm(emptyForm); setModalOpen(true); }}
+          onClick={() => { setEditingId(null); setForm(emptyForm); setPhotoFile(null); setPhotoCleared(false); setEditingPhotoPath(null); setModalOpen(true); }}
           className="flex items-center gap-2 px-4 py-2 bg-navy-muted text-white rounded-xl text-sm font-bold hover:bg-navy-muted/90 transition-colors"
         >
           <UserPlus size={16} />
@@ -294,7 +329,14 @@ export const TrustedContactsManager: React.FC = () => {
           {contacts.map(c => (
             <div key={c.id} className={`paper-sheet p-5 ${c.is_deceased ? 'opacity-75 bg-stone-50/40' : ''}`}>
               <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <PersonAvatar
+                    photoPath={c.photo_path}
+                    name={c.contact_name}
+                    isDeceased={!!c.is_deceased}
+                    size={52}
+                  />
+                  <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className={`text-base font-bold ${c.is_deceased ? 'text-stone-500' : 'text-navy-muted'}`}>{c.contact_name}</h3>
                     {c.is_deceased && (
@@ -356,6 +398,7 @@ export const TrustedContactsManager: React.FC = () => {
                         Marked deceased — do not contact.
                       </p>
                     )}
+                  </div>
                   </div>
                 </div>
 
@@ -426,6 +469,17 @@ export const TrustedContactsManager: React.FC = () => {
             </div>
 
             <div className="space-y-3">
+              <div className="flex justify-center">
+                <ProfilePhotoUploader
+                  photoPath={photoCleared ? null : editingPhotoPath}
+                  pendingFile={photoFile}
+                  name={form.contact_name}
+                  onFileSelected={(f) => { setPhotoFile(f); setPhotoCleared(false); }}
+                  onRemove={() => { setPhotoFile(null); setPhotoCleared(true); setEditingPhotoPath(null); }}
+                  disabled={saving}
+                  size={88}
+                />
+              </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Full Name *</label>
                 <input type="text" value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))}

@@ -9,6 +9,7 @@ import { FamilyTreeView } from '../components/family/FamilyTreeView';
 import { SpouseProfileSheet } from '../components/family/SpouseProfileSheet';
 import { sectionService } from '../services/sectionService';
 import { StorageImage } from '../components/common/StorageImage';
+import { PersonAvatar } from '../components/common/PersonAvatar';
 import { useConfirm } from '../context/ConfirmDialogContext';
 
 export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
@@ -184,41 +185,20 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
                     ? 'Birthday'
                     : undefined;
 
-                  // Custom avatar for spouses with a photo
-                  if (spouse && record.photo_path) {
-                    return (
-                      <div key={record.id} className="relative">
-                        <RecordCard
-                          title={record.name}
-                          subtitle={buildSubtitle(...subtitleParts)}
-                          subtitlePlaceholder="No contact details added"
-                          icon={Heart}
-                          badge={badge}
-                          data={record}
-                          onEdit={() => openSpouseSheet(records, record)}
-                          onDelete={() => handleDelete(record, refresh)}
-                        />
-                        {/* Avatar overlay on top of the icon slot */}
-                        <div className={`absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none ${record.is_deceased ? 'grayscale' : ''}`}>
-                          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                            <StorageImage
-                              path={record.photo_path}
-                              alt={record.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-
                   return (
                     <RecordCard
                       key={record.id}
                       title={record.name}
                       subtitle={buildSubtitle(...subtitleParts)}
                       subtitlePlaceholder="No contact details added"
-                      icon={spouse ? Heart : getCategoryIcon('family', record)}
+                      avatar={
+                        <PersonAvatar
+                          photoPath={record.photo_path}
+                          name={record.name}
+                          isDeceased={!!record.is_deceased}
+                          size={52}
+                        />
+                      }
                       badge={badge}
                       data={record}
                       onEdit={() =>

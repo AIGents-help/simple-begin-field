@@ -20,6 +20,8 @@ import { useFederatedDefaults } from '../../hooks/useFederatedDefaults';
 import { PropertyPhotoGallery } from '../property/PropertyPhotoGallery';
 import { PropertyFamilyDatalist } from '../property/PropertyFamilyDatalist';
 import { MaskedInput } from '../common/MaskedInput';
+import { ProfilePhotoUploader } from '../common/ProfilePhotoUploader';
+import { uploadService } from '../../services/uploadService';
 
 // ---------------------------------------------------------------------------
 // Cross-section federation: snapshot which fields on a source record drive
@@ -157,6 +159,9 @@ export const AddEditSheet = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [initialAttachment, setInitialAttachment] = useState<FileMetadata | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Profile photo (used for person records: family non-spouse, advisors)
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+  const [profilePhotoCleared, setProfilePhotoCleared] = useState(false);
 
   // Determine if this is an entry-only form (no file upload)
   const isEntryOnly = initialData?.entryOnly === true || formData?.entryOnly === true;
@@ -183,6 +188,8 @@ export const AddEditSheet = ({
       if (isOpen) {
         setErrors({});
         setAutoFilledOrigins({});
+        setProfilePhotoFile(null);
+        setProfilePhotoCleared(false);
         if (initialData) {
           let data = { ...initialData };
           if (data.entryOnly && !data.category) {
@@ -657,6 +664,22 @@ export const AddEditSheet = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Authentication required");
 
+      // 0a. Upload profile photo if a new one was selected (family/advisors)
+      let profilePhotoPath: string | null | undefined = undefined;
+      if (activeTab === 'family' || activeTab === 'advisors') {
+        if (profilePhotoFile && currentPacket) {
+          const safe = profilePhotoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+          const ts = Date.now();
+          const recIdHint = initialData?.id || 'new';
+          const path = `${currentPacket.id}/${activeTab}/${recIdHint}/profile_${ts}_${safe}`;
+          const { error: photoErr } = await uploadService.uploadFile('packet-documents', path, profilePhotoFile);
+          if (photoErr) throw new Error(photoErr.message || 'Profile photo upload failed');
+          profilePhotoPath = path;
+        } else if (profilePhotoCleared) {
+          profilePhotoPath = null;
+        }
+      }
+
       // 1. Create or Update the record metadata
       let recordToSave: any;
       
@@ -684,6 +707,12 @@ export const AddEditSheet = ({
         Object.keys(record).forEach((k) => {
           if (k.startsWith('__')) delete record[k];
         });
+        // Apply newly uploaded / cleared profile photo for person records
+        if (activeTab === 'family' || activeTab === 'advisors') {
+          if (profilePhotoPath !== undefined) {
+            record.photo_path = profilePhotoPath;
+          }
+        }
         // Property: coerce Yes/No strings to booleans for boolean columns and empty dates to null
         if (activeTab === 'property') {
           const boolKeys = [
@@ -1008,6 +1037,36 @@ export const AddEditSheet = ({
                         relatedRecordId={initialData?.id ?? null}
                       />
                     )}
+                  </div>
+                )}
+
+                {/* Profile photo for person records (non-spouse family + advisors) */}
+                {!isNA && (activeTab === 'family' || activeTab === 'advisors') && (
+                  <div className="flex justify-center -mb-2">
+                    <ProfilePhotoUploader
+                      photoPath={profilePhotoCleared ? null : (formData.photo_path || null)}
+                      pendingFile={profilePhotoFile}
+                      name={
+                        activeTab === 'advisors'
+                          ? formData.name
+                          : [formData.first_name, formData.last_name].filter(Boolean).join(' ') || formData.name
+                      }
+                      isDeceased={
+                        activeTab === 'family'
+                          ? !!formData.is_deceased
+                          : formData.advisor_status === 'deceased'
+                      }
+                      onFileSelected={(file) => {
+                        setProfilePhotoFile(file);
+                        setProfilePhotoCleared(false);
+                      }}
+                      onRemove={() => {
+                        setProfilePhotoFile(null);
+                        setProfilePhotoCleared(true);
+                      }}
+                      disabled={loading}
+                      size={96}
+                    />
                   </div>
                 )}
 
