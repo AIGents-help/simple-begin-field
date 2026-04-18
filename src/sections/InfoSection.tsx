@@ -138,9 +138,10 @@ export const InfoSection = ({
   const recordsByCategory = useMemo(() => {
     const map = new Map<IdentityCategory, IdentityRecord[]>();
     records.forEach((r) => {
-      const list = map.get(r.category) || [];
+      const cat = r.category as IdentityCategory;
+      const list = map.get(cat) || [];
       list.push(r);
-      map.set(r.category, list);
+      map.set(cat, list);
     });
     return map;
   }, [records]);
