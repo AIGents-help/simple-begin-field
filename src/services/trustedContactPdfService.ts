@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
 import { SECTIONS_CONFIG } from '@/config/sectionsConfig';
+import { estateSummaryService, formatCurrency } from './estateSummaryService';
 
 /**
  * PDF export for the Trusted Contact viewer.
@@ -56,6 +57,51 @@ export async function generateTrustedContactPDF(
   doc.text(`Generated ${new Date().toLocaleString()}`, margin, y);
   y += 28;
   doc.setTextColor(0);
+
+  // Partial Estate Summary (only includes categories the viewer can see)
+  try {
+    const summary = await estateSummaryService.getSummaryForViewer(packetId);
+    if (summary) {
+      ensureSpace(40);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(15);
+      doc.setTextColor(26, 35, 50);
+      doc.text('Estate Snapshot', margin, y);
+      y += 8;
+      doc.setDrawColor(220);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 14;
+      doc.setTextColor(110);
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(9);
+      const intro = doc.splitTextToSize(
+        summary.partial
+          ? 'Partial summary based on the sections you have access to. Estimated values only.'
+          : 'Estimated values based on this packet. Not a professional appraisal.',
+        pageWidth - margin * 2,
+      );
+      doc.text(intro, margin, y);
+      y += intro.length * 11 + 6;
+      doc.setTextColor(0);
+
+      const totals: [string, number][] = [
+        ['Gross Estate', summary.gross_assets],
+        ['Total Liabilities', summary.total_liabilities],
+        ['Net Estate', summary.net_estate],
+      ];
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      totals.forEach(([label, val]) => {
+        ensureSpace(16);
+        doc.text(label, margin, y);
+        doc.text(formatCurrency(val), pageWidth - margin, y, { align: 'right' });
+        y += 14;
+      });
+      y += 8;
+    }
+  } catch (err) {
+    console.warn('[trustedContactPdfService] estate summary unavailable', err);
+  }
 
   for (const sectionId of permittedSections) {
     const tables = SECTION_TABLES[sectionId];

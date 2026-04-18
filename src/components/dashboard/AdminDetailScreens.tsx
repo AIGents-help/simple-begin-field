@@ -17,6 +17,7 @@ import {
 import { StatusPill } from './DashboardComponents';
 import { AssignPlanModal } from './AssignPlanModal';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
+import { EstateSummaryReadOnly } from '../estate/EstateSummaryReadOnly';
 import { supabase } from '@/integrations/supabase/client';
 
 interface DetailPanelProps {
@@ -274,6 +275,10 @@ export const PacketDetail: React.FC<{ packet: any; onClose: () => void }> = ({ p
                 </div>
               </div>
             </div>
+          </DetailPanel>
+
+          <DetailPanel title="Estate Value Summary">
+            <EstateSummaryReadOnly packetId={packet.id} />
           </DetailPanel>
 
           <DetailPanel title="Section Completion">

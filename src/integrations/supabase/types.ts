@@ -3759,6 +3759,10 @@ export type Database = {
         Returns: undefined
       }
       calculate_estate_summary: { Args: { p_packet_id: string }; Returns: Json }
+      calculate_estate_summary_for_viewer: {
+        Args: { p_packet_id: string }
+        Returns: Json
+      }
       calculate_health_score: { Args: { p_packet_id: string }; Returns: Json }
       complete_checkin_by_token: {
         Args: { p_token: string }

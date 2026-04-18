@@ -56,6 +56,8 @@ export interface EstateSummary {
   liabilities: EstateLiabilitySummary[];
   missing_values: EstateMissingValue[];
   calculated_at: string;
+  partial?: boolean;
+  permitted_sections?: string[];
 }
 
 export const LIABILITY_TYPES = [
@@ -73,6 +75,16 @@ export const estateSummaryService = {
     const { data, error } = await supabase.rpc('calculate_estate_summary', { p_packet_id: packetId });
     if (error) {
       console.error('[estateSummaryService] getSummary error:', error);
+      throw error;
+    }
+    return data as unknown as EstateSummary;
+  },
+
+  /** Section-aware summary for trusted contact viewers (also works for owners). */
+  async getSummaryForViewer(packetId: string): Promise<EstateSummary | null> {
+    const { data, error } = await supabase.rpc('calculate_estate_summary_for_viewer', { p_packet_id: packetId });
+    if (error) {
+      console.error('[estateSummaryService] getSummaryForViewer error:', error);
       throw error;
     }
     return data as unknown as EstateSummary;
