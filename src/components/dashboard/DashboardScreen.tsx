@@ -19,6 +19,7 @@ import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
 import { usePacketCompletion } from '../../hooks/usePacketCompletion';
 import { healthScoreService, HealthScore } from '../../services/healthScoreService';
+import { EstateSummaryCard } from '../estate/EstateSummaryCard';
 
 export const DashboardScreen = () => {
   const { setView, setTab, currentPacket, userDisplayName, completionVersion } = useAppContext();
@@ -129,6 +130,9 @@ export const DashboardScreen = () => {
 
       {/* Packet Health Score */}
       {currentPacket && <PacketHealthScore packetId={currentPacket.id} />}
+
+      {/* Estate Value Summary Card */}
+      {currentPacket && <EstateSummaryCard />}
 
       {/* Score History Sparkline */}
       {currentPacket && <ScoreHistorySparkline packetId={currentPacket.id} />}

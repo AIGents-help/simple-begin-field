@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X } from 'lucide-react';
+import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X, TrendingUp, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
@@ -241,6 +241,25 @@ export const ProfileScreen = () => {
               </button>
             )}
           </Card>
+        </div>
+
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Estate Overview</h3>
+          <button
+            onClick={() => setView('estate')}
+            className="w-full flex items-center justify-between p-4 bg-white border border-stone-200 rounded-2xl hover:border-navy-muted/30 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-navy-muted/5 rounded-xl flex items-center justify-center text-navy-muted">
+                <TrendingUp size={18} />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold text-navy-muted">Estate Value Summary</p>
+                <p className="text-[11px] text-stone-500">Estimated assets, liabilities, and net estate</p>
+              </div>
+            </div>
+            <ArrowRight size={16} className="text-stone-400 group-hover:translate-x-0.5 transition-transform" />
+          </button>
         </div>
 
         <AlertPreferences />
