@@ -113,16 +113,12 @@ export const EntryAttachments: React.FC<EntryAttachmentsProps> = ({
     let ok = 0;
     for (const file of valid) {
       const category = asPhoto || file.type.startsWith('image/') ? 'photo' : 'document';
-      const fileName = subKey
-        ? file.name
-        : file.name; // path is set inside documentService
-      // documentService builds path as packetId/sectionKey/recordId/timestamp_filename — good
       const { error } = await documentService.uploadAndCreate(file, {
         packetId,
         sectionKey,
-        recordId: subKey ? `${subKey}/${recordId}` : recordId,
+        recordId,
         category,
-        fileName,
+        fileName: file.name,
         scope,
         isPrivate: false,
       });
