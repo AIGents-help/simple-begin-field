@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.recalculate-health-scores]
 verify_jwt = false
+
+[functions.generate-packet-pdf]
+verify_jwt = false

@@ -4,6 +4,7 @@ import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, Shie
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
+import { DownloadHistoryList } from '../download/DownloadHistoryList';
 import { CheckInPreferences } from '../checkin/CheckInPreferences';
 import { InactivityCheckInCard } from '../checkin/InactivityCheckInCard';
 import { AlertPreferences } from '../notifications/AlertPreferences';
@@ -266,6 +267,11 @@ export const ProfileScreen = () => {
             </div>
             <DownloadPacketButton variant="settings" />
           </Card>
+        </div>
+
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Download History</h3>
+          <DownloadHistoryList />
         </div>
 
         <div>
