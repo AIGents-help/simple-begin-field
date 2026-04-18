@@ -163,10 +163,13 @@ export const DashboardScreen = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-serif font-bold text-lg text-navy-muted">{section.label}</h3>
-                    <ChevronRight size={18} className="text-stone-400 group-hover:text-navy-muted transition-colors" />
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-serif font-bold text-lg text-navy-muted leading-tight">{section.label}</h3>
+                    <ChevronRight size={18} className="text-stone-400 group-hover:text-navy-muted transition-colors shrink-0" />
                   </div>
+                  <p className="font-serif italic text-[12px] text-stone-500/80 leading-snug line-clamp-2">
+                    {section.description}
+                  </p>
                   <div className="flex items-center gap-1.5 text-stone-500 text-xs font-medium">
                     <FileText size={14} />
                     <span>{count} {count === 1 ? 'record' : 'records'}</span>
