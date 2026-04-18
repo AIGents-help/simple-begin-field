@@ -129,7 +129,7 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
         if (cancelErr) throw cancelErr;
         newStatus = 'free';
         newValue = { plan_key: 'free', plan_name: 'Free', status: 'free' };
-      } else if (choice === 'comp') {
+      } else if (choice === 'comp' || choice === 'comp_couple') {
         await plansAdminService.grantComp({
           userId: customer.id,
           pricingPlanId: targetPlan!.id,
@@ -142,6 +142,7 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
           plan_name: targetPlan!.name,
           status: 'active',
           is_comp: true,
+          comp_tier: choice === 'comp_couple' ? 'couple' : 'individual',
           comp_expires_at: compExpiry || null,
         };
       } else {
@@ -175,7 +176,7 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
       }
 
       // Log admin activity (skip if comp — grantComp already logs)
-      if (choice !== 'comp') {
+      if (choice !== 'comp' && choice !== 'comp_couple') {
         const { error: logErr } = await supabase.from('admin_activity_log').insert({
           admin_user_id: adminId,
           admin_email: adminEmail,
@@ -189,12 +190,34 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
         if (logErr) console.warn('Activity log insert failed:', logErr.message);
       }
 
+      // Optionally grant full admin role
+      if (grantAdmin && !isCurrentlyAdmin) {
+        const { error: roleErr } = await supabase
+          .from('profiles')
+          .update({ role: 'admin' })
+          .eq('id', customer.id);
+        if (roleErr) throw new Error(`Failed to grant admin role: ${roleErr.message}`);
+
+        const { error: roleLogErr } = await supabase.from('admin_activity_log').insert({
+          admin_user_id: adminId,
+          admin_email: adminEmail,
+          target_user_id: customer.id,
+          target_user_email: customer.email,
+          action: 'grant_admin_role',
+          old_value: { role: customer.role || 'customer' },
+          new_value: { role: 'admin' },
+          note: adminNote.trim() || null,
+        });
+        if (roleLogErr) console.warn('Admin role log insert failed:', roleLogErr.message);
+        toast.success('Full Admin Rights granted.');
+      }
+
       const planKey = choice === 'free' ? 'free' : targetPlan!.plan_key;
       const planName = choice === 'free' ? 'Free' : targetPlan!.name;
       toast.success(`Plan assigned: ${planName} — ${new Date().toLocaleTimeString()}`);
       onSuccess({ plan_key: planKey, plan_name: planName, status: newStatus });
 
-      if (hasStripeSub && choice !== 'comp') {
+      if (hasStripeSub && choice !== 'comp' && choice !== 'comp_couple') {
         toast.warning(
           'This user may have an active Stripe subscription. Visit Billing to cancel it separately.',
           { duration: 8000 }
