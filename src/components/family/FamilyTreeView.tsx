@@ -4,6 +4,7 @@ import { HavenOwlSvg } from '@/components/haven/HavenOwlSvg';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadService } from '@/services/uploadService';
+import { PersonAvatar } from '@/components/common/PersonAvatar';
 
 interface FamilyMember {
   id: string;
