@@ -110,6 +110,11 @@ Deno.serve(async (req) => {
             filename: body.filename,
             content: body.pdfBase64,
           },
+          ...photos.map((p) => ({
+            filename: p.filename,
+            content: p.content,
+            ...(p.mime ? { contentType: p.mime } : {}),
+          })),
         ],
       }),
     });
