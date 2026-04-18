@@ -3,6 +3,7 @@ import { X, Send, Loader2 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 import { sectionService } from '@/services/sectionService';
+import { healthScoreService, HealthScore } from '@/services/healthScoreService';
 import { HavenOwlSvg } from './HavenOwlSvg';
 
 interface ChatMessage {
@@ -80,16 +81,26 @@ export const HavenAssistant = () => {
     }
   };
 
+  const fetchHealthScore = async (): Promise<HealthScore | null> => {
+    if (!currentPacket) return null;
+    try {
+      return await healthScoreService.getCurrent(currentPacket.id);
+    } catch {
+      return null;
+    }
+  };
+
   const sendInitialMessage = async () => {
     setInitialSent(true);
     setLoading(true);
     try {
-      const sectionData = await fetchSectionData();
+      const [sectionData, healthScore] = await Promise.all([fetchSectionData(), fetchHealthScore()]);
       const { data, error } = await supabase.functions.invoke('haven-chat', {
         body: {
           messages: [{ role: 'user', content: `I just opened the ${section} section. What should I work on?` }],
           section,
           sectionData,
+          healthScore,
         },
       });
       if (error) throw error;
@@ -112,12 +123,13 @@ export const HavenAssistant = () => {
     setLoading(true);
 
     try {
-      const sectionData = await fetchSectionData();
+      const [sectionData, healthScore] = await Promise.all([fetchSectionData(), fetchHealthScore()]);
       const { data, error } = await supabase.functions.invoke('haven-chat', {
         body: {
           messages: newMessages.map(m => ({ role: m.role, content: m.content })),
           section,
           sectionData,
+          healthScore,
         },
       });
       if (error) throw error;
