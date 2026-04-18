@@ -399,6 +399,7 @@ export const TrustedContactsManager: React.FC = () => {
                       </p>
                     )}
                   </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-1 flex-shrink-0">
