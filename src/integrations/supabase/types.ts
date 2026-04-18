@@ -941,6 +941,170 @@ export type Database = {
           },
         ]
       }
+      investment_records: {
+        Row: {
+          account_nickname: string | null
+          account_number_encrypted: string | null
+          account_number_masked: string | null
+          account_phone: string | null
+          account_type: string | null
+          advisor_email: string | null
+          advisor_name: string | null
+          advisor_phone: string | null
+          allocation_bonds_pct: number | null
+          allocation_cash_pct: number | null
+          allocation_other_pct: number | null
+          allocation_stocks_pct: number | null
+          approximate_value: number | null
+          branch_address: string | null
+          category: string | null
+          co_owner_name: string | null
+          contingent_beneficiary: string | null
+          created_at: string | null
+          crypto_exchange_name: string | null
+          crypto_hardware_wallet_location: string | null
+          crypto_seed_phrase_location: string | null
+          crypto_wallet_type: string | null
+          disposition_action: string | null
+          disposition_instructions: string | null
+          id: string
+          institution: string
+          is_joint_account: boolean | null
+          is_na: boolean | null
+          last_statement_date: string | null
+          notes: string | null
+          packet_id: string | null
+          password_hint: string | null
+          pi_amount_invested: number | null
+          pi_company_contact: string | null
+          pi_company_name: string | null
+          pi_current_value: number | null
+          pi_investment_date: string | null
+          pi_investment_stage: string | null
+          pi_shareholder_agreement_notes: string | null
+          primary_beneficiary: string | null
+          primary_holdings_description: string | null
+          restricted_stock_notes: string | null
+          scope: string | null
+          status: string | null
+          tod_on_file: boolean | null
+          updated_at: string | null
+          username_encrypted: string | null
+          username_masked: string | null
+          website_url: string | null
+        }
+        Insert: {
+          account_nickname?: string | null
+          account_number_encrypted?: string | null
+          account_number_masked?: string | null
+          account_phone?: string | null
+          account_type?: string | null
+          advisor_email?: string | null
+          advisor_name?: string | null
+          advisor_phone?: string | null
+          allocation_bonds_pct?: number | null
+          allocation_cash_pct?: number | null
+          allocation_other_pct?: number | null
+          allocation_stocks_pct?: number | null
+          approximate_value?: number | null
+          branch_address?: string | null
+          category?: string | null
+          co_owner_name?: string | null
+          contingent_beneficiary?: string | null
+          created_at?: string | null
+          crypto_exchange_name?: string | null
+          crypto_hardware_wallet_location?: string | null
+          crypto_seed_phrase_location?: string | null
+          crypto_wallet_type?: string | null
+          disposition_action?: string | null
+          disposition_instructions?: string | null
+          id?: string
+          institution: string
+          is_joint_account?: boolean | null
+          is_na?: boolean | null
+          last_statement_date?: string | null
+          notes?: string | null
+          packet_id?: string | null
+          password_hint?: string | null
+          pi_amount_invested?: number | null
+          pi_company_contact?: string | null
+          pi_company_name?: string | null
+          pi_current_value?: number | null
+          pi_investment_date?: string | null
+          pi_investment_stage?: string | null
+          pi_shareholder_agreement_notes?: string | null
+          primary_beneficiary?: string | null
+          primary_holdings_description?: string | null
+          restricted_stock_notes?: string | null
+          scope?: string | null
+          status?: string | null
+          tod_on_file?: boolean | null
+          updated_at?: string | null
+          username_encrypted?: string | null
+          username_masked?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          account_nickname?: string | null
+          account_number_encrypted?: string | null
+          account_number_masked?: string | null
+          account_phone?: string | null
+          account_type?: string | null
+          advisor_email?: string | null
+          advisor_name?: string | null
+          advisor_phone?: string | null
+          allocation_bonds_pct?: number | null
+          allocation_cash_pct?: number | null
+          allocation_other_pct?: number | null
+          allocation_stocks_pct?: number | null
+          approximate_value?: number | null
+          branch_address?: string | null
+          category?: string | null
+          co_owner_name?: string | null
+          contingent_beneficiary?: string | null
+          created_at?: string | null
+          crypto_exchange_name?: string | null
+          crypto_hardware_wallet_location?: string | null
+          crypto_seed_phrase_location?: string | null
+          crypto_wallet_type?: string | null
+          disposition_action?: string | null
+          disposition_instructions?: string | null
+          id?: string
+          institution?: string
+          is_joint_account?: boolean | null
+          is_na?: boolean | null
+          last_statement_date?: string | null
+          notes?: string | null
+          packet_id?: string | null
+          password_hint?: string | null
+          pi_amount_invested?: number | null
+          pi_company_contact?: string | null
+          pi_company_name?: string | null
+          pi_current_value?: number | null
+          pi_investment_date?: string | null
+          pi_investment_stage?: string | null
+          pi_shareholder_agreement_notes?: string | null
+          primary_beneficiary?: string | null
+          primary_holdings_description?: string | null
+          restricted_stock_notes?: string | null
+          scope?: string | null
+          status?: string | null
+          tod_on_file?: boolean | null
+          updated_at?: string | null
+          username_encrypted?: string | null
+          username_masked?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_records_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_documents: {
         Row: {
           attorney_firm: string | null
