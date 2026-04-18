@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Search, Gift, Users, Heart, Crown, Sparkles, X, Save, Ban, ExternalLink } from 'lucide-react';
+import {
+  Search, Gift, Users, Heart, Crown, Sparkles, X, Save, Ban,
+  Pause, Play, Edit3, AlertTriangle,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { KPIStatCard, DataTable, StatusPill } from './DashboardComponents';
 import { plansAdminService, type PlanRow, type SubscriberRow } from '@/services/plansAdminService';
@@ -12,10 +15,30 @@ const fmtDate = (s: string | null) => (s ? new Date(s).toLocaleDateString() : '�
 
 const statusType = (status: string): 'success' | 'warning' | 'error' | 'info' => {
   if (status === 'active' || status === 'one_time_paid') return 'success';
+  if (status === 'paused') return 'warning';
   if (status === 'past_due' || status === 'pending') return 'warning';
   if (status === 'canceled' || status === 'failed') return 'error';
   return 'info';
 };
+
+const isRecurring = (s: SubscriberRow) =>
+  s.plan_key.startsWith('individual') || s.plan_key.startsWith('couple');
+
+const PlanBadge: React.FC<{ row: SubscriberRow }> = ({ row }) => (
+  <div className="flex items-center gap-2 flex-wrap">
+    <span className="text-sm font-medium text-stone-900">{row.plan_name}</span>
+    {row.is_comp && (
+      <span className="text-[10px] uppercase tracking-wider font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+        Comp
+      </span>
+    )}
+    {row.status === 'paused' && (
+      <span className="text-[10px] uppercase tracking-wider font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
+        Paused
+      </span>
+    )}
+  </div>
+);
 
 export const AdminPlans: React.FC = () => {
   const { profile } = useAppContext();
@@ -64,6 +87,30 @@ export const AdminPlans: React.FC = () => {
     });
   }, [subs, search, planFilter, statusFilter]);
 
+  const handleQuickPauseResume = async (row: SubscriberRow, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!row.purchase_id) {
+      toast.error('No active subscription on this user');
+      return;
+    }
+    try {
+      if (row.status === 'paused') {
+        await plansAdminService.resumeSubscription({ purchaseId: row.purchase_id });
+        toast.success(`Resumed billing for ${row.email}`);
+      } else {
+        await plansAdminService.pauseSubscription({
+          purchaseId: row.purchase_id,
+          resumesAt: null,
+          note: 'Quick pause from list view',
+        });
+        toast.success(`Paused billing for ${row.email}`);
+      }
+      await refresh();
+    } catch (err: any) {
+      toast.error(err?.message || 'Action failed');
+    }
+  };
+
   const columns = [
     {
       header: 'Subscriber',
@@ -83,16 +130,7 @@ export const AdminPlans: React.FC = () => {
     {
       header: 'Plan',
       accessorKey: 'plan_name',
-      cell: (row: SubscriberRow) => (
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-stone-900">{row.plan_name}</span>
-          {row.is_comp && (
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
-              Comp
-            </span>
-          )}
-        </div>
-      ),
+      cell: (row: SubscriberRow) => <PlanBadge row={row} />,
     },
     {
       header: 'Status',
@@ -100,17 +138,47 @@ export const AdminPlans: React.FC = () => {
       cell: (row: SubscriberRow) => <StatusPill status={row.status.replace('_', ' ')} type={statusType(row.status)} />,
     },
     {
-      header: 'Start Date',
-      accessorKey: 'start_date',
-      cell: (row: SubscriberRow) => <span className="text-xs text-stone-500">{fmtDate(row.start_date)}</span>,
-    },
-    {
       header: 'Renews / Expires',
       accessorKey: 'current_period_end',
       cell: (row: SubscriberRow) => (
         <span className="text-xs text-stone-500">
-          {fmtDate(row.comp_expires_at || row.current_period_end)}
+          {row.status === 'paused' && row.pause_resumes_at
+            ? `Resumes ${fmtDate(row.pause_resumes_at)}`
+            : row.status === 'paused'
+              ? 'Paused — indefinite'
+              : fmtDate(row.comp_expires_at || row.current_period_end)}
         </span>
+      ),
+    },
+    {
+      header: 'Actions',
+      accessorKey: 'actions',
+      cell: (row: SubscriberRow) => (
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelected(row);
+            }}
+            className="px-2 py-1 text-xs text-stone-600 hover:bg-stone-100 rounded"
+            title="Manage"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+          </button>
+          {isRecurring(row) && row.purchase_id && (
+            <button
+              onClick={(e) => handleQuickPauseResume(row, e)}
+              className="px-2 py-1 text-xs text-stone-600 hover:bg-stone-100 rounded"
+              title={row.status === 'paused' ? 'Resume billing' : 'Pause billing'}
+            >
+              {row.status === 'paused' ? (
+                <Play className="w-3.5 h-3.5 text-emerald-600" />
+              ) : (
+                <Pause className="w-3.5 h-3.5 text-amber-600" />
+              )}
+            </button>
+          )}
+        </div>
       ),
     },
   ];
@@ -175,6 +243,7 @@ export const AdminPlans: React.FC = () => {
           >
             <option value="all">All status</option>
             <option value="active">Active</option>
+            <option value="paused">Paused</option>
             <option value="one_time_paid">One-time paid</option>
             <option value="past_due">Past due</option>
             <option value="canceled">Canceled</option>
@@ -233,15 +302,47 @@ const SubscriberDetailDrawer: React.FC<{
   onUpdated: () => void;
 }> = ({ subscriber, plans, onClose, onUpdated }) => {
   const [planId, setPlanId] = useState<string>(subscriber.pricing_plan_id || '');
+  const [planChangeNote, setPlanChangeNote] = useState('');
+  const [partnerEmail, setPartnerEmail] = useState('');
+  const [confirmLifetime, setConfirmLifetime] = useState(false);
   const [note, setNote] = useState(subscriber.admin_note || '');
   const [busy, setBusy] = useState(false);
+  const [pauseOpen, setPauseOpen] = useState(false);
+
+  const selectedPlan = plans.find((p) => p.id === planId);
+  const isCouplePlan = selectedPlan?.household_mode === 'couple';
+  const isLifetimePlan = selectedPlan?.plan_key === 'lifetime';
 
   const handleChangePlan = async () => {
     if (!planId) return;
+    if (isLifetimePlan && !confirmLifetime) {
+      toast.error('Please confirm the Lifetime warning before applying');
+      return;
+    }
+    if (isCouplePlan && !partnerEmail.trim()) {
+      const ok = window.confirm(
+        'No partner email entered. Apply Couple plan without one?',
+      );
+      if (!ok) return;
+    }
+    if (!window.confirm(`Change ${subscriber.email}'s plan to "${selectedPlan?.name}"?`)) {
+      return;
+    }
     setBusy(true);
     try {
-      await plansAdminService.changePlan(subscriber.purchase_id, subscriber.user_id, planId);
-      toast.success('Plan updated');
+      const fullNote = [
+        planChangeNote,
+        isCouplePlan && partnerEmail ? `Partner email: ${partnerEmail}` : null,
+      ]
+        .filter(Boolean)
+        .join(' | ');
+      await plansAdminService.changePlan({
+        purchaseId: subscriber.purchase_id,
+        userId: subscriber.user_id,
+        pricingPlanId: planId,
+        note: fullNote || undefined,
+      });
+      toast.success(`Plan updated to ${selectedPlan?.name}`);
       onUpdated();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to update plan');
@@ -250,9 +351,31 @@ const SubscriberDetailDrawer: React.FC<{
     }
   };
 
+  const handleResume = async () => {
+    if (!subscriber.purchase_id) return;
+    if (!window.confirm(`Resume billing for ${subscriber.email}?`)) return;
+    setBusy(true);
+    try {
+      await plansAdminService.resumeSubscription({ purchaseId: subscriber.purchase_id });
+      toast.success('Billing resumed');
+      onUpdated();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to resume');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleCancel = async () => {
     if (!subscriber.purchase_id) {
       toast.error('No active subscription to cancel');
+      return;
+    }
+    if (
+      !window.confirm(
+        `Cancel ${subscriber.email}'s subscription? They will lose paid access at period end.`,
+      )
+    ) {
       return;
     }
     setBusy(true);
@@ -280,6 +403,9 @@ const SubscriberDetailDrawer: React.FC<{
     }
   };
 
+  const recurring = isRecurring(subscriber);
+  const paused = subscriber.status === 'paused';
+
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="bg-white w-full sm:max-w-lg sm:rounded-xl rounded-t-xl shadow-xl max-h-[90vh] overflow-y-auto">
@@ -294,52 +420,129 @@ const SubscriberDetailDrawer: React.FC<{
         </div>
 
         <div className="p-5 space-y-5">
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Plan</p>
-              <p className="text-stone-900 font-medium mt-1">{subscriber.plan_name}</p>
+          {/* Current plan */}
+          <div className="bg-stone-50 rounded-lg p-4 space-y-2">
+            <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">
+              Current plan
+            </p>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <PlanBadge row={subscriber} />
+              <span className="text-xs text-stone-500">
+                {subscriber.status === 'paused' && subscriber.pause_resumes_at
+                  ? `Resumes ${fmtDate(subscriber.pause_resumes_at)}`
+                  : subscriber.status === 'paused'
+                    ? 'Indefinite pause'
+                    : `Renews ${fmtDate(subscriber.comp_expires_at || subscriber.current_period_end)}`}
+              </span>
             </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Status</p>
-              <p className="text-stone-900 font-medium mt-1 capitalize">{subscriber.status.replace('_', ' ')}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Start</p>
-              <p className="text-stone-900 mt-1">{fmtDate(subscriber.start_date)}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Renews/Expires</p>
-              <p className="text-stone-900 mt-1">
-                {fmtDate(subscriber.comp_expires_at || subscriber.current_period_end)}
-              </p>
-            </div>
+            {paused && subscriber.pause_note && (
+              <p className="text-xs italic text-stone-500">"{subscriber.pause_note}"</p>
+            )}
           </div>
 
+          {/* Pause / Resume */}
+          {recurring && subscriber.purchase_id && (
+            <div className="border border-stone-200 rounded-lg p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-stone-900">Billing</p>
+                  <p className="text-xs text-stone-500">
+                    {paused
+                      ? 'Subscription is currently paused.'
+                      : 'Pause Stripe billing while keeping app access.'}
+                  </p>
+                </div>
+                {paused ? (
+                  <button
+                    disabled={busy}
+                    onClick={handleResume}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-100 disabled:opacity-50"
+                  >
+                    <Play className="w-4 h-4" /> Resume billing
+                  </button>
+                ) : (
+                  <button
+                    disabled={busy}
+                    onClick={() => setPauseOpen(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100 disabled:opacity-50"
+                  >
+                    <Pause className="w-4 h-4" /> Pause billing
+                  </button>
+                )}
+              </div>
+              {!subscriber.stripe_subscription_id && (
+                <p className="text-[11px] text-stone-400 italic">
+                  No Stripe subscription — soft pause only (status flag).
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Change plan */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-stone-600 uppercase tracking-wider">Change plan</label>
-            <div className="flex gap-2">
-              <select
-                value={planId}
-                onChange={(e) => setPlanId(e.target.value)}
-                className="flex-1 px-3 py-2 border border-stone-200 rounded-lg text-sm bg-white"
-              >
-                <option value="">Select a plan...</option>
-                {plans.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} — {fmtMoney(p.price_cents)}
-                  </option>
-                ))}
-              </select>
-              <button
-                disabled={busy || !planId}
-                onClick={handleChangePlan}
-                className="px-4 py-2 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800 disabled:opacity-50"
-              >
-                Apply
-              </button>
-            </div>
+            <label className="text-xs font-semibold text-stone-600 uppercase tracking-wider">
+              Change plan
+            </label>
+            <select
+              value={planId}
+              onChange={(e) => {
+                setPlanId(e.target.value);
+                setConfirmLifetime(false);
+              }}
+              className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm bg-white"
+            >
+              <option value="">Select a plan...</option>
+              {plans.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} — {fmtMoney(p.price_cents)}
+                </option>
+              ))}
+            </select>
+
+            {isCouplePlan && (
+              <input
+                type="email"
+                value={partnerEmail}
+                onChange={(e) => setPartnerEmail(e.target.value)}
+                placeholder="Partner email (optional, for note)"
+                className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm"
+              />
+            )}
+
+            <textarea
+              value={planChangeNote}
+              onChange={(e) => setPlanChangeNote(e.target.value)}
+              rows={2}
+              placeholder="Reason for change (optional)"
+              className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm"
+            />
+
+            {isLifetimePlan && (
+              <label className="flex items-start gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>
+                  <input
+                    type="checkbox"
+                    checked={confirmLifetime}
+                    onChange={(e) => setConfirmLifetime(e.target.checked)}
+                    className="mr-2"
+                  />
+                  I understand Lifetime grants permanent access and is not reversible
+                  without manual intervention.
+                </span>
+              </label>
+            )}
+
+            <button
+              disabled={busy || !planId}
+              onClick={handleChangePlan}
+              className="w-full px-4 py-2 bg-stone-900 text-white rounded-lg text-sm font-medium hover:bg-stone-800 disabled:opacity-50"
+            >
+              Apply plan change
+            </button>
           </div>
 
+          {/* Admin note */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-stone-600 uppercase tracking-wider">Admin note</label>
             <textarea
@@ -375,6 +578,146 @@ const SubscriberDetailDrawer: React.FC<{
           </div>
         </div>
       </div>
+
+      {pauseOpen && (
+        <PauseDialog
+          subscriber={subscriber}
+          onClose={() => setPauseOpen(false)}
+          onPaused={() => {
+            setPauseOpen(false);
+            onUpdated();
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+const PauseDialog: React.FC<{
+  subscriber: SubscriberRow;
+  onClose: () => void;
+  onPaused: () => void;
+}> = ({ subscriber, onClose, onPaused }) => {
+  const [duration, setDuration] = useState<'1m' | '2m' | '3m' | 'custom' | 'indefinite'>('1m');
+  const [customDate, setCustomDate] = useState('');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const computeResumesAt = (): string | null => {
+    const now = new Date();
+    if (duration === 'indefinite') return null;
+    if (duration === 'custom') return customDate || null;
+    const months = duration === '1m' ? 1 : duration === '2m' ? 2 : 3;
+    now.setMonth(now.getMonth() + months);
+    return now.toISOString();
+  };
+
+  const handlePause = async () => {
+    if (!subscriber.purchase_id) {
+      toast.error('No purchase record to pause');
+      return;
+    }
+    if (duration === 'custom' && !customDate) {
+      toast.error('Please pick a custom resume date');
+      return;
+    }
+    setBusy(true);
+    try {
+      await plansAdminService.pauseSubscription({
+        purchaseId: subscriber.purchase_id,
+        resumesAt: computeResumesAt(),
+        note: note || undefined,
+      });
+      toast.success(`Paused billing for ${subscriber.email}`);
+      onPaused();
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to pause');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-md rounded-xl shadow-xl">
+        <div className="flex items-center justify-between p-5 border-b border-stone-200">
+          <h3 className="font-serif italic text-lg text-stone-900 flex items-center gap-2">
+            <Pause className="w-4 h-4" /> Pause Billing
+          </h3>
+          <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-lg">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="p-5 space-y-4">
+          <p className="text-sm text-stone-600">
+            User keeps full app access. Stripe billing is suspended for the duration.
+          </p>
+          <div>
+            <label className="text-xs font-semibold text-stone-600 uppercase tracking-wider">
+              Duration
+            </label>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {(['1m', '2m', '3m', 'custom', 'indefinite'] as const).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDuration(d)}
+                  className={`px-3 py-2 rounded-lg text-sm border ${
+                    duration === d
+                      ? 'border-stone-900 bg-stone-900 text-white'
+                      : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
+                  }`}
+                >
+                  {d === '1m'
+                    ? '1 month'
+                    : d === '2m'
+                      ? '2 months'
+                      : d === '3m'
+                        ? '3 months'
+                        : d === 'custom'
+                          ? 'Custom date'
+                          : 'Indefinite'}
+                </button>
+              ))}
+            </div>
+          </div>
+          {duration === 'custom' && (
+            <input
+              type="date"
+              value={customDate}
+              onChange={(e) => setCustomDate(e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+              className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm"
+            />
+          )}
+          <div>
+            <label className="text-xs font-semibold text-stone-600 uppercase tracking-wider">
+              Internal note
+            </label>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={2}
+              placeholder="Reason for pausing..."
+              className="w-full mt-1 px-3 py-2 border border-stone-200 rounded-lg text-sm"
+            />
+          </div>
+        </div>
+        <div className="p-5 border-t border-stone-200 flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-white border border-stone-200 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-50"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={busy}
+            onClick={handlePause}
+            className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 disabled:opacity-50"
+          >
+            {busy ? 'Pausing...' : 'Pause billing'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -396,6 +739,10 @@ const GrantCompDialog: React.FC<{
     if (!email || !planId) {
       toast.error('Email and plan are required');
       return;
+    }
+    if (!note.trim()) {
+      const ok = window.confirm('No reason note entered. Grant comp anyway?');
+      if (!ok) return;
     }
     setBusy(true);
     try {
@@ -471,7 +818,9 @@ const GrantCompDialog: React.FC<{
             )}
           </div>
           <div>
-            <label className="text-xs font-semibold text-stone-600 uppercase tracking-wider">Note (optional)</label>
+            <label className="text-xs font-semibold text-stone-600 uppercase tracking-wider">
+              Reason / internal note
+            </label>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
