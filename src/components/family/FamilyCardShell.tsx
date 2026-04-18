@@ -18,6 +18,7 @@ import { LifeStatusToggle } from '@/components/common/LifeStatusToggle';
 import { DeathCertificateUpload } from '@/components/common/DeathCertificateUpload';
 import { RecordDocumentUpload } from '@/components/common/RecordDocumentUpload';
 import { PersonAvatar } from '@/components/common/PersonAvatar';
+import { GenderSelect } from '@/components/common/GenderSelect';
 
 const isDraft = (id?: string) => !!id && String(id).startsWith('draft-');
 
