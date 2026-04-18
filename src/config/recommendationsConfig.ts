@@ -23,7 +23,6 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       { label: 'Emergency Contact', prefill: { title: 'Emergency Contact' } },
       { label: 'Driver\'s License Details', prefill: { title: 'Driver\'s License Details' } },
       { label: 'Passport Details', prefill: { title: 'Passport Details' } },
-      { label: 'Social Security Location', prefill: { title: 'Social Security Location' } },
       { label: 'Marriage Information', prefill: { title: 'Marriage Information' } },
     ],
     documents: [
