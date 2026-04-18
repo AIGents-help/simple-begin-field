@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AdminCheckIns } from './AdminCheckIns';
+import { CheckInAlertCard } from './CheckInAlertCard';
 import { 
   Users, 
   Package, 
@@ -106,8 +106,8 @@ export const AdminOverview: React.FC = () => {
         </div>
       </div>
 
-      {/* Check-In Manager */}
-      <AdminCheckIns />
+      {/* Inactivity Check-In status */}
+      <CheckInAlertCard />
     </div>
   );
 };
