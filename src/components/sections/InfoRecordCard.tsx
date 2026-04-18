@@ -1,6 +1,23 @@
 import React from 'react';
 import { FileText, Paperclip, ChevronRight, Eye, Edit2, Trash2, ClipboardList } from 'lucide-react';
 import { format } from 'date-fns';
+import { formatHumanDate, isValidDisplayDate } from '@/lib/formatDate';
+
+const DATE_FIELD_KEYS = new Set([
+  'dob', 'date_of_birth', 'birthday',
+  'date_of_death', 'dod',
+  'expiryDate', 'expiry_date',
+  'issueDate', 'issue_date',
+  'marriageDate', 'marriage_date',
+  'document_date',
+]);
+
+const renderEntryValue = (key: string, value: any): string => {
+  if (DATE_FIELD_KEYS.has(key)) {
+    return formatHumanDate(value);
+  }
+  return String(value);
+};
 
 interface InfoRecordCardProps {
   record: any;
@@ -163,13 +180,18 @@ export const InfoRecordCard = ({ record, hasFile, onClick, onEdit, onDelete, onV
                   const s = String(value).trim().toLowerCase();
                   return s !== '' && s !== 'null' && s !== 'undefined';
                 })
+                .filter(([key, value]) => {
+                  // Hide entries that are date keys with invalid/placeholder dates.
+                  if (DATE_FIELD_KEYS.has(key)) return isValidDisplayDate(value);
+                  return true;
+                })
                 .map(([key, value]) => (
                 <div key={key} className="flex items-baseline gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 shrink-0">
                     {formatKey(key)}:
                   </span>
                   <span className="text-xs text-stone-600 font-medium truncate">
-                    {String(value)}
+                    {renderEntryValue(key, value)}
                   </span>
                 </div>
               ))}
