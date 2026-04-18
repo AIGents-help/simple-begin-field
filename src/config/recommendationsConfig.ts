@@ -277,32 +277,29 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
   },
   property: {
     entries: [
-      { label: 'Jewelry', prefill: { item_name: 'Jewelry' } },
-      { label: 'Heirlooms', prefill: { item_name: 'Heirloom' } },
-      { label: 'Firearms', prefill: { item_name: 'Firearms' } },
-      { label: 'Art', prefill: { item_name: 'Art' } },
-      { label: 'Collectibles', prefill: { item_name: 'Collectibles' } },
-      { label: 'Storage Unit Contents', prefill: { item_name: 'Storage Unit' } },
-      { label: 'Sentimental Items', prefill: { item_name: 'Sentimental Item' } },
-      { label: 'Intended Recipient', prefill: { item_name: 'Intended Recipient' } },
+      { label: 'Jewelry & Watches', prefill: { title: 'Jewelry & Watches', category: 'Jewelry & Watches' } },
+      { label: 'Art & Collectibles', prefill: { title: 'Art Piece', category: 'Art & Paintings' } },
+      { label: 'Firearms', prefill: { title: 'Firearm', category: 'Firearms & Weapons' } },
+      { label: 'Musical Instruments', prefill: { title: 'Musical Instrument', category: 'Musical Instruments' } },
+      { label: 'Antiques', prefill: { title: 'Antique Item', category: 'Antiques & Furniture' } },
+      { label: 'Sports & Hobby Equipment', prefill: { title: 'Sports / Hobby Equipment', category: 'Sports Equipment' } },
+      { label: 'Family Heirlooms', prefill: { title: 'Family Heirloom', category: 'Collectibles & Memorabilia' } },
     ],
-    documents: [
-      { label: 'Appraisals', prefill: { item_name: 'Appraisal' } },
-      { label: 'Receipts', prefill: { item_name: 'Receipt' } },
-      { label: 'Insurance Riders', prefill: { item_name: 'Insurance Rider' } },
-      { label: 'Photo Inventory', prefill: { item_name: 'Photo Inventory' } },
-      { label: 'Ownership Documentation', prefill: { item_name: 'Ownership Doc' } },
-    ],
+    // Per-item documents (Appraisal, Receipt, Certificate of Authenticity,
+    // Insurance Rider) are attached directly to each property record via
+    // RECORD_DOC_SLOTS in AddEditSheet. No standalone document chips here.
+    documents: [],
     contacts: [
       { label: 'Appraiser', prefill: { name: 'Appraiser' } },
       { label: 'Insurance Agent', prefill: { name: 'Insurance Agent' } },
-      { label: 'Intended Recipient', prefill: { name: 'Recipient' } },
+      { label: 'Auction House', prefill: { name: 'Auction House' } },
     ],
     considerations: [
       'Which items have sentimental value beyond price?',
-      'Which items are promised to someone?',
-      'Where items are physically stored?',
-      'Which items need extra protection?',
+      'Which items are promised to someone specific?',
+      'Where each item is physically stored?',
+      'Which items need climate control or special handling?',
+      'Which items are separately insured with a rider?',
     ]
   },
   // pets: intentionally omitted — Pets uses a dedicated multi-pet
