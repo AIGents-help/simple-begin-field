@@ -67,8 +67,8 @@ Deno.serve(async (req) => {
     const inviteToken = token || contact.invite_token || '';
     const baseUrl = req.headers.get('origin') || 'https://app.survivorpacket.com';
     const inviteUrl = mode === 'invitation'
-      ? `${baseUrl}/trusted-contact/accept/${inviteToken}`
-      : `${baseUrl}/trusted-contact/login`;
+      ? `${baseUrl}/trusted/invite/${inviteToken}`
+      : `${baseUrl}/trusted`;
 
     const eventName = mode === 'invitation'
       ? 'trusted_contact_invitation'
