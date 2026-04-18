@@ -23,7 +23,8 @@ const HavenOwl = () => <HavenOwlSvg size={120} className="mx-auto" />;
 
 // ── Node card dimensions ──
 const NODE_W = 140;
-const NODE_H = 72;
+const NODE_H = 130;
+const AVATAR_SIZE = 48;
 const H_GAP = 24;
 const V_GAP = 70;
 
