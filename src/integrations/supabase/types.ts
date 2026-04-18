@@ -1977,6 +1977,7 @@ export type Database = {
           category: string
           created_at: string | null
           created_by: string | null
+          details: Json
           expiry_date: string | null
           id: string
           is_na: boolean | null
@@ -1991,6 +1992,7 @@ export type Database = {
           category: string
           created_at?: string | null
           created_by?: string | null
+          details?: Json
           expiry_date?: string | null
           id?: string
           is_na?: boolean | null
@@ -2005,6 +2007,7 @@ export type Database = {
           category?: string
           created_at?: string | null
           created_by?: string | null
+          details?: Json
           expiry_date?: string | null
           id?: string
           is_na?: boolean | null
@@ -3508,15 +3511,35 @@ export type Database = {
           checkin_status: string | null
           consent_timestamp: string | null
           created_at: string | null
+          current_address_city: string | null
+          current_address_state: string | null
+          current_address_street: string | null
+          current_address_zip: string | null
+          date_of_birth: string | null
           email: string | null
+          first_name: string | null
           full_name: string | null
+          gender: string | null
           id: string
           last_checkin_acknowledged_at: string | null
           last_checkin_at: string | null
           last_checkin_sent_at: string | null
           last_login_at: string | null
+          last_name: string | null
           legal_version_accepted: string | null
+          mailing_address_city: string | null
+          mailing_address_state: string | null
+          mailing_address_street: string | null
+          mailing_address_zip: string | null
+          mailing_same_as_current: boolean | null
+          marital_status: string | null
+          middle_name: string | null
+          nationality: string | null
+          place_of_birth: string | null
+          preferred_name: string | null
+          primary_phone: string | null
           role: string | null
+          suffix: string | null
           updated_at: string | null
         }
         Insert: {
@@ -3526,15 +3549,35 @@ export type Database = {
           checkin_status?: string | null
           consent_timestamp?: string | null
           created_at?: string | null
+          current_address_city?: string | null
+          current_address_state?: string | null
+          current_address_street?: string | null
+          current_address_zip?: string | null
+          date_of_birth?: string | null
           email?: string | null
+          first_name?: string | null
           full_name?: string | null
+          gender?: string | null
           id: string
           last_checkin_acknowledged_at?: string | null
           last_checkin_at?: string | null
           last_checkin_sent_at?: string | null
           last_login_at?: string | null
+          last_name?: string | null
           legal_version_accepted?: string | null
+          mailing_address_city?: string | null
+          mailing_address_state?: string | null
+          mailing_address_street?: string | null
+          mailing_address_zip?: string | null
+          mailing_same_as_current?: boolean | null
+          marital_status?: string | null
+          middle_name?: string | null
+          nationality?: string | null
+          place_of_birth?: string | null
+          preferred_name?: string | null
+          primary_phone?: string | null
           role?: string | null
+          suffix?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -3544,15 +3587,35 @@ export type Database = {
           checkin_status?: string | null
           consent_timestamp?: string | null
           created_at?: string | null
+          current_address_city?: string | null
+          current_address_state?: string | null
+          current_address_street?: string | null
+          current_address_zip?: string | null
+          date_of_birth?: string | null
           email?: string | null
+          first_name?: string | null
           full_name?: string | null
+          gender?: string | null
           id?: string
           last_checkin_acknowledged_at?: string | null
           last_checkin_at?: string | null
           last_checkin_sent_at?: string | null
           last_login_at?: string | null
+          last_name?: string | null
           legal_version_accepted?: string | null
+          mailing_address_city?: string | null
+          mailing_address_state?: string | null
+          mailing_address_street?: string | null
+          mailing_address_zip?: string | null
+          mailing_same_as_current?: boolean | null
+          marital_status?: string | null
+          middle_name?: string | null
+          nationality?: string | null
+          place_of_birth?: string | null
+          preferred_name?: string | null
+          primary_phone?: string | null
           role?: string | null
+          suffix?: string | null
           updated_at?: string | null
         }
         Relationships: [
