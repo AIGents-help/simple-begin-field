@@ -13,6 +13,7 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
   const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
   const [spouseSheetOpen, setSpouseSheetOpen] = useState(false);
   const [editingSpouse, setEditingSpouse] = useState<any | null>(null);
+  const refreshRef = React.useRef<(() => void) | null>(null);
   const { bumpCompletion } = useAppContext();
 
   const isSpouse = (record: any) =>
