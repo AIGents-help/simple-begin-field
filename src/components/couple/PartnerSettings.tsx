@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Loader2, Eye, EyeOff, Pencil, AlertTriangle, Heart } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, Loader2, Eye, EyeOff, Pencil, AlertTriangle, Heart, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppContext } from '../../context/AppContext';
 import { useCouple } from '../../hooks/useCouple';
@@ -22,6 +22,23 @@ export const PartnerSettings: React.FC = () => {
   const { link, partner, myPermissions, refresh, loading } = useCouple();
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [unlinking, setUnlinking] = useState(false);
+  const [emailEnabled, setEmailEnabled] = useState(true);
+
+  useEffect(() => {
+    if (link) setEmailEnabled(link.email_notifications_enabled);
+  }, [link]);
+
+  const handleToggleEmail = async (next: boolean) => {
+    if (!link) return;
+    setEmailEnabled(next);
+    try {
+      await coupleService.setEmailNotifications(link.id, next);
+      toast.success(next ? 'Email notifications on.' : 'Email notifications off.', { duration: 1800, position: 'bottom-center' });
+    } catch (err: any) {
+      setEmailEnabled(!next);
+      toast.error(err?.message || 'Failed to update.', { position: 'bottom-center' });
+    }
+  };
 
   const partnerId =
     link && user
