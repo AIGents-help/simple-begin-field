@@ -409,6 +409,7 @@ export const AddEditSheet = ({
           { name: 'religious_cultural_preferences', label: 'Religious / Cultural Preferences', placeholder: 'Any traditions or customs' },
           { name: 'cemetery_plot_details', label: 'Cemetery / Plot Details', placeholder: 'Location and plot info' },
           { name: 'prepaid_arrangements', label: 'Prepaid Arrangements', placeholder: 'Details of prepaid plans' },
+          { name: 'attorney_to_notify', label: 'Attorney to Notify', type: 'textarea', placeholder: 'Attorney name, firm and phone', rows: 2 },
           { name: 'obituary_notes', label: 'Obituary Notes', type: 'textarea', placeholder: 'Key points for obituary' },
           { name: 'additional_instructions', label: 'Additional Instructions', type: 'textarea', placeholder: 'Anything else...' },
         ];
