@@ -3320,6 +3320,11 @@ export type Database = {
           professional_name: string
         }[]
       }
+      viewer_permitted_sections: {
+        Args: { p_packet_id: string }
+        Returns: string[]
+      }
+      viewer_released_packet_ids: { Args: never; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
