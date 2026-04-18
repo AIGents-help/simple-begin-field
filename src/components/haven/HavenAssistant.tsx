@@ -113,10 +113,18 @@ export const HavenAssistant = () => {
     }
   };
 
-  const sendMessage = async () => {
-    const text = input.trim();
+  const SUGGESTED_PROMPTS = [
+    'What should I add next?',
+    'What are my biggest gaps?',
+    'Help me understand why this matters',
+    'What would happen if I died today?',
+    'What documents should I upload?',
+  ];
+
+  const sendMessage = async (overrideText?: string) => {
+    const text = (overrideText ?? input).trim();
     if (!text || loading) return;
-    setInput('');
+    if (!overrideText) setInput('');
 
     const newMessages: ChatMessage[] = [...messages, { role: 'user', content: text }];
     setMessages(newMessages);
@@ -223,6 +231,26 @@ export const HavenAssistant = () => {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Suggested prompts (only when chat is empty and not loading) */}
+        {messages.length === 0 && !loading && (
+          <div className="px-4 pb-2 flex-shrink-0">
+            <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-widest mb-2">
+              Try asking
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {SUGGESTED_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt}
+                  onClick={() => sendMessage(prompt)}
+                  className="text-xs text-stone-700 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-full px-3 py-1.5 transition-colors text-left"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Input */}
         <div className="p-3 border-t border-stone-100 flex-shrink-0">
           <div className="flex gap-2">
@@ -236,7 +264,7 @@ export const HavenAssistant = () => {
               className="flex-1 px-4 py-2.5 bg-stone-50 rounded-xl border border-stone-200 text-sm outline-none focus:border-stone-400 placeholder:text-stone-400"
             />
             <button
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={!input.trim() || loading}
               className="w-10 h-10 bg-navy-muted text-white rounded-xl flex items-center justify-center disabled:opacity-40 hover:bg-stone-800 transition-colors flex-shrink-0"
             >
