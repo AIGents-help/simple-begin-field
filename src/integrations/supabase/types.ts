@@ -2050,51 +2050,255 @@ export type Database = {
       real_estate_records: {
         Row: {
           address: string | null
+          alarm_code: string | null
+          annual_property_tax_amount: number | null
           category: string | null
           created_at: string | null
+          electric_account_number: string | null
+          electric_company_name: string | null
+          electric_monthly_estimate: number | null
+          electric_phone: string | null
+          estimated_value: number | null
+          garage_code: string | null
+          gas_account_number: string | null
+          gas_company_name: string | null
+          gas_monthly_estimate: number | null
+          gas_phone: string | null
+          gate_code: string | null
+          has_mortgage: boolean
+          hoa_account_number: string | null
+          hoa_management_company: string | null
+          hoa_monthly_fee: number | null
+          hoa_name: string | null
+          hoa_phone: string | null
           id: string
+          insurance_agent_name: string | null
+          insurance_agent_phone: string | null
+          insurance_annual_premium: number | null
+          insurance_coverage_amount: number | null
           insurance_details: string | null
+          insurance_policy_number: string | null
+          insurance_policy_renewal_date: string | null
+          insurance_provider_name: string | null
+          internet_cable_account_number: string | null
+          internet_cable_monthly_estimate: number | null
+          internet_cable_phone: string | null
+          internet_cable_provider: string | null
           is_na: boolean | null
+          key_location: string | null
+          key_location_notes: string | null
+          lockbox_code: string | null
+          maintenance_contact_name: string | null
+          maintenance_contact_phone: string | null
+          mortgage_account_number: string | null
+          mortgage_interest_rate: number | null
+          mortgage_lender_name: string | null
+          mortgage_lender_phone: string | null
+          mortgage_lender_website: string | null
+          mortgage_loan_type: string | null
+          mortgage_monthly_payment: number | null
+          mortgage_payoff_date: string | null
+          municipality_contact: string | null
           notes: string | null
+          ownership_type: string | null
           packet_id: string | null
           property_label: string
+          property_manager_company: string | null
+          property_manager_email: string | null
+          property_manager_name: string | null
+          property_manager_phone: string | null
+          property_tax_account_number: string | null
+          property_type: string | null
+          purchase_price: number | null
+          realtor_agency: string | null
+          realtor_email: string | null
+          realtor_name: string | null
+          realtor_phone: string | null
           scope: string | null
+          security_account_number: string | null
+          security_company_name: string | null
+          security_monitoring_phone: string | null
           security_system_details: string | null
           status: string | null
+          tax_due_date: string | null
+          trash_recycling_account_number: string | null
+          trash_recycling_pickup_day: string | null
+          trash_recycling_provider: string | null
           updated_at: string | null
           utilities_account_numbers: Json | null
+          water_sewer_account_number: string | null
+          water_sewer_company_name: string | null
+          water_sewer_monthly_estimate: number | null
+          water_sewer_phone: string | null
+          year_purchased: number | null
         }
         Insert: {
           address?: string | null
+          alarm_code?: string | null
+          annual_property_tax_amount?: number | null
           category?: string | null
           created_at?: string | null
+          electric_account_number?: string | null
+          electric_company_name?: string | null
+          electric_monthly_estimate?: number | null
+          electric_phone?: string | null
+          estimated_value?: number | null
+          garage_code?: string | null
+          gas_account_number?: string | null
+          gas_company_name?: string | null
+          gas_monthly_estimate?: number | null
+          gas_phone?: string | null
+          gate_code?: string | null
+          has_mortgage?: boolean
+          hoa_account_number?: string | null
+          hoa_management_company?: string | null
+          hoa_monthly_fee?: number | null
+          hoa_name?: string | null
+          hoa_phone?: string | null
           id?: string
+          insurance_agent_name?: string | null
+          insurance_agent_phone?: string | null
+          insurance_annual_premium?: number | null
+          insurance_coverage_amount?: number | null
           insurance_details?: string | null
+          insurance_policy_number?: string | null
+          insurance_policy_renewal_date?: string | null
+          insurance_provider_name?: string | null
+          internet_cable_account_number?: string | null
+          internet_cable_monthly_estimate?: number | null
+          internet_cable_phone?: string | null
+          internet_cable_provider?: string | null
           is_na?: boolean | null
+          key_location?: string | null
+          key_location_notes?: string | null
+          lockbox_code?: string | null
+          maintenance_contact_name?: string | null
+          maintenance_contact_phone?: string | null
+          mortgage_account_number?: string | null
+          mortgage_interest_rate?: number | null
+          mortgage_lender_name?: string | null
+          mortgage_lender_phone?: string | null
+          mortgage_lender_website?: string | null
+          mortgage_loan_type?: string | null
+          mortgage_monthly_payment?: number | null
+          mortgage_payoff_date?: string | null
+          municipality_contact?: string | null
           notes?: string | null
+          ownership_type?: string | null
           packet_id?: string | null
           property_label: string
+          property_manager_company?: string | null
+          property_manager_email?: string | null
+          property_manager_name?: string | null
+          property_manager_phone?: string | null
+          property_tax_account_number?: string | null
+          property_type?: string | null
+          purchase_price?: number | null
+          realtor_agency?: string | null
+          realtor_email?: string | null
+          realtor_name?: string | null
+          realtor_phone?: string | null
           scope?: string | null
+          security_account_number?: string | null
+          security_company_name?: string | null
+          security_monitoring_phone?: string | null
           security_system_details?: string | null
           status?: string | null
+          tax_due_date?: string | null
+          trash_recycling_account_number?: string | null
+          trash_recycling_pickup_day?: string | null
+          trash_recycling_provider?: string | null
           updated_at?: string | null
           utilities_account_numbers?: Json | null
+          water_sewer_account_number?: string | null
+          water_sewer_company_name?: string | null
+          water_sewer_monthly_estimate?: number | null
+          water_sewer_phone?: string | null
+          year_purchased?: number | null
         }
         Update: {
           address?: string | null
+          alarm_code?: string | null
+          annual_property_tax_amount?: number | null
           category?: string | null
           created_at?: string | null
+          electric_account_number?: string | null
+          electric_company_name?: string | null
+          electric_monthly_estimate?: number | null
+          electric_phone?: string | null
+          estimated_value?: number | null
+          garage_code?: string | null
+          gas_account_number?: string | null
+          gas_company_name?: string | null
+          gas_monthly_estimate?: number | null
+          gas_phone?: string | null
+          gate_code?: string | null
+          has_mortgage?: boolean
+          hoa_account_number?: string | null
+          hoa_management_company?: string | null
+          hoa_monthly_fee?: number | null
+          hoa_name?: string | null
+          hoa_phone?: string | null
           id?: string
+          insurance_agent_name?: string | null
+          insurance_agent_phone?: string | null
+          insurance_annual_premium?: number | null
+          insurance_coverage_amount?: number | null
           insurance_details?: string | null
+          insurance_policy_number?: string | null
+          insurance_policy_renewal_date?: string | null
+          insurance_provider_name?: string | null
+          internet_cable_account_number?: string | null
+          internet_cable_monthly_estimate?: number | null
+          internet_cable_phone?: string | null
+          internet_cable_provider?: string | null
           is_na?: boolean | null
+          key_location?: string | null
+          key_location_notes?: string | null
+          lockbox_code?: string | null
+          maintenance_contact_name?: string | null
+          maintenance_contact_phone?: string | null
+          mortgage_account_number?: string | null
+          mortgage_interest_rate?: number | null
+          mortgage_lender_name?: string | null
+          mortgage_lender_phone?: string | null
+          mortgage_lender_website?: string | null
+          mortgage_loan_type?: string | null
+          mortgage_monthly_payment?: number | null
+          mortgage_payoff_date?: string | null
+          municipality_contact?: string | null
           notes?: string | null
+          ownership_type?: string | null
           packet_id?: string | null
           property_label?: string
+          property_manager_company?: string | null
+          property_manager_email?: string | null
+          property_manager_name?: string | null
+          property_manager_phone?: string | null
+          property_tax_account_number?: string | null
+          property_type?: string | null
+          purchase_price?: number | null
+          realtor_agency?: string | null
+          realtor_email?: string | null
+          realtor_name?: string | null
+          realtor_phone?: string | null
           scope?: string | null
+          security_account_number?: string | null
+          security_company_name?: string | null
+          security_monitoring_phone?: string | null
           security_system_details?: string | null
           status?: string | null
+          tax_due_date?: string | null
+          trash_recycling_account_number?: string | null
+          trash_recycling_pickup_day?: string | null
+          trash_recycling_provider?: string | null
           updated_at?: string | null
           utilities_account_numbers?: Json | null
+          water_sewer_account_number?: string | null
+          water_sewer_company_name?: string | null
+          water_sewer_monthly_estimate?: number | null
+          water_sewer_phone?: string | null
+          year_purchased?: number | null
         }
         Relationships: [
           {
