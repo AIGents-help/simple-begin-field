@@ -33,23 +33,37 @@ export const PropertyPhotoGallery: React.FC<Props> = ({ packetId, recordId }) =>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordId]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+  const processFiles = async (files: File[]) => {
     if (!files.length || !recordId) return;
+    const images = files.filter((f) => f.type.startsWith('image/'));
+    if (images.length !== files.length) {
+      toast.error('Only image files are supported here.', { duration: 4000, position: 'bottom-center' });
+    }
+    if (!images.length) return;
     setUploading(true);
     try {
-      for (const file of files) {
+      for (const file of images) {
         await propertyPhotoService.upload({ packetId, recordId, file });
       }
-      toast.success(`${files.length} photo${files.length > 1 ? 's' : ''} added`);
+      toast.success(`${images.length} photo${images.length > 1 ? 's' : ''} added`);
       await refresh();
     } catch (err: any) {
       toast.error(err?.message || 'Upload failed');
     } finally {
       setUploading(false);
-      e.target.value = '';
     }
   };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    await processFiles(files);
+    e.target.value = '';
+  };
+
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: processFiles,
+    disabled: uploading || !recordId,
+  });
 
   const setHero = async (photo: PropertyPhoto) => {
     if (!recordId) return;
