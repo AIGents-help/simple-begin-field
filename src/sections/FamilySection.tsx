@@ -218,11 +218,8 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
         onClose={() => setSpouseSheetOpen(false)}
         spouse={editingSpouse}
         onSaved={() => {
-          // Trigger the SectionScreenTemplate refresh by re-invoking the parent refresh
-          if (onRefresh) onRefresh(() => {});
-          // The template's internal fetchData will run via its useEffect when records change.
-          // To be safe, we reload the page-level data by emitting a synthetic re-render:
-          window.dispatchEvent(new CustomEvent('family-refresh'));
+          // Refresh the family list (template exposed its refresh via onRefresh)
+          refreshRef.current?.();
         }}
       />
     </div>
