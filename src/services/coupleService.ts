@@ -122,7 +122,7 @@ export const coupleService = {
   async getPartnerProfile(partnerId: string) {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, email, last_login_at')
+      .select('id, full_name, email, last_login_at, avatar_path')
       .eq('id', partnerId)
       .maybeSingle();
     if (error) {
