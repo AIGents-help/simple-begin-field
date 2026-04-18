@@ -165,7 +165,20 @@ export const PersonalInfoCard: React.FC = () => {
                         <Input value={profile?.nationality ?? ''} onChange={(e) => setField('nationality', e.target.value)} />
                       </Field>
                       <Field label="Marital status">
-                        <Input value={profile?.marital_status ?? ''} onChange={(e) => setField('marital_status', e.target.value)} placeholder="Single / Married / Divorced / Widowed" />
+                        <select
+                          value={profile?.marital_status ?? ''}
+                          onChange={(e) => setField('marital_status', e.target.value)}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        >
+                          <option value="">Select…</option>
+                          <option value="Single">Single</option>
+                          <option value="Married">Married</option>
+                          <option value="Separated">Separated</option>
+                          <option value="Divorced">Divorced</option>
+                          <option value="Widowed">Widowed</option>
+                          <option value="Domestic Partner">Domestic Partner</option>
+                          <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
                       </Field>
                     </div>
                   </AccordionContent>

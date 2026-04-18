@@ -24,7 +24,7 @@ export const SpouseCard: React.FC<any> = (props) => {
       id: 'marriage',
       label: 'Marriage Details',
       fields: [
-        { name: 'marital_status', label: 'Marital status', type: 'select', options: ['Married', 'Separated', 'Divorced', 'Widowed', 'Partner'] },
+        { name: 'marital_status', label: 'Marital status', type: 'select', options: ['Single', 'Married', 'Separated', 'Divorced', 'Widowed', 'Domestic Partner', 'Prefer not to say'] },
         { name: 'marriage_date', label: 'Date of marriage', type: 'date' },
         { name: 'marriage_place', label: 'Place of marriage', placeholder: 'City, State' },
         { name: 'separation_date', label: 'Date of separation', type: 'date',
