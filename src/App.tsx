@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from './context/AppContext';
+import { ConfirmDialogProvider } from './context/ConfirmDialogContext';
 import { AppShell } from './components/layout/AppShell';
 import { DashboardShell } from './components/dashboard/DashboardShell';
 import { AdminOverview, ProfessionalOverview } from './components/dashboard/Overview';
@@ -69,6 +70,7 @@ export default function App() {
         <Sonner />
         <InstallPromptBanner />
         <AppProvider>
+          <ConfirmDialogProvider>
           <Router>
             <Routes>
               <Route path="/" element={<AppShell />}>
@@ -85,6 +87,7 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
+          </ConfirmDialogProvider>
         </AppProvider>
       </TooltipProvider>
     </QueryClientProvider>

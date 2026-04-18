@@ -4,6 +4,7 @@ import { Plus, Trash2, BookOpen, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 
 interface Reading {
   id: string;
@@ -23,6 +24,7 @@ export const FuneralReadings: React.FC<Props> = ({ packetId, funeralRecordId }) 
   const [items, setItems] = useState<Reading[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const confirm = useConfirm();
 
   const load = async () => {
     setLoading(true);
@@ -73,7 +75,12 @@ export const FuneralReadings: React.FC<Props> = ({ packetId, funeralRecordId }) 
   };
 
   const remove = async (id: string) => {
-    if (!window.confirm('Remove this reading?')) return;
+    const ok = await confirm({
+      title: 'Remove this reading?',
+      description: 'This action cannot be undone.',
+      confirmLabel: 'Remove',
+    });
+    if (!ok) return;
     const { error } = await (supabase as any).from('funeral_readings').delete().eq('id', id);
     if (error) {
       toast.error(`Delete failed: ${error.message}`, { duration: 4000, position: 'bottom-center' });

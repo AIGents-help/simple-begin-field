@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { Plus, Trash2, ChevronUp, ChevronDown, Music, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 
 const PLAY_OPTIONS = [
   'Processional',
@@ -30,6 +31,7 @@ export const FuneralMusicList: React.FC<Props> = ({ packetId, funeralRecordId })
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const confirm = useConfirm();
 
   const load = async () => {
     setLoading(true);
@@ -80,7 +82,12 @@ export const FuneralMusicList: React.FC<Props> = ({ packetId, funeralRecordId })
   };
 
   const removeSong = async (id: string) => {
-    if (!window.confirm('Remove this song?')) return;
+    const ok = await confirm({
+      title: 'Remove this song?',
+      description: 'This action cannot be undone.',
+      confirmLabel: 'Remove',
+    });
+    if (!ok) return;
     const { error } = await (supabase as any).from('funeral_music').delete().eq('id', id);
     if (error) {
       toast.error(`Delete failed: ${error.message}`, { duration: 4000, position: 'bottom-center' });

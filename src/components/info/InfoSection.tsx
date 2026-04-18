@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 
 import { useInfoRecords } from '../../hooks/useInfoRecords'
 import { AddInfoForm } from './AddInfoForm'
+import { useConfirm } from '../../context/ConfirmDialogContext'
 
 interface InfoSectionProps {
   packetId: string
@@ -22,6 +23,7 @@ export function InfoSection({ packetId, scope }: InfoSectionProps) {
     deleteRecord,
     clearMessages,
   } = useInfoRecords(packetId, scope)
+  const confirm = useConfirm()
 
   useEffect(() => {
     loadRecords()
@@ -129,10 +131,12 @@ export function InfoSection({ packetId, scope }: InfoSectionProps) {
                   </p>
                 </div>
                 <button
-                  onClick={() => {
-                    if (window.confirm('Delete this record and any attached documents?')) {
-                      deleteRecord(record.id)
-                    }
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: 'Delete this record?',
+                      description: 'This will also remove any attached documents. This action cannot be undone.',
+                    })
+                    if (ok) deleteRecord(record.id)
                   }}
                   style={{ fontSize: 12, color: '#cc0000' }}
                   aria-label={`Delete ${record.title}`}

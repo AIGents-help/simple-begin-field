@@ -5,6 +5,23 @@ import { format } from 'date-fns';
 
 import { UploadedFileCard } from '../upload/UploadedFileCard';
 import { FileMetadata } from '../upload/types';
+import { formatHumanDate, isValidDisplayDate } from '@/lib/formatDate';
+
+const DATE_FIELD_KEYS = new Set([
+  'dob', 'date_of_birth', 'birthday',
+  'date_of_death', 'dod',
+  'expiryDate', 'expiry_date',
+  'issueDate', 'issue_date',
+  'marriageDate', 'marriage_date', 'dateOfMarriage',
+  'document_date',
+]);
+
+const renderEntryValue = (key: string, value: any): string => {
+  if (DATE_FIELD_KEYS.has(key)) {
+    return formatHumanDate(value);
+  }
+  return String(value);
+};
 
 interface InfoRecordDetailSheetProps {
   isOpen: boolean;
@@ -144,13 +161,14 @@ export const InfoRecordDetailSheet = ({
                   <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden divide-y divide-stone-50 shadow-sm">
                     {Object.entries(entryData).map(([key, value]) => {
                       if (value === null || value === undefined || value === '') return null;
+                      if (DATE_FIELD_KEYS.has(key) && !isValidDisplayDate(value)) return null;
                       return (
                         <div key={key} className="p-4 space-y-1">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
                             {formatKey(key)}
                           </label>
                           <p className="text-sm font-bold text-navy-muted">
-                            {String(value)}
+                            {renderEntryValue(key, value)}
                           </p>
                         </div>
                       );

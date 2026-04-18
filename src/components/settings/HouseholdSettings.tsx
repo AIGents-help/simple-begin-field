@@ -20,6 +20,7 @@ import { useAppContext } from '../../context/AppContext';
 import { inviteService } from '../../services/inviteService';
 import { packetService } from '../../services/packetService';
 import { PlanGate } from '../billing/PlanGate';
+import { useConfirm } from '../../context/ConfirmDialogContext';
 
 interface HouseholdSettingsProps {
   onBack: () => void;
@@ -27,6 +28,7 @@ interface HouseholdSettingsProps {
 
 export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) => {
   const { packet, user, refreshPacketData } = useAppContext();
+  const confirm = useConfirm();
   const [members, setMembers] = useState<any[]>([]);
   const [invites, setInvites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,13 +92,23 @@ export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) 
   };
 
   const handleRevokeInvite = async (id: string) => {
-    if (!confirm('Are you sure you want to revoke this invite?')) return;
+    const ok = await confirm({
+      title: 'Revoke this invite?',
+      description: 'The recipient will no longer be able to use this invitation link.',
+      confirmLabel: 'Revoke',
+    });
+    if (!ok) return;
     await inviteService.revokeInvite(id);
     fetchData();
   };
 
   const handleRemoveMember = async (id: string) => {
-    if (!confirm('Are you sure you want to remove this member? This will immediately revoke their access.')) return;
+    const ok = await confirm({
+      title: 'Remove this household member?',
+      description: 'They will immediately lose access. This action cannot be undone.',
+      confirmLabel: 'Remove',
+    });
+    if (!ok) return;
     await inviteService.removeMember(id);
     fetchData();
   };
@@ -105,7 +117,13 @@ export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) 
     if (!packet) return;
     const newMode = packet.household_mode === 'single' ? 'couple' : 'single';
     if (newMode === 'single' && members.length > 1) {
-      if (!confirm('Switching to single mode will not remove members, but will change how data is scoped. Continue?')) return;
+      const ok = await confirm({
+        title: 'Switch to single mode?',
+        description: 'Members are not removed, but data scoping will change. Continue?',
+        confirmLabel: 'Switch mode',
+        variant: 'warning',
+      });
+      if (!ok) return;
     }
     await packetService.updatePacket(packet.id, { household_mode: newMode });
     refreshPacketData();

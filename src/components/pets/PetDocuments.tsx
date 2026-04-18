@@ -3,6 +3,7 @@ import { Upload, Trash2, FileText, Loader2, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { documentService } from '@/services/documentService';
+import { useConfirm } from '@/context/ConfirmDialogContext';
 
 const PET_DOC_CATEGORIES: { key: string; label: string }[] = [
   { key: 'vaccination_records', label: 'Vaccination records' },
@@ -31,6 +32,7 @@ export const PetDocuments: React.FC<Props> = ({ packetId, petRecordId }) => {
   const [loading, setLoading] = useState(true);
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const confirm = useConfirm();
 
   const load = async () => {
     setLoading(true);
@@ -79,7 +81,11 @@ export const PetDocuments: React.FC<Props> = ({ packetId, petRecordId }) => {
   };
 
   const handleDelete = async (doc: DocRow) => {
-    if (!window.confirm(`Delete "${doc.file_name}"?`)) return;
+    const ok = await confirm({
+      title: 'Delete this document?',
+      description: `Delete "${doc.file_name}"? This action cannot be undone.`,
+    });
+    if (!ok) return;
     const { error } = await documentService.deleteDocument(doc.id, doc.file_path, doc.is_private);
     if (error) {
       toast.error(`Delete failed: ${error.message || 'Unknown error'}`, {

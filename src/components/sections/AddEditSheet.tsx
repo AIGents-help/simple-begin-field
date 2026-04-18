@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAppContext } from '../../context/AppContext';
 import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { sectionService } from '../../services/sectionService';
+import { useConfirm } from '../../context/ConfirmDialogContext';
 import { documentService } from '../../services/documentService';
 import { FileAttachmentField } from '../upload/FileAttachmentField';
 import { CategorySelector } from '../upload/CategorySelector';
@@ -34,6 +35,7 @@ export const AddEditSheet = ({
   categoryOptions?: CategoryOption[];
 }) => {
   const { activeTab, activeScope, currentPacket, profile, bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [isNA, setIsNA] = useState(false);
@@ -717,7 +719,11 @@ export const AddEditSheet = ({
             {initialData?.id && activeTab && (
               <button
                 onClick={async () => {
-                  if (!window.confirm('Delete this record? This cannot be undone.')) return;
+                  const ok = await confirm({
+                    title: 'Delete this record?',
+                    description: 'This action cannot be undone.',
+                  });
+                  if (!ok) return;
                   setLoading(true);
                   const { error } = await sectionService.deleteRecord(activeTab, initialData.id);
                   setLoading(false);

@@ -6,13 +6,23 @@ import { Home as HomeIcon } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { HomeInventoryVideo } from '../components/realestate/HomeInventoryVideo';
 import { sectionService } from '../services/sectionService';
+import { useConfirm } from '../context/ConfirmDialogContext';
 
 export const RealEstateSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const { currentPacket, activeScope, bumpCompletion } = useAppContext();
+  const confirm = useConfirm();
 
   const handleDelete = async (record: any, refresh: () => void) => {
     if (!record?.id) return;
-    if (!window.confirm(`Delete "${record.property_label || 'this property'}"? This cannot be undone.`)) return;
+    const ok = await confirm({
+
+      title: 'Delete this record?',
+
+      description: `Delete "${record.property_label || 'this property'}"? This action cannot be undone.`,
+
+    });
+
+    if (!ok) return;
     const { error } = await sectionService.deleteRecord('real-estate', record.id);
     if (error) {
       toast.error(`Failed to delete: ${error.message}`, { duration: 4000, position: 'bottom-center' });
