@@ -10,6 +10,7 @@ import { MedicationCard } from '../components/medical/MedicationCard';
 import { AllergyCard } from '../components/medical/AllergyCard';
 import { SurgicalHistoryCard } from '../components/medical/SurgicalHistoryCard';
 import { daysUntil } from '../components/medical/MedicalCardShell';
+import { LegacyMedicalRecordCard, isLegacyMedicalRecord } from '../components/medical/LegacyMedicalRecordCard';
 
 const draftMedical = (record_type: MedicalRecord['record_type'], scope: string, defaults: Partial<MedicalRecord> = {}): MedicalRecord => ({
   id: `draft-${crypto.randomUUID()}`,
@@ -105,10 +106,11 @@ export const MedicalSection: React.FC<Props> = ({ onRefresh }) => {
     return existing || draftMedical('emergency', scope, { provider_name: 'Emergency Medical Info' });
   }, [records, scope]);
 
-  const doctors = useMemo(() => records.filter((r) => r.record_type === 'doctor'), [records]);
-  const insurances = useMemo(() => records.filter((r) => r.record_type === 'insurance'), [records]);
-  const allergies = useMemo(() => records.filter((r) => r.record_type === 'allergy'), [records]);
-  const surgeries = useMemo(() => records.filter((r) => r.record_type === 'surgery'), [records]);
+  const legacyRecords = useMemo(() => records.filter((r) => isLegacyMedicalRecord(r)), [records]);
+  const doctors = useMemo(() => records.filter((r) => r.record_type === 'doctor' && !isLegacyMedicalRecord(r)), [records]);
+  const insurances = useMemo(() => records.filter((r) => r.record_type === 'insurance' && !isLegacyMedicalRecord(r)), [records]);
+  const allergies = useMemo(() => records.filter((r) => r.record_type === 'allergy' && !isLegacyMedicalRecord(r)), [records]);
+  const surgeries = useMemo(() => records.filter((r) => r.record_type === 'surgery' && !isLegacyMedicalRecord(r)), [records]);
 
   // Insurance expiry alerts (within 60 days)
   const expiringInsurance = useMemo(
