@@ -6,6 +6,7 @@ import { MemoryCard } from '../components/memories/MemoryCard';
 import { MemoryEntrySheet } from '../components/memories/MemoryEntrySheet';
 import { MemoryTypePicker } from '../components/memories/MemoryTypePicker';
 import type { MemoryEntryType } from '../config/memoryTypes';
+import { TemplateLauncher } from '../components/templates/TemplateLauncher';
 
 /**
  * Memories — letters, advice, photos, videos, voice notes, bucket lists,
@@ -71,6 +72,15 @@ export const MemoriesSection: React.FC = () => {
         <p className="text-sm text-stone-500">
           Letters, advice, photos, videos, and personal messages — meaningful things to leave behind for the people you love.
         </p>
+      </div>
+
+      <div className="mb-6">
+        <TemplateLauncher
+          templateType="letter_to_loved_ones"
+          title="Want a guided way to write a letter?"
+          description="The Letter to Loved Ones template walks you through reflections, values, gratitude, and forgiveness — a meaningful companion to your packet."
+          buttonLabel="Open Letter Template"
+        />
       </div>
 
       {loading ? (
