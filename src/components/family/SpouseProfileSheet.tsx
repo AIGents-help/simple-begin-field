@@ -144,6 +144,16 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
   const handleField = (field: string, value: any) => {
     setForm((prev: any) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
+    // Auto-expand the Marriage section when a status that needs more info is chosen
+    if (field === 'marital_status') {
+      const v = String(value || '').toLowerCase();
+      if (['divorced', 'separated', 'widowed'].includes(v)) {
+        setOpenSection('marriage');
+      }
+    }
+    if (field === 'is_deceased' && value) {
+      setOpenSection('lifecycle');
+    }
   };
 
   // Toggle "Same as my address" — pre-fills from the user's profile address if available
