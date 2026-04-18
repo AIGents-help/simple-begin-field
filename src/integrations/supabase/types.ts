@@ -420,6 +420,107 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_accounts: {
+        Row: {
+          admin_user_id: string
+          billing_email: string | null
+          company_logo_url: string | null
+          company_name: string
+          created_at: string
+          feature_tier: string
+          id: string
+          plan_key: string
+          seat_limit: number
+          stripe_payment_intent_id: string | null
+          total_paid: number | null
+          updated_at: string
+        }
+        Insert: {
+          admin_user_id: string
+          billing_email?: string | null
+          company_logo_url?: string | null
+          company_name: string
+          created_at?: string
+          feature_tier?: string
+          id?: string
+          plan_key: string
+          seat_limit?: number
+          stripe_payment_intent_id?: string | null
+          total_paid?: number | null
+          updated_at?: string
+        }
+        Update: {
+          admin_user_id?: string
+          billing_email?: string | null
+          company_logo_url?: string | null
+          company_name?: string
+          created_at?: string
+          feature_tier?: string
+          id?: string
+          plan_key?: string
+          seat_limit?: number
+          stripe_payment_intent_id?: string | null
+          total_paid?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      corporate_seats: {
+        Row: {
+          activated_at: string | null
+          corporate_account_id: string
+          created_at: string
+          id: string
+          invite_expires_at: string | null
+          invite_token: string | null
+          invited_at: string
+          invited_email: string
+          invited_name: string | null
+          revoked_at: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          activated_at?: string | null
+          corporate_account_id: string
+          created_at?: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          invited_at?: string
+          invited_email: string
+          invited_name?: string | null
+          revoked_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          activated_at?: string | null
+          corporate_account_id?: string
+          created_at?: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          invited_at?: string
+          invited_email?: string
+          invited_name?: string | null
+          revoked_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corporate_seats_corporate_account_id_fkey"
+            columns: ["corporate_account_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       couple_activity: {
         Row: {
           action_type: Database["public"]["Enums"]["couple_activity_action"]
@@ -1036,6 +1137,42 @@ export type Database = {
           },
         ]
       }
+      enterprise_leads: {
+        Row: {
+          company_name: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          estimated_seats: number | null
+          id: string
+          message: string | null
+          status: string
+        }
+        Insert: {
+          company_name: string
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          estimated_seats?: number | null
+          id?: string
+          message?: string | null
+          status?: string
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          estimated_seats?: number | null
+          id?: string
+          message?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       estate_liabilities: {
         Row: {
           balance: number
@@ -1232,6 +1369,98 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      family_plan_members: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          family_plan_id: string
+          id: string
+          invite_expires_at: string | null
+          invite_token: string | null
+          invited_at: string
+          invited_email: string
+          invited_name: string | null
+          removed_at: string | null
+          share_completion_pct: boolean | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          family_plan_id: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          invited_at?: string
+          invited_email: string
+          invited_name?: string | null
+          removed_at?: string | null
+          share_completion_pct?: boolean | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          family_plan_id?: string
+          id?: string
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          invited_at?: string
+          invited_email?: string
+          invited_name?: string | null
+          removed_at?: string | null
+          share_completion_pct?: boolean | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_plan_members_family_plan_id_fkey"
+            columns: ["family_plan_id"]
+            isOneToOne: false
+            referencedRelation: "family_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_plans: {
+        Row: {
+          created_at: string
+          feature_tier: string
+          id: string
+          owner_user_id: string
+          plan_key: string
+          seat_limit: number
+          stripe_payment_intent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          feature_tier?: string
+          id?: string
+          owner_user_id: string
+          plan_key: string
+          seat_limit?: number
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          feature_tier?: string
+          id?: string
+          owner_user_id?: string
+          plan_key?: string
+          seat_limit?: number
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       featured_professionals: {
         Row: {
@@ -1616,6 +1845,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      gift_codes: {
+        Row: {
+          code: string
+          created_at: string
+          delivered_at: string | null
+          delivery_date: string | null
+          expires_at: string
+          id: string
+          personal_message: string | null
+          plan_key: string
+          purchased_by_user_id: string | null
+          recipient_email: string | null
+          recipient_name: string | null
+          redeemed_at: string | null
+          redeemed_by_user_id: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          delivered_at?: string | null
+          delivery_date?: string | null
+          expires_at?: string
+          id?: string
+          personal_message?: string | null
+          plan_key: string
+          purchased_by_user_id?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          redeemed_at?: string | null
+          redeemed_by_user_id?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          delivered_at?: string | null
+          delivery_date?: string | null
+          expires_at?: string
+          id?: string
+          personal_message?: string | null
+          plan_key?: string
+          purchased_by_user_id?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          redeemed_at?: string | null
+          redeemed_by_user_id?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       health_score_history: {
         Row: {
@@ -4281,6 +4567,7 @@ export type Database = {
         }[]
       }
       current_user_role: { Args: never; Returns: string }
+      generate_gift_code: { Args: never; Returns: string }
       get_checkin_status: {
         Args: { p_user_id: string }
         Returns: {
@@ -4384,6 +4671,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      redeem_gift_code: { Args: { p_code: string }; Returns: Json }
       regenerate_emergency_token: { Args: never; Returns: string }
       run_inactivity_release_sweep: {
         Args: never
