@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadService } from '@/services/uploadService';
 import { useConfirm } from '@/context/ConfirmDialogContext';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface DeathCertificateUploadProps {
   packetId: string;
