@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
 import { useAppContext } from '@/context/AppContext';
 import { useConfirm } from '@/context/ConfirmDialogContext';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface HomeInventoryVideoProps {
   packetId: string;

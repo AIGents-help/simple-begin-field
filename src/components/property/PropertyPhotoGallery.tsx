@@ -3,6 +3,7 @@ import { Upload, Star, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { propertyPhotoService, type PropertyPhoto } from '@/services/propertyPhotoService';
 import { StorageImage } from '@/components/common/StorageImage';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface Props {
   packetId: string;

@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Loader2, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Image as ImageIcon, Plus, Trash2, Upload } from 'lucide-react';
 import { funeralPhotoService, FuneralPhoto } from '@/services/funeralPhotoService';
 import { supabase } from '@/integrations/supabase/client';
+import { useFileDropzone } from '@/hooks/useFileDropzone';
 
 interface Props {
   packetId: string;
