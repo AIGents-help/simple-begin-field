@@ -37,7 +37,16 @@ export const PersonalPropertyCard: React.FC<Props> = ({ record, onEdit, onDelete
   }, [record.id]);
 
   const value = fmtCurrency(record.appraised_value || record.estimated_value);
-  const title = record.title || record.item_name || 'Untitled item';
+  const isFirearm = record.category === 'Firearms & Weapons';
+  const title = isFirearm
+    ? [record.firearm_make, record.firearm_model].filter(Boolean).join(' ') || record.title || record.item_name || 'Untitled firearm'
+    : record.title || record.item_name || 'Untitled item';
+  const maskedSerial = (() => {
+    const s = record.firearm_serial_masked;
+    if (!s) return null;
+    const t = String(s);
+    return t.length <= 4 ? '••••' : `••••${t.slice(-4)}`;
+  })();
 
   return (
     <div className="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
