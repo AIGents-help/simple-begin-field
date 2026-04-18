@@ -155,6 +155,12 @@ export const PersonalInfoCard: React.FC = () => {
                           />
                         </Field>
                       ))}
+                      <Field label="Gender">
+                        <GenderSelect
+                          value={profile?.gender ?? ''}
+                          onChange={(v) => setField('gender', v)}
+                        />
+                      </Field>
                       <Field label="Nationality / citizenship">
                         <Input value={profile?.nationality ?? ''} onChange={(e) => setField('nationality', e.target.value)} />
                       </Field>
