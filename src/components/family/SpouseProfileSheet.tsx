@@ -430,7 +430,7 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                   </button>
                 </div>
                 <p className="text-[10px] text-stone-400 italic">
-                  Tip: Use the Info section to upload the certificate file itself, or the document attachment on this record after saving.
+                  Upload the actual certificate file in the Documents section below.
                 </p>
               </Section>
 
