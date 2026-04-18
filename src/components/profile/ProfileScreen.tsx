@@ -19,28 +19,48 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 // ── Edit Profile Modal ──
-const EditProfileModal = ({ isOpen, onClose, userId, currentName, email }: {
+const EditProfileModal = ({ isOpen, onClose, userId, currentName, currentAvatarPath, email }: {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
   currentName: string;
+  currentAvatarPath: string | null;
   email: string;
 }) => {
   const [fullName, setFullName] = useState('');
   const [saving, setSaving] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [photoPath, setPhotoPath] = useState<string | null>(null);
+  const [removed, setRemoved] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setFullName(currentName || '');
+      setPhotoPath(currentAvatarPath || null);
+      setPendingFile(null);
+      setRemoved(false);
     }
-  }, [isOpen, currentName]);
+  }, [isOpen, currentName, currentAvatarPath]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
+      let nextPath: string | null = photoPath;
+
+      // Upload new file if picked
+      if (pendingFile) {
+        const ext = pendingFile.name.split('.').pop() || 'jpg';
+        const path = `avatars/${userId}/${Date.now()}.${ext}`;
+        const { error: upErr } = await uploadService.uploadFile('packet-documents', path, pendingFile);
+        if (upErr) throw upErr;
+        nextPath = path;
+      } else if (removed) {
+        nextPath = null;
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: fullName.trim() })
+        .update({ full_name: fullName.trim(), avatar_path: nextPath })
         .eq('id', userId);
       if (error) throw error;
       toast.success('Profile updated', { duration: 3000, position: 'bottom-center' });
@@ -66,6 +86,16 @@ const EditProfileModal = ({ isOpen, onClose, userId, currentName, email }: {
             <X size={16} className="text-stone-500" />
           </button>
         </div>
+
+        <ProfilePhotoUploader
+          photoPath={removed ? null : photoPath}
+          pendingFile={pendingFile}
+          name={fullName || email}
+          onFileSelected={(f) => { setPendingFile(f); setRemoved(false); }}
+          onRemove={() => { setPendingFile(null); setPhotoPath(null); setRemoved(true); }}
+          size={96}
+          disabled={saving}
+        />
 
         <div className="space-y-3">
           <div className="space-y-1">
