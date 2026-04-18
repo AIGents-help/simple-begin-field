@@ -135,7 +135,7 @@ export const FuneralPhotoGallery: React.FC<Props> = ({ packetId, funeralRecordId
 
       <p className="text-xs text-stone-500 mb-3">
         Add photos for slideshows, programs, or memorial display. Images are compressed before
-        emailing to the funeral home.
+        emailing to the funeral home.{!isTouch && ' Drag & drop multiple files anywhere here.'}
       </p>
 
       {loading ? (
