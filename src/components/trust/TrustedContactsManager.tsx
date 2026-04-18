@@ -8,6 +8,9 @@ import {
 } from 'lucide-react';
 import { LifeStatusToggle } from '../common/LifeStatusToggle';
 import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
+import { PersonAvatar } from '../common/PersonAvatar';
+import { ProfilePhotoUploader } from '../common/ProfilePhotoUploader';
+import { uploadService } from '@/services/uploadService';
 
 interface TrustedContact {
   id: string;
@@ -28,6 +31,7 @@ interface TrustedContact {
   notify_on_updates: boolean;
   is_deceased?: boolean | null;
   date_of_death?: string | null;
+  photo_path?: string | null;
 }
 
 const SECTION_OPTIONS = [
@@ -74,6 +78,9 @@ export const TrustedContactsManager: React.FC = () => {
   const [grantingId, setGrantingId] = useState<string | null>(null);
   const [confirmGrantId, setConfirmGrantId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoCleared, setPhotoCleared] = useState(false);
+  const [editingPhotoPath, setEditingPhotoPath] = useState<string | null>(null);
 
   const loadContacts = useCallback(async () => {
     if (!user) return;
