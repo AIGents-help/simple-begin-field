@@ -20,6 +20,8 @@ import { useFederatedDefaults } from '../../hooks/useFederatedDefaults';
 import { PropertyPhotoGallery } from '../property/PropertyPhotoGallery';
 import { PropertyFamilyDatalist } from '../property/PropertyFamilyDatalist';
 import { MaskedInput } from '../common/MaskedInput';
+import { ProfilePhotoUploader } from '../common/ProfilePhotoUploader';
+import { uploadService } from '../../services/uploadService';
 
 // ---------------------------------------------------------------------------
 // Cross-section federation: snapshot which fields on a source record drive
@@ -157,6 +159,9 @@ export const AddEditSheet = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [initialAttachment, setInitialAttachment] = useState<FileMetadata | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Profile photo (used for person records: family non-spouse, advisors)
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+  const [profilePhotoCleared, setProfilePhotoCleared] = useState(false);
 
   // Determine if this is an entry-only form (no file upload)
   const isEntryOnly = initialData?.entryOnly === true || formData?.entryOnly === true;
