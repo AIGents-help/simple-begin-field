@@ -83,9 +83,32 @@ export const SectionScreenTemplate = ({
 
   return (
     <div className="p-6 pb-32">
-      <div className="mb-6">
-        <h2 className="text-2xl font-serif font-bold text-navy-muted mb-2">{config.label}</h2>
-        <p className="text-sm text-stone-500">{config.description}</p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-2xl font-serif font-bold text-navy-muted mb-2">{config.label}</h2>
+          <p className="text-sm text-stone-500">{config.description}</p>
+        </div>
+        {activeTab !== 'affiliate' && activeTab !== 'funeral' && currentPacket?.id && (
+          <div className="flex flex-wrap items-center gap-2">
+            {activeTab === 'medical' && (
+              <QuickDownloadButton
+                downloadType="emergency_medical"
+                packetId={currentPacket.id}
+                label="Emergency Card"
+                icon={HeartPulse}
+                variant="outline"
+              />
+            )}
+            <QuickDownloadButton
+              downloadType="section"
+              packetId={currentPacket.id}
+              sections={[activeTab]}
+              label="Download Section"
+              icon={FileDown}
+              variant="ghost"
+            />
+          </div>
+        )}
       </div>
 
       <ScopeToggle />
