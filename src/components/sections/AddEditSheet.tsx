@@ -680,6 +680,24 @@ export const AddEditSheet = ({
           status: isNA ? 'not_applicable' : 'completed',
           is_na: isNA
         };
+        // Strip UI-only meta fields (headers, notes, warnings) that begin with "__"
+        Object.keys(record).forEach((k) => {
+          if (k.startsWith('__')) delete record[k];
+        });
+        // Property: coerce Yes/No strings to booleans for boolean columns and empty dates to null
+        if (activeTab === 'property') {
+          const boolKeys = [
+            'insurance_rider', 'has_certificate_of_authenticity',
+            'firearm_is_loaded', 'firearm_is_registered', 'firearm_ccw_permit',
+          ];
+          boolKeys.forEach((k) => {
+            if (record[k] === 'Yes') record[k] = true;
+            else if (record[k] === 'No') record[k] = false;
+            else if (record[k] === '') record[k] = null;
+          });
+          const dateKeys = ['last_appraisal_date', 'firearm_purchase_date', 'firearm_ccw_expiration'];
+          dateKeys.forEach((k) => { if (record[k] === '') record[k] = null; });
+        }
         // Family: derive the legacy `name` column from first + last so the NOT NULL constraint is satisfied
         if (activeTab === 'family') {
           const composed = [formData.first_name, formData.last_name].filter(Boolean).join(' ').trim();
