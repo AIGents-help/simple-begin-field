@@ -58,4 +58,62 @@ export const healthScoreService = {
     if (error) throw error;
     return ((data || []) as any[]).reverse().map((r) => ({ total_score: r.total_score, recorded_at: r.recorded_at }));
   },
+
+  async adminStats(): Promise<{
+    averageScore: number;
+    totalPackets: number;
+    distribution: Record<string, number>;
+    criticalUsers: Array<{
+      user_id: string;
+      packet_id: string;
+      total_score: number;
+      email: string | null;
+      display_name: string | null;
+      calculated_at: string;
+    }>;
+  }> {
+    // Pull all current scores (admin RLS allows this via is_admin())
+    const { data: scores, error } = await supabase
+      .from('health_scores' as any)
+      .select('user_id, packet_id, total_score, calculated_at')
+      .order('total_score', { ascending: true });
+    if (error) throw error;
+
+    const rows = (scores || []) as any[];
+    const totalPackets = rows.length;
+    const averageScore = totalPackets === 0
+      ? 0
+      : Math.round(rows.reduce((sum, r) => sum + (r.total_score || 0), 0) / totalPackets);
+
+    const distribution: Record<string, number> = { critical: 0, at_risk: 0, good: 0, strong: 0, excellent: 0 };
+    for (const r of rows) {
+      const tier = tierForScore(r.total_score || 0).key;
+      distribution[tier]++;
+    }
+
+    // Critical users (score < 25) — fetch profile info
+    const critical = rows.filter((r) => (r.total_score || 0) < 25);
+    let criticalUsers: any[] = [];
+    if (critical.length > 0) {
+      const userIds = critical.map((r) => r.user_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, email, full_name')
+        .in('id', userIds);
+      const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
+      criticalUsers = critical.map((r) => {
+        const prof = profileMap.get(r.user_id) as any;
+        return {
+          user_id: r.user_id,
+          packet_id: r.packet_id,
+          total_score: r.total_score,
+          email: prof?.email ?? null,
+          display_name: prof?.full_name ?? null,
+          calculated_at: r.calculated_at,
+        };
+      });
+    }
+
+    return { averageScore, totalPackets, distribution, criticalUsers };
+  },
 };
