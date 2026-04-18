@@ -19,6 +19,7 @@ import { AutoFilledIndicator } from '../common/AutoFilledIndicator';
 import { useFederatedDefaults } from '../../hooks/useFederatedDefaults';
 import { PropertyPhotoGallery } from '../property/PropertyPhotoGallery';
 import { PropertyFamilyDatalist } from '../property/PropertyFamilyDatalist';
+import { MaskedInput } from '../common/MaskedInput';
 
 // ---------------------------------------------------------------------------
 // Cross-section federation: snapshot which fields on a source record drive
@@ -118,6 +119,13 @@ const RECORD_DOC_SLOTS: Record<string, { table: string; slots: { category: strin
     ],
   },
 };
+
+// Extra document slots shown only when category = "Firearms & Weapons"
+const FIREARM_DOC_SLOTS: { category: string; label: string; description?: string }[] = [
+  { category: 'firearm_bill_of_sale', label: 'Bill of Sale / Receipt', description: 'Proof of purchase or transfer' },
+  { category: 'firearm_registration', label: 'Registration Certificate', description: 'State or federal registration' },
+  { category: 'firearm_ccw_permit', label: 'Concealed Carry Permit', description: 'CCW or carry license' },
+];
 
 export const AddEditSheet = ({ 
   isOpen, 
@@ -464,8 +472,8 @@ export const AddEditSheet = ({
           { name: 'who_should_access', label: 'Who Should Access', placeholder: 'Who needs this after you?' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
-      case 'property':
-        return [
+      case 'property': {
+        const baseFields: any[] = [
           { name: 'title', label: 'Item Name / Title', required: true, placeholder: "e.g. Grandmother's diamond ring" },
           { name: 'category', label: 'Category', type: 'select', options: [
             'Jewelry & Watches', 'Art & Paintings', 'Collectibles & Memorabilia',
@@ -506,6 +514,49 @@ export const AddEditSheet = ({
           { name: 'special_handling', label: 'Special Handling Instructions', type: 'textarea', placeholder: 'Fragile, climate-sensitive, etc.', rows: 2 },
           { name: 'notes', label: 'Additional Notes', type: 'textarea', placeholder: 'Anything else...', rows: 2 },
         ];
+
+        if (formData.category === 'Firearms & Weapons') {
+          const firearmFields: any[] = [
+            { name: '__firearm_id_header', type: 'header', label: 'Firearm Identification' },
+            { name: 'firearm_type', label: 'Firearm Type', type: 'select', options: ['Handgun', 'Rifle', 'Shotgun', 'Antique', 'Other'] },
+            { name: 'firearm_make', label: 'Make / Manufacturer', required: true, placeholder: 'e.g. Smith & Wesson' },
+            { name: 'firearm_model', label: 'Model', required: true, placeholder: 'e.g. M&P Shield 9mm' },
+            { name: 'firearm_caliber', label: 'Caliber / Gauge', placeholder: 'e.g. 9mm, .45 ACP, 12 gauge' },
+            { name: 'firearm_serial_masked', label: 'Serial Number', required: true, type: 'masked', placeholder: 'Serial number — stored securely' },
+            { name: 'firearm_finish', label: 'Finish / Color', placeholder: 'e.g. Blued, Stainless, Matte black' },
+            { name: 'firearm_barrel_length', label: 'Barrel Length', placeholder: 'e.g. 4 inches' },
+            { name: 'firearm_action_type', label: 'Action Type', type: 'select', options: ['Semi-auto', 'Bolt', 'Lever', 'Pump', 'Revolver', 'Single shot'] },
+            { name: 'firearm_year_manufactured', label: 'Year Manufactured', type: 'number', placeholder: 'e.g. 1998' },
+            { name: 'firearm_country_origin', label: 'Country of Origin', placeholder: 'e.g. USA, Germany, Italy' },
+            { name: '__firearm_photo_note', type: 'note', label: 'Photograph both sides, the serial number, and any unique markings.' },
+            { name: '__firearm_storage_header', type: 'header', label: 'Storage & Access' },
+            { name: 'firearm_storage_location', label: 'Storage Location', placeholder: 'e.g. Gun safe in master closet' },
+            { name: 'firearm_safe_code_masked', label: 'Safe Combination / Access Code', type: 'masked', placeholder: 'Combination — stored securely' },
+            { name: 'firearm_who_has_access', label: 'Who Has Access', type: 'textarea', placeholder: 'Names of people who know how to access', rows: 2 },
+            { name: 'firearm_is_loaded', label: 'Is It Loaded?', type: 'select', options: ['No', 'Yes'] },
+            { name: 'firearm_ammunition_location', label: 'Ammunition Storage Location', placeholder: 'Where ammo is kept' },
+            { name: '__firearm_legal_header', type: 'header', label: 'Legal & Ownership' },
+            { name: 'firearm_purchased_from_type', label: 'Purchased From', type: 'select', options: ['Dealer', 'Private sale', 'Auction', 'Inherited', 'Gifted'] },
+            { name: 'firearm_ffl_dealer', label: 'FFL Dealer Name', placeholder: 'If purchased through licensed dealer' },
+            { name: 'firearm_purchase_date', label: 'Date of Purchase', type: 'date' },
+            { name: 'firearm_is_registered', label: 'Is It Registered?', type: 'select', options: ['No', 'Yes'] },
+            { name: 'firearm_registration_state', label: 'Registration State', placeholder: 'State where registered' },
+            { name: 'firearm_transfer_restrictions', label: 'Transfer Restrictions', type: 'textarea', placeholder: 'Any noted transfer restrictions...', rows: 2 },
+            { name: '__firearm_permit_header', type: 'header', label: 'License & Permits' },
+            { name: 'firearm_ccw_permit', label: 'Concealed Carry Permit', type: 'select', options: ['No', 'Yes'] },
+            { name: 'firearm_ccw_state', label: 'Permit State', placeholder: 'State that issued the permit' },
+            { name: 'firearm_ccw_expiration', label: 'Permit Expiration Date', type: 'date' },
+            { name: '__firearm_disposition_header', type: 'header', label: 'Firearm Disposition Instructions' },
+            { name: '__firearm_legal_warning', type: 'warning', label: 'Firearm transfers must comply with federal and state law — consult an attorney before transferring.' },
+            { name: 'firearm_disposition_action', label: 'What Should Happen To This Firearm', type: 'select', options: ['Transfer to family member', 'Sell through licensed dealer', 'Surrender to law enforcement', 'Per my Will'] },
+            { name: 'firearm_disposition_recipient', label: 'Recipient (if transferring)', placeholder: 'Family member name', list: 'family-recipients' },
+            { name: 'firearm_attorney_to_contact', label: 'Attorney to Contact', placeholder: 'Attorney name & phone' },
+            { name: 'firearm_special_instructions', label: 'Special Instructions', type: 'textarea', placeholder: 'Any additional instructions for disposition...', rows: 3 },
+          ];
+          return [...baseFields, ...firearmFields];
+        }
+        return baseFields;
+      }
       case 'pets':
         return [
           { name: 'pet_name', label: 'Pet Name', required: true, placeholder: 'e.g. Buddy' },
@@ -629,6 +680,24 @@ export const AddEditSheet = ({
           status: isNA ? 'not_applicable' : 'completed',
           is_na: isNA
         };
+        // Strip UI-only meta fields (headers, notes, warnings) that begin with "__"
+        Object.keys(record).forEach((k) => {
+          if (k.startsWith('__')) delete record[k];
+        });
+        // Property: coerce Yes/No strings to booleans for boolean columns and empty dates to null
+        if (activeTab === 'property') {
+          const boolKeys = [
+            'insurance_rider', 'has_certificate_of_authenticity',
+            'firearm_is_loaded', 'firearm_is_registered', 'firearm_ccw_permit',
+          ];
+          boolKeys.forEach((k) => {
+            if (record[k] === 'Yes') record[k] = true;
+            else if (record[k] === 'No') record[k] = false;
+            else if (record[k] === '') record[k] = null;
+          });
+          const dateKeys = ['last_appraisal_date', 'firearm_purchase_date', 'firearm_ccw_expiration'];
+          dateKeys.forEach((k) => { if (record[k] === '') record[k] = null; });
+        }
         // Family: derive the legacy `name` column from first + last so the NOT NULL constraint is satisfied
         if (activeTab === 'family') {
           const composed = [formData.first_name, formData.last_name].filter(Boolean).join(' ').trim();
@@ -962,6 +1031,31 @@ export const AddEditSheet = ({
                         return true;
                       })
                       .map((field) => {
+                        // Render section header within the field stream
+                        if (field.type === 'header') {
+                          return (
+                            <div key={field.name} className="pt-4 pb-1 border-t border-stone-200 first:border-t-0 first:pt-2">
+                              <h3 className="text-xs font-bold uppercase tracking-widest text-navy-muted">{field.label}</h3>
+                            </div>
+                          );
+                        }
+                        // Render an inline informational note (e.g. photo prompt)
+                        if (field.type === 'note') {
+                          return (
+                            <div key={field.name} className="text-[11px] text-stone-500 italic px-1 -mt-1">
+                              {field.label}
+                            </div>
+                          );
+                        }
+                        // Render a legal/safety warning callout
+                        if (field.type === 'warning') {
+                          return (
+                            <div key={field.name} className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] font-semibold text-amber-800 leading-snug">
+                              ⚠️ {field.label}
+                            </div>
+                          );
+                        }
+
                         const origin = autoFilledOrigins[field.name];
                         const clearOrigin = () => {
                           if (!origin) return;
@@ -1004,6 +1098,13 @@ export const AddEditSheet = ({
                               <option key={opt} value={opt}>{opt}</option>
                             ))}
                           </select>
+                        ) : field.type === 'masked' ? (
+                          <MaskedInput
+                            value={formData[field.name] || ''}
+                            onChange={handleChange}
+                            placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
+                            disabled={loading}
+                          />
                         ) : (
                           <input
                             type={field.type || 'text'}
@@ -1068,6 +1169,19 @@ export const AddEditSheet = ({
                             label={slot.label}
                             description={slot.description}
                             isPrivate={activeTab === 'medical'}
+                          />
+                        ))}
+                        {/* Firearm-specific document slots */}
+                        {activeTab === 'property' && formData.category === 'Firearms & Weapons' && FIREARM_DOC_SLOTS.map((slot) => (
+                          <RecordDocumentUpload
+                            key={slot.category}
+                            packetId={currentPacket.id}
+                            relatedTable={RECORD_DOC_SLOTS.property.table}
+                            relatedRecordId={initialData?.id ?? null}
+                            category={slot.category}
+                            label={slot.label}
+                            description={slot.description}
+                            isPrivate={true}
                           />
                         ))}
                       </div>

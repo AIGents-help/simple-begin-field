@@ -1723,6 +1723,36 @@ export type Database = {
           disposition_action: string | null
           estimated_sale_price: number | null
           estimated_value: number | null
+          firearm_action_type: string | null
+          firearm_ammunition_location: string | null
+          firearm_attorney_to_contact: string | null
+          firearm_barrel_length: string | null
+          firearm_caliber: string | null
+          firearm_ccw_expiration: string | null
+          firearm_ccw_permit: boolean | null
+          firearm_ccw_state: string | null
+          firearm_country_origin: string | null
+          firearm_disposition_action: string | null
+          firearm_disposition_recipient: string | null
+          firearm_ffl_dealer: string | null
+          firearm_finish: string | null
+          firearm_is_loaded: boolean | null
+          firearm_is_registered: boolean | null
+          firearm_make: string | null
+          firearm_model: string | null
+          firearm_purchase_date: string | null
+          firearm_purchased_from_type: string | null
+          firearm_registration_state: string | null
+          firearm_safe_code_encrypted: string | null
+          firearm_safe_code_masked: string | null
+          firearm_serial_encrypted: string | null
+          firearm_serial_masked: string | null
+          firearm_special_instructions: string | null
+          firearm_storage_location: string | null
+          firearm_transfer_restrictions: string | null
+          firearm_type: string | null
+          firearm_who_has_access: string | null
+          firearm_year_manufactured: number | null
           has_certificate_of_authenticity: boolean | null
           id: string
           insurance_company: string | null
@@ -1763,6 +1793,36 @@ export type Database = {
           disposition_action?: string | null
           estimated_sale_price?: number | null
           estimated_value?: number | null
+          firearm_action_type?: string | null
+          firearm_ammunition_location?: string | null
+          firearm_attorney_to_contact?: string | null
+          firearm_barrel_length?: string | null
+          firearm_caliber?: string | null
+          firearm_ccw_expiration?: string | null
+          firearm_ccw_permit?: boolean | null
+          firearm_ccw_state?: string | null
+          firearm_country_origin?: string | null
+          firearm_disposition_action?: string | null
+          firearm_disposition_recipient?: string | null
+          firearm_ffl_dealer?: string | null
+          firearm_finish?: string | null
+          firearm_is_loaded?: boolean | null
+          firearm_is_registered?: boolean | null
+          firearm_make?: string | null
+          firearm_model?: string | null
+          firearm_purchase_date?: string | null
+          firearm_purchased_from_type?: string | null
+          firearm_registration_state?: string | null
+          firearm_safe_code_encrypted?: string | null
+          firearm_safe_code_masked?: string | null
+          firearm_serial_encrypted?: string | null
+          firearm_serial_masked?: string | null
+          firearm_special_instructions?: string | null
+          firearm_storage_location?: string | null
+          firearm_transfer_restrictions?: string | null
+          firearm_type?: string | null
+          firearm_who_has_access?: string | null
+          firearm_year_manufactured?: number | null
           has_certificate_of_authenticity?: boolean | null
           id?: string
           insurance_company?: string | null
@@ -1803,6 +1863,36 @@ export type Database = {
           disposition_action?: string | null
           estimated_sale_price?: number | null
           estimated_value?: number | null
+          firearm_action_type?: string | null
+          firearm_ammunition_location?: string | null
+          firearm_attorney_to_contact?: string | null
+          firearm_barrel_length?: string | null
+          firearm_caliber?: string | null
+          firearm_ccw_expiration?: string | null
+          firearm_ccw_permit?: boolean | null
+          firearm_ccw_state?: string | null
+          firearm_country_origin?: string | null
+          firearm_disposition_action?: string | null
+          firearm_disposition_recipient?: string | null
+          firearm_ffl_dealer?: string | null
+          firearm_finish?: string | null
+          firearm_is_loaded?: boolean | null
+          firearm_is_registered?: boolean | null
+          firearm_make?: string | null
+          firearm_model?: string | null
+          firearm_purchase_date?: string | null
+          firearm_purchased_from_type?: string | null
+          firearm_registration_state?: string | null
+          firearm_safe_code_encrypted?: string | null
+          firearm_safe_code_masked?: string | null
+          firearm_serial_encrypted?: string | null
+          firearm_serial_masked?: string | null
+          firearm_special_instructions?: string | null
+          firearm_storage_location?: string | null
+          firearm_transfer_restrictions?: string | null
+          firearm_type?: string | null
+          firearm_who_has_access?: string | null
+          firearm_year_manufactured?: number | null
           has_certificate_of_authenticity?: boolean | null
           id?: string
           insurance_company?: string | null
