@@ -103,6 +103,12 @@ export const FuneralPhotoGallery: React.FC<Props> = ({ packetId, funeralRecordId
         isDragging ? 'border-amber-500 border-2 ring-4 ring-amber-200' : 'border-stone-200'
       }`}
     >
+      {isDragging && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-amber-50/95 rounded-2xl pointer-events-none">
+          <Upload size={32} className="text-amber-600" />
+          <p className="font-bold text-amber-700">Drop photos to upload</p>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <ImageIcon size={18} className="text-navy-muted" />
