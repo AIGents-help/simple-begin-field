@@ -1153,6 +1153,19 @@ export const AddEditSheet = ({
                             isPrivate={activeTab === 'medical'}
                           />
                         ))}
+                        {/* Firearm-specific document slots */}
+                        {activeTab === 'property' && formData.category === 'Firearms & Weapons' && FIREARM_DOC_SLOTS.map((slot) => (
+                          <RecordDocumentUpload
+                            key={slot.category}
+                            packetId={currentPacket.id}
+                            relatedTable={RECORD_DOC_SLOTS.property.table}
+                            relatedRecordId={initialData?.id ?? null}
+                            category={slot.category}
+                            label={slot.label}
+                            description={slot.description}
+                            isPrivate={true}
+                          />
+                        ))}
                       </div>
                     )}
                   </>
