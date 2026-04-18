@@ -2382,6 +2382,7 @@ export type Database = {
           id: string
           last_checkin_acknowledged_at: string | null
           last_checkin_sent_at: string | null
+          last_login_at: string | null
           legal_version_accepted: string | null
           role: string | null
           updated_at: string | null
@@ -2397,6 +2398,7 @@ export type Database = {
           id: string
           last_checkin_acknowledged_at?: string | null
           last_checkin_sent_at?: string | null
+          last_login_at?: string | null
           legal_version_accepted?: string | null
           role?: string | null
           updated_at?: string | null
@@ -2412,6 +2414,7 @@ export type Database = {
           id?: string
           last_checkin_acknowledged_at?: string | null
           last_checkin_sent_at?: string | null
+          last_login_at?: string | null
           legal_version_accepted?: string | null
           role?: string | null
           updated_at?: string | null
@@ -3311,6 +3314,15 @@ export type Database = {
       }
       is_packet_member: { Args: { p_id: string }; Returns: boolean }
       is_professional: { Args: never; Returns: boolean }
+      run_inactivity_release_sweep: {
+        Args: never
+        Returns: {
+          owner_id: string
+          packet_id: string
+          released_contact_id: string
+        }[]
+      }
+      touch_last_login: { Args: never; Returns: undefined }
       validate_referral_code: {
         Args: { code_input: string }
         Returns: {
