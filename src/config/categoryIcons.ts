@@ -78,6 +78,16 @@ export function getCategoryIcon(section: SectionId | string, record: any): Lucid
       if (has('video', 'inventory')) return Video;
       return Home;
     }
+    case 'investments': {
+      if (has('crypto', 'bitcoin', 'ethereum', 'coinbase', 'binance', 'kraken')) return KeyRound;
+      if (has('private equity', 'angel', 'startup', 'venture')) return Building2;
+      if (has('hedge')) return TrendingUp;
+      if (has('trust')) return Building;
+      if (has('joint')) return Users;
+      if (has('custodial', 'utma')) return Baby;
+      if (has('managed', 'portfolio')) return Briefcase;
+      return TrendingUp;
+    }
     case 'retirement': {
       if (has('401', 'ira', 'roth')) return PiggyBank;
       if (has('pension')) return Briefcase;

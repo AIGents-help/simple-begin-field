@@ -11,6 +11,7 @@ export const sectionService = {
     'family': 'family_members',
     'real-estate': 'real_estate_records',
     'banking': 'banking_records',
+    'investments': 'investment_records',
     'retirement': 'retirement_records',
     'vehicles': 'vehicle_records',
     'advisors': 'advisor_records',

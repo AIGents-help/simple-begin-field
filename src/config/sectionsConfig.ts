@@ -13,7 +13,8 @@ import {
   Lock,
   Activity,
   Share2,
-  Sparkles
+  Sparkles,
+  TrendingUp
 } from 'lucide-react';
 import { Section, SectionId } from './types';
 
@@ -56,6 +57,14 @@ export const SECTIONS_CONFIG: Section[] = [
     icon: CreditCard, 
     description: 'Bank account records and related notes.',
     emptyStateText: 'No bank accounts added yet.',
+    addButtonLabel: 'Add Account'
+  },
+  {
+    id: 'investments',
+    label: 'Investments',
+    icon: TrendingUp,
+    description: 'Brokerage, crypto, private equity, and other investment accounts.',
+    emptyStateText: 'No investment accounts added yet.',
     addButtonLabel: 'Add Account'
   },
   { 

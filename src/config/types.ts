@@ -6,6 +6,7 @@ export type SectionId =
   | 'medical'
   | 'real-estate' 
   | 'banking' 
+  | 'investments'
   | 'retirement' 
   | 'vehicles' 
   | 'advisors' 
