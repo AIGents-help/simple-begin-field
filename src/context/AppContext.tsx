@@ -194,6 +194,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const { data: { subscription } } = authService.onAuthStateChange((nextUser, event) => {
       void hydrateUserState(nextUser);
 
+      // Phase 3: bump last_login_at to power inactivity-based trusted-contact release
+      if (nextUser && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+        supabase.rpc('touch_last_login' as any).then(({ error }) => {
+          if (error) console.error('touch_last_login failed:', error);
+        });
+      }
+
       // Enroll new signups in Loops welcome sequence
       if (event === 'SIGNED_IN' && nextUser) {
         const seenKey = `sp_loops_synced_${nextUser.id}`;
