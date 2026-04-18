@@ -105,13 +105,20 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
       {viewMode === 'list' ? (
         <SectionScreenTemplate
           onAddClick={(file, data, options) => {
+            // Family relationship entries (Parent, Child, Sibling, etc.) must use the
+            // full structured form — strip `entryOnly` which would otherwise force the
+            // generic Title/Notes layout.
+            const cleaned = data ? { ...data } : data;
+            if (cleaned && cleaned.relationship) {
+              delete cleaned.entryOnly;
+            }
             // If the prefilled data already says Spouse, route to the rich sheet
-            if (data?.relationship && (data.relationship as string).toLowerCase() === 'spouse') {
-              setEditingSpouse(data);
+            if (cleaned?.relationship && (cleaned.relationship as string).toLowerCase() === 'spouse') {
+              setEditingSpouse(cleaned);
               setSpouseSheetOpen(true);
               return;
             }
-            onAddClick(file, data, options);
+            onAddClick(file, cleaned, options);
           }}
           onRefresh={(fn) => {
             refreshRef.current = fn;
