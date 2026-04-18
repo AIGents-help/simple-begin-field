@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, ArrowRight, Check, Home, Star, Zap, Users, Building2, Gift, User as UserIcon, HeartHandshake } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Home, Star, Zap, Users, Building2, Gift, User as UserIcon, HeartHandshake, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { PUBLIC_PLANS, getPlansByCategory, PricingPlan, PlanCategory } from '../../config/pricingConfig';
 import { useAppContext } from '../../context/AppContext';
+import { supabase } from '../../integrations/supabase/client';
 import { CheckoutButton } from './CheckoutButton';
 import { GiftPurchaseModal } from './GiftPurchaseModal';
 
