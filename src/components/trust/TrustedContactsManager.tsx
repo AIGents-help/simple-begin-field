@@ -124,46 +124,71 @@ export const TrustedContactsManager: React.FC = () => {
     }
     setSaving(true);
     try {
+      // Determine the packet id we will use for the photo path
+      const targetPacketId = editingId
+        ? (contacts.find((c) => c.id === editingId)?.packet_id || (await getPacketId()))
+        : await getPacketId();
+
+      // Upload new photo if one was selected
+      let nextPhotoPath: string | null | undefined = undefined;
+      if (photoFile && targetPacketId) {
+        const safe = photoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const ts = Date.now();
+        const recIdHint = editingId || 'new';
+        const path = `${targetPacketId}/trusted-contacts/${recIdHint}/profile_${ts}_${safe}`;
+        const { error: upErr } = await uploadService.uploadFile('packet-documents', path, photoFile);
+        if (upErr) throw new Error(upErr.message || 'Photo upload failed');
+        nextPhotoPath = path;
+      } else if (photoCleared) {
+        nextPhotoPath = null;
+      }
+
       if (editingId) {
+        const updatePayload: any = {
+          contact_name: form.contact_name.trim(),
+          contact_email: form.contact_email.trim(),
+          contact_phone: form.contact_phone.trim() || null,
+          relationship: form.relationship || null,
+          access_level: form.access_level,
+          notes: form.notes.trim() || null,
+          assigned_sections: form.assigned_sections,
+          notify_on_updates: form.notify_on_updates,
+          updated_at: new Date().toISOString(),
+        };
+        if (nextPhotoPath !== undefined) updatePayload.photo_path = nextPhotoPath;
         const { error } = await supabase
           .from('trusted_contacts')
-          .update({
-            contact_name: form.contact_name.trim(),
-            contact_email: form.contact_email.trim(),
-            contact_phone: form.contact_phone.trim() || null,
-            relationship: form.relationship || null,
-            access_level: form.access_level,
-            notes: form.notes.trim() || null,
-            assigned_sections: form.assigned_sections,
-            notify_on_updates: form.notify_on_updates,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updatePayload)
           .eq('id', editingId);
         if (error) throw error;
         toast.success('Contact updated');
       } else {
-        const packetId = await getPacketId();
-        if (!packetId) return;
+        if (!targetPacketId) return;
+        const insertPayload: any = {
+          packet_id: targetPacketId,
+          user_id: user!.id,
+          contact_name: form.contact_name.trim(),
+          contact_email: form.contact_email.trim(),
+          contact_phone: form.contact_phone.trim() || null,
+          relationship: form.relationship || null,
+          access_level: form.access_level,
+          notes: form.notes.trim() || null,
+          assigned_sections: form.assigned_sections,
+          notify_on_updates: form.notify_on_updates,
+        };
+        if (nextPhotoPath) insertPayload.photo_path = nextPhotoPath;
         const { error } = await supabase
           .from('trusted_contacts')
-          .insert({
-            packet_id: packetId,
-            user_id: user!.id,
-            contact_name: form.contact_name.trim(),
-            contact_email: form.contact_email.trim(),
-            contact_phone: form.contact_phone.trim() || null,
-            relationship: form.relationship || null,
-            access_level: form.access_level,
-            notes: form.notes.trim() || null,
-            assigned_sections: form.assigned_sections,
-            notify_on_updates: form.notify_on_updates,
-          });
+          .insert(insertPayload);
         if (error) throw error;
         toast.success('Trusted contact added');
       }
       setModalOpen(false);
       setEditingId(null);
       setForm(emptyForm);
+      setPhotoFile(null);
+      setPhotoCleared(false);
+      setEditingPhotoPath(null);
       await loadContacts();
     } catch (err: any) {
       console.error('Save trusted contact error:', err);
