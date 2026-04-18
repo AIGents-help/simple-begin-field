@@ -138,3 +138,44 @@ export const FileAttachmentField = ({
     </div>
   );
 };
+
+const EmptyDropzone: React.FC<{
+  onPick: () => void;
+  onFile: (file: File) => void;
+  disabled?: boolean;
+}> = ({ onPick, onFile, disabled }) => {
+  const { isDragging, isTouch, dropzoneProps } = useFileDropzone({
+    onFiles: (files) => files[0] && onFile(files[0]),
+    disabled,
+    multiple: false,
+  });
+  return (
+    <button
+      type="button"
+      onClick={onPick}
+      disabled={disabled}
+      {...dropzoneProps}
+      className={`w-full p-6 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center gap-2 bg-white transition-all disabled:opacity-50 min-h-[140px] ${
+        isDragging
+          ? 'border-solid border-amber-500 bg-amber-50 text-amber-700 scale-[1.01]'
+          : 'border-stone-200 text-stone-400 hover:border-stone-300'
+      }`}
+    >
+      <div
+        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+          isDragging ? 'bg-amber-500 text-white' : 'bg-stone-50 text-stone-300'
+        }`}
+      >
+        {isDragging ? <Upload size={20} /> : <Plus size={24} />}
+      </div>
+      <span className="font-bold text-sm">
+        {isDragging ? 'Drop to upload' : isTouch ? 'Attach a document' : 'Drag & drop your file here'}
+      </span>
+      {!isDragging && (
+        <span className="text-[11px] text-stone-500">{isTouch ? 'Tap to browse' : 'or tap to browse'}</span>
+      )}
+      <span className="text-[10px] uppercase tracking-widest font-bold opacity-60">PDF, DOC, or Image · Max 10MB</span>
+    </button>
+  );
+};
+
