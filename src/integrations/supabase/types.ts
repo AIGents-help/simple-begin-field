@@ -189,12 +189,14 @@ export type Database = {
           account_number_encrypted: string | null
           account_number_masked: string | null
           account_type: string | null
+          beneficiary_notes: string | null
           category: string | null
           contact_info: string | null
           created_at: string | null
           id: string
           institution: string
           is_na: boolean | null
+          joint_account_holder: string | null
           notes: string | null
           online_login_instructions: string | null
           packet_id: string | null
@@ -208,12 +210,14 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          beneficiary_notes?: string | null
           category?: string | null
           contact_info?: string | null
           created_at?: string | null
           id?: string
           institution: string
           is_na?: boolean | null
+          joint_account_holder?: string | null
           notes?: string | null
           online_login_instructions?: string | null
           packet_id?: string | null
@@ -227,12 +231,14 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          beneficiary_notes?: string | null
           category?: string | null
           contact_info?: string | null
           created_at?: string | null
           id?: string
           institution?: string
           is_na?: boolean | null
+          joint_account_holder?: string | null
           notes?: string | null
           online_login_instructions?: string | null
           packet_id?: string | null
@@ -739,6 +745,7 @@ export type Database = {
       funeral_records: {
         Row: {
           additional_instructions: string | null
+          attorney_to_notify: string | null
           burial_or_cremation: string | null
           category: string | null
           cemetery_plot_details: string | null
@@ -769,6 +776,7 @@ export type Database = {
         }
         Insert: {
           additional_instructions?: string | null
+          attorney_to_notify?: string | null
           burial_or_cremation?: string | null
           category?: string | null
           cemetery_plot_details?: string | null
@@ -799,6 +807,7 @@ export type Database = {
         }
         Update: {
           additional_instructions?: string | null
+          attorney_to_notify?: string | null
           burial_or_cremation?: string | null
           category?: string | null
           cemetery_plot_details?: string | null
@@ -1008,6 +1017,7 @@ export type Database = {
           packet_id: string | null
           phone: string | null
           provider_name: string
+          referring_physician: string | null
           scope: string | null
           specialty: string | null
           status: string | null
@@ -1026,6 +1036,7 @@ export type Database = {
           packet_id?: string | null
           phone?: string | null
           provider_name: string
+          referring_physician?: string | null
           scope?: string | null
           specialty?: string | null
           status?: string | null
@@ -1044,6 +1055,7 @@ export type Database = {
           packet_id?: string | null
           phone?: string | null
           provider_name?: string
+          referring_physician?: string | null
           scope?: string | null
           specialty?: string | null
           status?: string | null
@@ -2100,6 +2112,7 @@ export type Database = {
           internet_cable_phone: string | null
           internet_cable_provider: string | null
           is_na: boolean | null
+          joint_owner_name: string | null
           key_location: string | null
           key_location_notes: string | null
           lockbox_code: string | null
@@ -2184,6 +2197,7 @@ export type Database = {
           internet_cable_phone?: string | null
           internet_cable_provider?: string | null
           is_na?: boolean | null
+          joint_owner_name?: string | null
           key_location?: string | null
           key_location_notes?: string | null
           lockbox_code?: string | null
@@ -2268,6 +2282,7 @@ export type Database = {
           internet_cable_phone?: string | null
           internet_cable_provider?: string | null
           is_na?: boolean | null
+          joint_owner_name?: string | null
           key_location?: string | null
           key_location_notes?: string | null
           lockbox_code?: string | null
@@ -2549,6 +2564,7 @@ export type Database = {
           agent_contact: string | null
           category: string | null
           created_at: string | null
+          garaging_address: string | null
           id: string
           insurance: string | null
           is_na: boolean | null
@@ -2573,6 +2589,7 @@ export type Database = {
           agent_contact?: string | null
           category?: string | null
           created_at?: string | null
+          garaging_address?: string | null
           id?: string
           insurance?: string | null
           is_na?: boolean | null
@@ -2597,6 +2614,7 @@ export type Database = {
           agent_contact?: string | null
           category?: string | null
           created_at?: string | null
+          garaging_address?: string | null
           id?: string
           insurance?: string | null
           is_na?: boolean | null
