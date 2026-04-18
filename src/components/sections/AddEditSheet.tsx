@@ -820,6 +820,7 @@ export const AddEditSheet = ({
                 const sectionTitles: Record<string, string> = {
                   'medical': 'Add Medical Provider',
                   'banking': 'Add Bank Account',
+                  'investments': 'Add Investment Account',
                   'real-estate': 'Add Property',
                   'retirement': 'Add Retirement Account',
                   'vehicles': 'Add Vehicle',
@@ -1039,6 +1040,11 @@ export const AddEditSheet = ({
                         <PropertyFamilyDatalist packetId={currentPacket.id} />
                         <PropertyPhotoGallery packetId={currentPacket.id} recordId={initialData?.id ?? null} />
                       </>
+                    )}
+
+                    {/* Investments: family datalist for beneficiary/advisor autocomplete */}
+                    {activeTab === 'investments' && currentPacket && (
+                      <PropertyFamilyDatalist packetId={currentPacket.id} />
                     )}
 
                     {/* Per-record document slots (Vehicles, Real Estate, Medical, Property, etc.) */}
