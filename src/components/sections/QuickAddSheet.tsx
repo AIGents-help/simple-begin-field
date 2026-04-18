@@ -216,6 +216,18 @@ export const QuickAddSheet = ({
         </motion.div>
         </>
       )}
+
+      <CustomSectionModal
+        isOpen={showCustomModal}
+        onClose={() => setShowCustomModal(false)}
+        onSaved={(s) => {
+          void refreshCustomSections();
+          setActiveCustomSection(s.id);
+          setTab('custom');
+          setView('sections');
+          handleClose();
+        }}
+      />
     </AnimatePresence>
   );
 };
