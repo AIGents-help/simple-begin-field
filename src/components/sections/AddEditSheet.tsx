@@ -22,6 +22,7 @@ import { PropertyFamilyDatalist } from '../property/PropertyFamilyDatalist';
 import { MaskedInput } from '../common/MaskedInput';
 import { ProfilePhotoUploader } from '../common/ProfilePhotoUploader';
 import { uploadService } from '../../services/uploadService';
+import { AIValuationPanel } from '../common/AIValuationPanel';
 
 // ---------------------------------------------------------------------------
 // Cross-section federation: snapshot which fields on a source record drive
@@ -1177,6 +1178,24 @@ export const AddEditSheet = ({
                         )}
                         {errors[field.name] && (
                           <p className="text-xs font-bold text-red-500 mt-1">{errors[field.name]}</p>
+                        )}
+                        {activeTab === 'property' && field.name === 'estimated_value' && (
+                          <AIValuationPanel
+                            variant="personal_property"
+                            enabled={Boolean(
+                              String(formData.title || formData.item_name || '').trim() &&
+                              String(formData.category || '').trim()
+                            )}
+                            disabledHint="Enter Item Name and Category to use AI estimation."
+                            input={() => ({
+                              item_name: formData.title || formData.item_name || '',
+                              category: formData.category || undefined,
+                              brand: formData.brand || undefined,
+                              model: formData.model_serial || undefined,
+                              condition: formData.condition || undefined,
+                            })}
+                            onAccept={(v) => setFormData({ ...formData, estimated_value: v })}
+                          />
                         )}
                       </div>
                         );

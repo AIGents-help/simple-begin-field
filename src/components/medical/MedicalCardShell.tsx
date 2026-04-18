@@ -208,14 +208,17 @@ export const MedicalCardShell: React.FC<MedicalCardShellProps> = ({
   const handleSave = async () => {
     setSaving(true);
     try {
+      const wasNewRecord = isDraft(record.id);
       const saved = await onSave({
         ...data,
         packet_id: packetId,
         scope: data.scope || scope,
       });
       toast.success(`${title} saved`, { position: 'bottom-center' });
-      onSaved(saved, isDraft(record.id) ? record.id : undefined);
+      onSaved(saved, wasNewRecord ? record.id : undefined);
       setDirty(false);
+      // Collapse on save for new records (return to list view); keep open when editing.
+      if (wasNewRecord && expanded) onToggle();
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || 'Could not save', { position: 'bottom-center' });
