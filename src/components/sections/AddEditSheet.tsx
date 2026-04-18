@@ -71,9 +71,12 @@ export const AddEditSheet = ({
   categoryOptions?: CategoryOption[];
 }) => {
   const { activeTab, activeScope, currentPacket, profile, bumpCompletion } = useAppContext();
+  const { applyDefaults, sources } = useFederatedDefaults();
   const confirm = useConfirm();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
+  const [autoFilledOrigins, setAutoFilledOrigins] = useState<Record<string, string>>({});
+  const [originalSourceSnapshot, setOriginalSourceSnapshot] = useState<Record<string, any>>({});
   const [isNA, setIsNA] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [initialAttachment, setInitialAttachment] = useState<FileMetadata | null>(null);
