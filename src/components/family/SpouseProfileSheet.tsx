@@ -288,8 +288,11 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
     }
   };
 
-  // ---- Local UI helpers ----
-  const Section: React.FC<{ id: SectionKey; children: React.ReactNode }> = ({ id, children }) => {
+  // Bind shared props for module-scope subcomponents
+  const sectionProps = { openSection, setOpenSection: (s: SectionKey | '') => setOpenSection(s as SectionKey) };
+  const fieldProps = { form, errors, onChange: handleField };
+
+
     const open = openSection === id;
     return (
       <div className="border border-stone-200 rounded-2xl bg-white overflow-hidden">
