@@ -144,6 +144,16 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
   const handleField = (field: string, value: any) => {
     setForm((prev: any) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
+    // Auto-expand the Marriage section when a status that needs more info is chosen
+    if (field === 'marital_status') {
+      const v = String(value || '').toLowerCase();
+      if (['divorced', 'separated', 'widowed'].includes(v)) {
+        setOpenSection('marriage');
+      }
+    }
+    if (field === 'is_deceased' && value) {
+      setOpenSection('lifecycle');
+    }
   };
 
   // Toggle "Same as my address" — pre-fills from the user's profile address if available
@@ -239,6 +249,11 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
         ssn_encrypted: ssnDigits ? ssnDigits : null,
         ssn_masked: ssnDigits ? maskSsn(ssnDigits) : null,
         marital_status: form.marital_status || 'married',
+        separation_date: form.separation_date || null,
+        divorce_finalized_date: form.divorce_finalized_date || null,
+        divorce_attorney: form.divorce_attorney || null,
+        divorce_jurisdiction: form.divorce_jurisdiction || null,
+        divorce_settlement_notes: form.divorce_settlement_notes || null,
         photo_path,
         is_deceased: !!form.is_deceased,
         date_of_death: form.is_deceased ? (form.date_of_death || null) : null,
@@ -429,9 +444,72 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                     <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${form.marriage_certificate_on_file ? 'left-7' : 'left-1'}`} />
                   </button>
                 </div>
-                <p className="text-[10px] text-stone-400 italic">
-                  Upload the actual certificate file in the Documents section below.
-                </p>
+                {currentPacket && (
+                  <RecordDocumentUpload
+                    packetId={currentPacket.id}
+                    relatedTable="family_members"
+                    relatedRecordId={spouse?.id ?? null}
+                    category="marriage_certificate"
+                    label="Marriage Certificate"
+                    description="Official certificate from this marriage (PDF, JPG, PNG)"
+                    isPrivate={false}
+                  />
+                )}
+
+                {/* Divorce / Separation extra fields */}
+                {['divorced', 'separated'].includes(String(form.marital_status || '').toLowerCase()) && (
+                  <div className="pt-3 mt-1 border-t border-stone-200 space-y-3">
+                    <div>
+                      <p className="text-xs font-bold text-navy-muted">
+                        {form.marital_status === 'separated' ? 'Separation details' : 'Divorce details'}
+                      </p>
+                      <p className="text-[10px] text-stone-500">All fields optional — fill in what's known.</p>
+                    </div>
+                    <Field label="Date of separation" field="separation_date" type="date" form={form} errors={errors} onChange={handleField} />
+                    <Field label="Date divorce finalized" field="divorce_finalized_date" type="date" form={form} errors={errors} onChange={handleField} />
+                    <Field label="Divorce attorney" field="divorce_attorney" placeholder="Attorney name" form={form} errors={errors} onChange={handleField} />
+                    <Field label="Jurisdiction / court" field="divorce_jurisdiction" placeholder="e.g. Cook County Circuit Court, IL" form={form} errors={errors} onChange={handleField} />
+                    <div>
+                      <label className="block text-xs font-bold text-stone-600 mb-1">Notes about settlement (private)</label>
+                      <textarea
+                        rows={3}
+                        value={form.divorce_settlement_notes ?? ''}
+                        onChange={(e) => handleField('divorce_settlement_notes', e.target.value)}
+                        placeholder="Kept private — visible only to you and trusted contacts"
+                        className="w-full px-3 py-2 rounded-lg border border-stone-200 bg-white text-sm text-navy-muted focus:outline-none focus:ring-2 focus:ring-navy-muted/20 resize-none"
+                      />
+                    </div>
+                    {currentPacket && (
+                      <RecordDocumentUpload
+                        packetId={currentPacket.id}
+                        relatedTable="family_members"
+                        relatedRecordId={spouse?.id ?? null}
+                        category="divorce_decree"
+                        label="Divorce Decree"
+                        description="Final divorce decree or separation order (PDF, JPG, PNG)"
+                        isPrivate={false}
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* Widowed extra fields — date of death + certificate */}
+                {String(form.marital_status || '').toLowerCase() === 'widowed' && (
+                  <div className="pt-3 mt-1 border-t border-stone-200 space-y-3">
+                    <div>
+                      <p className="text-xs font-bold text-navy-muted">Spouse passing</p>
+                      <p className="text-[10px] text-stone-500">Record the date and attach the death certificate if available.</p>
+                    </div>
+                    <Field label="Date of death" field="date_of_death" type="date" form={form} errors={errors} onChange={handleField} />
+                    {currentPacket && (
+                      <DeathCertificateUpload
+                        packetId={currentPacket.id}
+                        relatedTable="family_members"
+                        relatedRecordId={spouse?.id ?? null}
+                      />
+                    )}
+                  </div>
+                )}
               </Section>
 
               <Section id="contact" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
@@ -503,40 +581,6 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                 </div>
               </Section>
 
-              {/* Documents — conditional on marital status */}
-              {currentPacket && (() => {
-                const status = (form.marital_status || 'married').toLowerCase();
-                const showMarriageCert = ['married', 'separated', 'widowed'].includes(status);
-                const showDivorceDecree = ['divorced', 'separated'].includes(status);
-                if (!showMarriageCert && !showDivorceDecree) return null;
-                return (
-                  <Section id="documents" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
-                    <p className="text-[11px] text-stone-500 italic">
-                      Documents are attached directly to this spouse record. They appear here only — never as standalone entries.
-                    </p>
-                    {showMarriageCert && (
-                      <RecordDocumentUpload
-                        packetId={currentPacket.id}
-                        relatedTable="family_members"
-                        relatedRecordId={spouse?.id ?? null}
-                        category="marriage_certificate"
-                        label="Marriage Certificate"
-                        description="Official certificate from this marriage (PDF, JPG, PNG)"
-                      />
-                    )}
-                    {showDivorceDecree && (
-                      <RecordDocumentUpload
-                        packetId={currentPacket.id}
-                        relatedTable="family_members"
-                        relatedRecordId={spouse?.id ?? null}
-                        category="divorce_decree"
-                        label="Divorce Decree"
-                        description="Final divorce decree or separation order (PDF, JPG, PNG)"
-                      />
-                    )}
-                  </Section>
-                );
-              })()}
 
               <Section id="lifecycle" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
                 <LifeStatusToggle

@@ -426,6 +426,10 @@ export type Database = {
           cause_of_death: string | null
           created_at: string | null
           date_of_death: string | null
+          divorce_attorney: string | null
+          divorce_finalized_date: string | null
+          divorce_jurisdiction: string | null
+          divorce_settlement_notes: string | null
           email: string | null
           employer: string | null
           first_name: string | null
@@ -450,6 +454,7 @@ export type Database = {
           relationship: string | null
           reminder_notes: string | null
           scope: string | null
+          separation_date: string | null
           ssn_encrypted: string | null
           ssn_masked: string | null
           status: string | null
@@ -463,6 +468,10 @@ export type Database = {
           cause_of_death?: string | null
           created_at?: string | null
           date_of_death?: string | null
+          divorce_attorney?: string | null
+          divorce_finalized_date?: string | null
+          divorce_jurisdiction?: string | null
+          divorce_settlement_notes?: string | null
           email?: string | null
           employer?: string | null
           first_name?: string | null
@@ -487,6 +496,7 @@ export type Database = {
           relationship?: string | null
           reminder_notes?: string | null
           scope?: string | null
+          separation_date?: string | null
           ssn_encrypted?: string | null
           ssn_masked?: string | null
           status?: string | null
@@ -500,6 +510,10 @@ export type Database = {
           cause_of_death?: string | null
           created_at?: string | null
           date_of_death?: string | null
+          divorce_attorney?: string | null
+          divorce_finalized_date?: string | null
+          divorce_jurisdiction?: string | null
+          divorce_settlement_notes?: string | null
           email?: string | null
           employer?: string | null
           first_name?: string | null
@@ -524,6 +538,7 @@ export type Database = {
           relationship?: string | null
           reminder_notes?: string | null
           scope?: string | null
+          separation_date?: string | null
           ssn_encrypted?: string | null
           ssn_masked?: string | null
           status?: string | null
