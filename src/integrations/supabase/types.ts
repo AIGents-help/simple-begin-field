@@ -3007,11 +3007,106 @@ export type Database = {
           },
         ]
       }
+      trusted_contact_access_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          packet_id: string
+          section_key: string | null
+          trusted_contact_id: string | null
+          trusted_contact_user_id: string | null
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          packet_id: string
+          section_key?: string | null
+          trusted_contact_id?: string | null
+          trusted_contact_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          packet_id?: string
+          section_key?: string | null
+          trusted_contact_id?: string | null
+          trusted_contact_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trusted_contact_access_log_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trusted_contact_access_log_trusted_contact_id_fkey"
+            columns: ["trusted_contact_id"]
+            isOneToOne: false
+            referencedRelation: "trusted_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trusted_contact_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          is_permitted: boolean
+          packet_id: string
+          section_key: string
+          trusted_contact_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_permitted?: boolean
+          packet_id: string
+          section_key: string
+          trusted_contact_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_permitted?: boolean
+          packet_id?: string
+          section_key?: string
+          trusted_contact_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trusted_contact_permissions_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trusted_contact_permissions_trusted_contact_id_fkey"
+            columns: ["trusted_contact_id"]
+            isOneToOne: false
+            referencedRelation: "trusted_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trusted_contacts: {
         Row: {
           access_granted: boolean | null
           access_granted_at: string | null
           access_level: string | null
+          access_released: boolean
+          access_released_at: string | null
           assigned_sections: string[] | null
           contact_email: string
           contact_name: string
@@ -3019,6 +3114,8 @@ export type Database = {
           created_at: string | null
           date_of_death: string | null
           id: string
+          inactivity_days: number | null
+          invite_accepted_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           is_deceased: boolean
@@ -3028,6 +3125,7 @@ export type Database = {
           packet_id: string
           photo_path: string | null
           relationship: string | null
+          release_method: string
           status: string | null
           updated_at: string | null
           user_id: string
@@ -3036,6 +3134,8 @@ export type Database = {
           access_granted?: boolean | null
           access_granted_at?: string | null
           access_level?: string | null
+          access_released?: boolean
+          access_released_at?: string | null
           assigned_sections?: string[] | null
           contact_email: string
           contact_name: string
@@ -3043,6 +3143,8 @@ export type Database = {
           created_at?: string | null
           date_of_death?: string | null
           id?: string
+          inactivity_days?: number | null
+          invite_accepted_at?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
           is_deceased?: boolean
@@ -3052,6 +3154,7 @@ export type Database = {
           packet_id: string
           photo_path?: string | null
           relationship?: string | null
+          release_method?: string
           status?: string | null
           updated_at?: string | null
           user_id: string
@@ -3060,6 +3163,8 @@ export type Database = {
           access_granted?: boolean | null
           access_granted_at?: string | null
           access_level?: string | null
+          access_released?: boolean
+          access_released_at?: string | null
           assigned_sections?: string[] | null
           contact_email?: string
           contact_name?: string
@@ -3067,6 +3172,8 @@ export type Database = {
           created_at?: string | null
           date_of_death?: string | null
           id?: string
+          inactivity_days?: number | null
+          invite_accepted_at?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
           is_deceased?: boolean
@@ -3076,6 +3183,7 @@ export type Database = {
           packet_id?: string
           photo_path?: string | null
           relationship?: string | null
+          release_method?: string
           status?: string | null
           updated_at?: string | null
           user_id?: string
@@ -3192,6 +3300,10 @@ export type Database = {
     }
     Functions: {
       current_user_role: { Args: never; Returns: string }
+      has_trusted_access: {
+        Args: { p_packet_id: string; p_section_key: string }
+        Returns: boolean
+      }
       is_admin: { Args: never; Returns: boolean }
       is_member_of_packet_in_path: {
         Args: { file_path: string }
