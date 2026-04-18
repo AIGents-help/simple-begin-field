@@ -20,7 +20,6 @@ const FIELDS_BASIC = [
 const FIELDS_BIRTH = [
   { name: 'date_of_birth', label: 'Date of birth', type: 'date' },
   { name: 'place_of_birth', label: 'Place of birth (city, state, country)', placeholder: 'Boston, MA, USA' },
-  { name: 'gender', label: 'Gender', placeholder: '' },
 ];
 
 const FIELDS_CONTACT = [
