@@ -642,8 +642,291 @@ interface RequestBody {
   format?: 'full' | 'summary';   // default 'full'
   include_cover?: boolean;       // default true
   include_watermark?: boolean;   // default true
-  download_type?: 'full_packet' | 'section' | 'admin';
-  admin_target_packet_id?: string; // when admin downloads someone else's
+  download_type?: 'full_packet' | 'section' | 'admin' | 'funeral_instructions' | 'emergency_medical';
+  admin_target_packet_id?: string;
+}
+
+// ── Specialty PDFs ──────────────────────────────────────────────────────────
+
+async function buildFuneralInstructionsPdf(
+  callerClient: any,
+  ctx: Ctx,
+  packetId: string,
+  ownerName: string,
+  dateLong: string,
+) {
+  // Header letter-style
+  ctx.page.drawRectangle({ x: 0, y: PAGE_H - 110, width: PAGE_W, height: 110, color: NAVY });
+  ctx.page.drawRectangle({ x: 0, y: PAGE_H - 114, width: PAGE_W, height: 4, color: GOLD });
+  ctx.page.drawText('FUNERAL INSTRUCTIONS', {
+    x: MARGIN, y: PAGE_H - 60, size: 11, font: ctx.sansBold, color: GOLD,
+  });
+  ctx.page.drawText(sanitizeForPdf(`For ${ownerName}`), {
+    x: MARGIN, y: PAGE_H - 92, size: 22, font: ctx.serifBold, color: WHITE,
+  });
+  ctx.y = PAGE_H - 150;
+
+  drawText(ctx, `Prepared on ${dateLong}`, { font: ctx.sans, size: 10, color: MUTED });
+  ctx.y -= 6;
+  drawText(ctx,
+    'To the funeral director or person receiving this document: the wishes recorded below have been documented in advance. Please follow them as closely as possible.',
+    { font: ctx.serif, size: 11, lineHeight: 16 },
+  );
+  ctx.y -= 10;
+
+  const { data: funeralRows } = await callerClient
+    .from('funeral_records')
+    .select('*')
+    .eq('packet_id', packetId)
+    .order('created_at', { ascending: true })
+    .limit(1);
+  const f = (funeralRows || [])[0];
+
+  if (!f) {
+    drawText(ctx, 'No funeral wishes have been recorded yet.', { font: ctx.serif, size: 11, color: MUTED });
+    return;
+  }
+
+  // Funeral home contact prominently
+  if (f.funeral_home || f.funeral_director || f.funeral_home_phone || f.funeral_home_email) {
+    ensure(ctx, 90);
+    ctx.page.drawRectangle({
+      x: MARGIN, y: ctx.y - 80, width: CONTENT_W, height: 80, color: PALE,
+    });
+    ctx.page.drawText('FUNERAL HOME OF RECORD', {
+      x: MARGIN + 14, y: ctx.y - 22, size: 9, font: ctx.sansBold, color: NAVY,
+    });
+    let yy = ctx.y - 40;
+    const lines = [
+      f.funeral_home && `Home: ${f.funeral_home}`,
+      f.funeral_director && `Director: ${f.funeral_director}`,
+      f.funeral_home_phone && `Phone: ${f.funeral_home_phone}`,
+      f.funeral_home_email && `Email: ${f.funeral_home_email}`,
+    ].filter(Boolean) as string[];
+    for (const l of lines) {
+      ctx.page.drawText(sanitizeForPdf(l), {
+        x: MARGIN + 14, y: yy, size: 10, font: ctx.serif, color: BODY,
+      });
+      yy -= 13;
+    }
+    ctx.y -= 100;
+  }
+
+  const labelMap: [string, string][] = [
+    ['burial_or_cremation', 'Burial or Cremation'],
+    ['service_preferences', 'Service Preferences'],
+    ['religious_cultural_preferences', 'Religious / Cultural Preferences'],
+    ['cemetery_plot_details', 'Cemetery / Plot Details'],
+    ['prepaid_arrangements', 'Prepaid Arrangements'],
+    ['flowers_preferences', 'Flowers & Arrangements'],
+    ['reception_wishes', 'Reception Wishes'],
+    ['personal_messages', 'Personal Messages'],
+    ['additional_instructions', 'Additional Instructions'],
+  ];
+
+  for (const [key, label] of labelMap) {
+    const raw = f[key];
+    if (!raw || !String(raw).trim()) continue;
+    ensure(ctx, 30);
+    ctx.page.drawText(sanitizeForPdf(label.toUpperCase()), {
+      x: MARGIN, y: ctx.y - 11, size: 9, font: ctx.sansBold, color: NAVY,
+    });
+    ctx.page.drawLine({
+      start: { x: MARGIN, y: ctx.y - 16 }, end: { x: MARGIN + 60, y: ctx.y - 16 },
+      thickness: 1, color: GOLD,
+    });
+    ctx.y -= 24;
+    drawText(ctx, stripHtml(String(raw)), { font: ctx.serif, size: 11, lineHeight: 15 });
+    ctx.y -= 8;
+  }
+
+  // Obituary in full
+  if (f.obituary_text && stripHtml(f.obituary_text).trim()) {
+    ensure(ctx, 60);
+    newPage(ctx);
+    ctx.page.drawText('OBITUARY', {
+      x: MARGIN, y: ctx.y - 14, size: 14, font: ctx.serifBold, color: NAVY,
+    });
+    ctx.page.drawLine({
+      start: { x: MARGIN, y: ctx.y - 20 }, end: { x: MARGIN + 70, y: ctx.y - 20 },
+      thickness: 1.5, color: GOLD,
+    });
+    ctx.y -= 32;
+    drawText(ctx, stripHtml(f.obituary_text), { font: ctx.serif, size: 11, lineHeight: 16 });
+  }
+
+  // Eulogy
+  if (f.eulogy_text && stripHtml(f.eulogy_text).trim()) {
+    ensure(ctx, 60);
+    newPage(ctx);
+    ctx.page.drawText('EULOGY', {
+      x: MARGIN, y: ctx.y - 14, size: 14, font: ctx.serifBold, color: NAVY,
+    });
+    ctx.page.drawLine({
+      start: { x: MARGIN, y: ctx.y - 20 }, end: { x: MARGIN + 70, y: ctx.y - 20 },
+      thickness: 1.5, color: GOLD,
+    });
+    ctx.y -= 32;
+    if (f.eulogy_author) {
+      drawText(ctx, `By ${f.eulogy_author}`, { font: ctx.serif, size: 11, color: MUTED });
+      ctx.y -= 4;
+    }
+    drawText(ctx, stripHtml(f.eulogy_text), { font: ctx.serif, size: 11, lineHeight: 16 });
+  }
+
+  // Music list
+  const { data: music } = await callerClient
+    .from('funeral_music')
+    .select('song_title, artist, when_to_play, notes')
+    .eq('funeral_record_id', f.id)
+    .order('display_order', { ascending: true });
+
+  if (music && music.length > 0) {
+    ensure(ctx, 60);
+    newPage(ctx);
+    ctx.page.drawText('MUSIC LIST', {
+      x: MARGIN, y: ctx.y - 14, size: 14, font: ctx.serifBold, color: NAVY,
+    });
+    ctx.page.drawLine({
+      start: { x: MARGIN, y: ctx.y - 20 }, end: { x: MARGIN + 70, y: ctx.y - 20 },
+      thickness: 1.5, color: GOLD,
+    });
+    ctx.y -= 32;
+    music.forEach((s: any, i: number) => {
+      const head = `${i + 1}. ${s.song_title}${s.artist ? ` — ${s.artist}` : ''}`;
+      drawText(ctx, head, { font: ctx.serifBold, size: 11 });
+      if (s.when_to_play) {
+        drawText(ctx, `   When: ${s.when_to_play}`, { font: ctx.serif, size: 10, color: MUTED });
+      }
+      if (s.notes) {
+        drawText(ctx, `   ${s.notes}`, { font: ctx.serif, size: 10, color: BODY });
+      }
+      ctx.y -= 4;
+    });
+  }
+
+  // Readings
+  const { data: readings } = await callerClient
+    .from('funeral_readings')
+    .select('title, author, full_text, reader_name')
+    .eq('funeral_record_id', f.id)
+    .order('display_order', { ascending: true });
+
+  if (readings && readings.length > 0) {
+    ensure(ctx, 60);
+    newPage(ctx);
+    ctx.page.drawText('READINGS & POEMS', {
+      x: MARGIN, y: ctx.y - 14, size: 14, font: ctx.serifBold, color: NAVY,
+    });
+    ctx.page.drawLine({
+      start: { x: MARGIN, y: ctx.y - 20 }, end: { x: MARGIN + 70, y: ctx.y - 20 },
+      thickness: 1.5, color: GOLD,
+    });
+    ctx.y -= 32;
+    for (const r of readings as any[]) {
+      drawText(ctx, r.title, { font: ctx.serifBold, size: 12 });
+      if (r.author) drawText(ctx, `By ${r.author}`, { font: ctx.serif, size: 10, color: MUTED });
+      if (r.reader_name) drawText(ctx, `Read by ${r.reader_name}`, { font: ctx.serif, size: 10, color: MUTED });
+      ctx.y -= 4;
+      if (r.full_text) drawText(ctx, r.full_text, { font: ctx.serif, size: 11, lineHeight: 15 });
+      ctx.y -= 8;
+    }
+  }
+}
+
+async function buildEmergencyMedicalPdf(
+  callerClient: any,
+  ctx: Ctx,
+  packetId: string,
+  ownerName: string,
+  dateLong: string,
+) {
+  // Single-page large-font emergency reference card
+  ctx.page.drawRectangle({ x: 0, y: PAGE_H - 90, width: PAGE_W, height: 90, color: rgb(0.65, 0.10, 0.15) });
+  ctx.page.drawText('EMERGENCY MEDICAL INFORMATION', {
+    x: MARGIN, y: PAGE_H - 50, size: 14, font: ctx.sansBold, color: WHITE,
+  });
+  ctx.page.drawText(sanitizeForPdf(ownerName), {
+    x: MARGIN, y: PAGE_H - 75, size: 18, font: ctx.serifBold, color: WHITE,
+  });
+  ctx.y = PAGE_H - 120;
+
+  drawText(ctx, `Updated ${dateLong}`, { font: ctx.sans, size: 10, color: MUTED });
+  ctx.y -= 8;
+
+  // Pull info_records (for blood type / allergies if recorded), medical_records, medications, family (emergency contacts)
+  const [info, medical, meds, family] = await Promise.all([
+    callerClient.from('info_records').select('*').eq('packet_id', packetId),
+    callerClient.from('medical_records').select('*').eq('packet_id', packetId),
+    callerClient.from('medications').select('*').eq('packet_id', packetId),
+    callerClient.from('family_members').select('*').eq('packet_id', packetId),
+  ]);
+
+  const infoRecords = (info.data || []) as any[];
+  const findInfo = (needle: string) => infoRecords.find((r) =>
+    `${r.title || ''} ${r.category || ''}`.toLowerCase().includes(needle));
+  const bloodType = findInfo('blood');
+  const allergies = findInfo('allerg');
+
+  const block = (label: string, lines: string[], emphasize = false) => {
+    ensure(ctx, 60 + lines.length * 16);
+    ctx.page.drawRectangle({
+      x: MARGIN, y: ctx.y - 28, width: CONTENT_W, height: 24,
+      color: emphasize ? rgb(1, 0.92, 0.85) : PALE,
+    });
+    ctx.page.drawText(label.toUpperCase(), {
+      x: MARGIN + 12, y: ctx.y - 22, size: 11, font: ctx.sansBold,
+      color: emphasize ? rgb(0.65, 0.10, 0.15) : NAVY,
+    });
+    ctx.y -= 36;
+    if (lines.length === 0) {
+      drawText(ctx, 'Not recorded.', { font: ctx.serif, size: 12, color: MUTED });
+    } else {
+      for (const l of lines) {
+        drawText(ctx, l, { font: ctx.serif, size: 13, lineHeight: 18 });
+      }
+    }
+    ctx.y -= 8;
+  };
+
+  block('Blood Type', bloodType?.notes ? [stripHtml(bloodType.notes)] : [], true);
+  block('Allergies', allergies?.notes ? [stripHtml(allergies.notes)] : [], true);
+
+  const medsLines = ((meds.data || []) as any[])
+    .filter((m) => !m.is_na)
+    .map((m) => {
+      const parts = [m.name, m.dose, m.frequency].filter(Boolean).join(' · ');
+      return parts;
+    });
+  block('Current Medications', medsLines);
+
+  const docLines = ((medical.data || []) as any[])
+    .filter((m) => !m.is_na)
+    .slice(0, 5)
+    .map((m) => {
+      const parts = [m.provider_name, m.specialty, m.phone].filter(Boolean).join(' · ');
+      return parts;
+    });
+  block('Doctors', docLines);
+
+  const insLine = ((medical.data || []) as any[])
+    .filter((m) => m.insurance_provider)
+    .slice(0, 2)
+    .map((m) => {
+      const parts = [m.insurance_provider, m.member_id && `Member: ${m.member_id}`, m.group_number && `Group: ${m.group_number}`]
+        .filter(Boolean).join(' · ');
+      return parts;
+    });
+  block('Insurance', insLine);
+
+  const contactLines = ((family.data || []) as any[])
+    .filter((f) => !f.is_deceased && (f.phone || f.email))
+    .slice(0, 4)
+    .map((f) => {
+      const parts = [f.name, f.relationship, f.phone, f.email].filter(Boolean).join(' · ');
+      return parts;
+    });
+  block('Emergency Contacts', contactLines);
 }
 
 Deno.serve(async (req) => {
