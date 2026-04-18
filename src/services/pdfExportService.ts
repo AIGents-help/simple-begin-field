@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
+import { estateSummaryService, formatCurrency } from './estateSummaryService';
 
 const NAVY = [26, 39, 68] as const;   // #1a2744
 const GOLD = [201, 168, 76] as const;  // #c9a84c
@@ -207,6 +208,123 @@ function addFooterPage(doc: jsPDF, dateStr: string) {
   doc.text(dateStr, w / 2, h / 2 + 22, { align: 'center' });
 }
 
+async function addEstateSummaryPage(doc: jsPDF, packetId: string) {
+  let summary;
+  try {
+    summary = await estateSummaryService.getSummary(packetId);
+  } catch (err) {
+    console.warn('[pdfExportService] estate summary unavailable', err);
+    return;
+  }
+  if (!summary) return;
+
+  doc.addPage();
+  const w = doc.internal.pageSize.getWidth();
+  let y = 30;
+
+  // Title
+  doc.setTextColor(...NAVY);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('ESTATE VALUE SUMMARY', 20, y);
+  y += 6;
+  doc.setDrawColor(...GOLD);
+  doc.setLineWidth(1);
+  doc.line(20, y, w - 20, y);
+  y += 10;
+
+  doc.setTextColor(...GRAY);
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(9);
+  const subtitle = doc.splitTextToSize(
+    'Estimated values based on information in this packet. Not a professional appraisal — consult a financial advisor or estate attorney for accurate valuation.',
+    w - 40
+  );
+  doc.text(subtitle, 20, y);
+  y += subtitle.length * 4 + 8;
+
+  // Totals block
+  const totals: [string, string][] = [
+    ['Gross Estate Value', formatCurrency(summary.gross_assets)],
+    ['Total Liabilities', formatCurrency(summary.total_liabilities)],
+    ['Net Estate Value', formatCurrency(summary.net_estate)],
+    ['Liquid Assets', formatCurrency(summary.liquid_assets)],
+    ['Illiquid Assets', formatCurrency(summary.illiquid_assets)],
+    ['Death Benefits (separate from probate estate)', formatCurrency(summary.death_benefits)],
+  ];
+  totals.forEach(([label, value]) => {
+    doc.setTextColor(...NAVY);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(label, 20, y);
+    doc.setTextColor(40, 40, 40);
+    doc.setFont('helvetica', 'normal');
+    doc.text(value, w - 20, y, { align: 'right' });
+    y += 7;
+  });
+
+  y += 4;
+
+  // Category breakdown header
+  doc.setTextColor(...NAVY);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text('Asset Categories', 20, y);
+  y += 6;
+  doc.setDrawColor(220, 220, 220);
+  doc.setLineWidth(0.3);
+  doc.line(20, y, w - 20, y);
+  y += 6;
+
+  const categoryEntries: [string, string, number][] = [
+    ['Real Estate', 'real_estate', summary.categories.real_estate.total],
+    ['Vehicles', 'vehicles', summary.categories.vehicles.total],
+    ['Banking', 'banking', summary.categories.banking.total],
+    ['Investments', 'investments', summary.categories.investments.total],
+    ['Retirement', 'retirement', summary.categories.retirement.total],
+    ['Personal Property', 'property', summary.categories.property.total],
+  ];
+  categoryEntries.forEach(([label, , total]) => {
+    if (y > doc.internal.pageSize.getHeight() - 30) {
+      doc.addPage();
+      y = 30;
+    }
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(label, 20, y);
+    doc.text(formatCurrency(total), w - 20, y, { align: 'right' });
+    y += 6;
+  });
+
+  if (summary.liabilities && summary.liabilities.length > 0) {
+    y += 6;
+    if (y > doc.internal.pageSize.getHeight() - 40) {
+      doc.addPage();
+      y = 30;
+    }
+    doc.setTextColor(...NAVY);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('Liabilities', 20, y);
+    y += 6;
+    doc.line(20, y, w - 20, y);
+    y += 6;
+    summary.liabilities.forEach((l: any) => {
+      if (y > doc.internal.pageSize.getHeight() - 20) {
+        doc.addPage();
+        y = 30;
+      }
+      doc.setTextColor(60, 60, 60);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`${l.label} (${l.liability_type})`, 20, y);
+      doc.text(formatCurrency(l.value), w - 20, y, { align: 'right' });
+      y += 6;
+    });
+  }
+}
+
 export async function generatePacketPDF(userId: string): Promise<void> {
   // Get user profile
   const { data: profile } = await supabase
@@ -237,6 +355,9 @@ export async function generatePacketPDF(userId: string): Promise<void> {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
 
   addCoverPage(doc, fullName, dateStr);
+
+  // Estate Value Summary appears immediately after the cover
+  await addEstateSummaryPage(doc, packet.id);
 
   sections.forEach((section) => {
     addSectionPages(doc, section);
