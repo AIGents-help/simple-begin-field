@@ -13,6 +13,8 @@ interface FamilyMember {
   is_deceased?: boolean | null;
   date_of_death?: string | null;
   category?: string | null; // e.g. "Maternal" / "Paternal" / "Mother" / "Father"
+  marital_status?: string | null; // for spouses: married | separated | divorced | widowed
+  [key: string]: any; // Allow full-row hydration
 }
 
 const HavenOwl = () => <HavenOwlSvg size={120} className="mx-auto" />;
