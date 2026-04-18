@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import {
-  Loader2, ShieldCheck, Lock, Eye, LogOut, AlertCircle, FileText,
+  Loader2, ShieldCheck, Lock, Eye, LogOut, AlertCircle, FileText, Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { trustedContactPortalService } from '@/services/trustedContactPortalService';
+import { generateTrustedContactPDF } from '@/services/trustedContactPdfService';
 import { SECTIONS_CONFIG } from '@/config/sectionsConfig';
 
 /**
@@ -60,6 +61,7 @@ export const TrustedContactDashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [sectionRows, setSectionRows] = useState<any[]>([]);
   const [sectionLoading, setSectionLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   // Auth check
   useEffect(() => {
@@ -161,6 +163,24 @@ export const TrustedContactDashboard: React.FC = () => {
     navigate('/', { replace: true });
   };
 
+  const handleDownload = async () => {
+    if (!activePacketId || permittedSections.length === 0) {
+      toast.error('No permitted sections to export');
+      return;
+    }
+    setDownloading(true);
+    try {
+      const ownerName = activePacket?.packets?.person_a_name || 'Owner';
+      await generateTrustedContactPDF(activePacketId, ownerName, permittedSections);
+      toast.success('Packet PDF downloaded');
+    } catch (err: any) {
+      console.error('PDF export:', err);
+      toast.error(err?.message || 'Failed to generate PDF');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (!authChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fdfaf3]">
@@ -254,12 +274,22 @@ export const TrustedContactDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="text-xs font-bold text-stone-600 hover:text-navy-muted inline-flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-stone-50"
-        >
-          <LogOut className="w-4 h-4" /> Sign out
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleDownload}
+            disabled={downloading || permittedSections.length === 0}
+            className="text-xs font-bold text-white bg-navy-muted hover:bg-navy-muted/90 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg disabled:opacity-50"
+          >
+            {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {downloading ? 'Preparing…' : 'Download PDF'}
+          </button>
+          <button
+            onClick={handleSignOut}
+            className="text-xs font-bold text-stone-600 hover:text-navy-muted inline-flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-stone-50"
+          >
+            <LogOut className="w-4 h-4" /> Sign out
+          </button>
+        </div>
       </header>
 
       <div className="flex-1 flex flex-col lg:flex-row max-w-[1280px] w-full mx-auto">
