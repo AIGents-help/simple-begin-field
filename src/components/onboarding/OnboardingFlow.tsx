@@ -92,7 +92,7 @@ const OnboardingFlowComponent = () => {
         const affiliateCode = localStorage.getItem('affiliate_code');
         if (affiliateCode && signUpData?.user?.id) {
           try {
-            await fetch('https://bfvtfenrkomhbzctljyt.supabase.co/functions/v1/track-affiliate', {
+            await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/track-affiliate`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
