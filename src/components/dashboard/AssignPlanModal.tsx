@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { X, Loader2, AlertTriangle, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { plansAdminService, PlanRow } from '@/services/plansAdminService';
 import { toast } from 'sonner';
@@ -11,19 +11,21 @@ interface AssignPlanModalProps {
     id: string;
     full_name: string | null;
     email: string | null;
+    role?: string | null;
     purchases?: any[];
   };
   onSuccess: (newPlan: { plan_key: string; plan_name: string; status: string }) => void;
 }
 
-type PlanKeyChoice = 'free' | 'individual' | 'couple' | 'lifetime' | 'comp';
+type PlanKeyChoice = 'free' | 'individual' | 'couple' | 'lifetime' | 'comp' | 'comp_couple';
 
 const PLAN_LABEL: Record<PlanKeyChoice, string> = {
   free: 'Free',
   individual: 'Individual',
   couple: 'Couple',
   lifetime: 'Lifetime (one-time)',
-  comp: 'Complimentary (no charge)',
+  comp: 'Complimentary Individual (no charge)',
+  comp_couple: 'Complimentary Couple (no charge)',
 };
 
 export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
