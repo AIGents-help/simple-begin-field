@@ -244,6 +244,7 @@ export const RecordCard = ({
   data?: any;
   subtitlePlaceholder?: string;
 }) => {
+  const { activeTab } = useAppContext();
   const isNA = data?.is_na || data?.status === 'not_applicable';
   // Person/animal lifecycle dimming — applies to family/pets/trusted contacts (is_deceased)
   // and advisors (advisor_status !== 'active').
@@ -268,6 +269,10 @@ export const RecordCard = ({
     : advisorStatus === 'former'
     ? 'Former'
     : null;
+
+  // For N/A records, surface a "Find a Professional" prompt with a query
+  // resolved from the record's content (falls back to the section default).
+  const proQuery = isNA && activeTab ? resolveRecordQuery(activeTab, data) : null;
 
   return (
     <div
