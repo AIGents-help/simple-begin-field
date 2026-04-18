@@ -3398,6 +3398,10 @@ export type Database = {
       }
     }
     Functions: {
+      bump_checkin_reminder: {
+        Args: { p_event_id: string }
+        Returns: undefined
+      }
       complete_checkin_by_token: {
         Args: { p_token: string }
         Returns: {
@@ -3427,7 +3431,19 @@ export type Database = {
       }
       is_packet_member: { Args: { p_id: string }; Returns: boolean }
       is_professional: { Args: never; Returns: boolean }
+      issue_checkin_token: {
+        Args: { p_grace_days?: number; p_user_id: string }
+        Returns: {
+          event_id: string
+          expires_at: string
+          token: string
+        }[]
+      }
       manual_check_in: { Args: never; Returns: undefined }
+      mark_checkin_triggered: {
+        Args: { p_event_id: string }
+        Returns: undefined
+      }
       run_inactivity_release_sweep: {
         Args: never
         Returns: {
