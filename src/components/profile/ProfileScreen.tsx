@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
 import { CheckInPreferences } from '../checkin/CheckInPreferences';
+import { InactivityCheckInCard } from '../checkin/InactivityCheckInCard';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -241,6 +242,8 @@ export const ProfileScreen = () => {
         </div>
 
         <CheckInPreferences />
+
+        <InactivityCheckInCard />
 
         <div>
           <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Data Export</h3>
