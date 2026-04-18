@@ -32,6 +32,9 @@ import { CheckInRedirect } from './pages/CheckInRedirect';
 import { SharedTemplateView } from './components/templates/SharedTemplateView';
 import { CoupleInviteAccept } from './components/couple/CoupleInviteAccept';
 import { EmergencyView } from './components/emergency/EmergencyView';
+import RedeemGift from './pages/RedeemGift';
+import CorporateDashboard from './pages/CorporateDashboard';
+import EnterpriseContact from './pages/EnterpriseContact';
 import NotFound from "./pages/NotFound.tsx";
 import { InstallPromptBanner } from './components/pwa/InstallPromptBanner';
 
@@ -105,6 +108,10 @@ export default function App() {
               <Route path="/template/share/:token" element={<SharedTemplateView />} />
               <Route path="/couple/invite/:token" element={<CoupleInviteAccept />} />
               <Route path="/emergency/:token" element={<EmergencyView />} />
+              <Route path="/gift/redeem" element={<RedeemGift />} />
+              <Route path="/gift/success" element={<RedeemGift />} />
+              <Route path="/corporate/dashboard" element={<CorporateDashboard />} />
+              <Route path="/contact" element={<EnterpriseContact />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
