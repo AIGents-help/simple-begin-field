@@ -1996,12 +1996,16 @@ export type Database = {
       }
       purchases: {
         Row: {
+          admin_note: string | null
           affiliate_code_used: string | null
           affiliate_referral_id: string | null
           billing_type: string | null
+          comp_expires_at: string | null
+          comp_granted_by: string | null
           created_at: string | null
           current_period_end: string | null
           id: string
+          is_comp: boolean
           packet_id: string | null
           pricing_plan_id: string | null
           status: string | null
@@ -2012,12 +2016,16 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          admin_note?: string | null
           affiliate_code_used?: string | null
           affiliate_referral_id?: string | null
           billing_type?: string | null
+          comp_expires_at?: string | null
+          comp_granted_by?: string | null
           created_at?: string | null
           current_period_end?: string | null
           id?: string
+          is_comp?: boolean
           packet_id?: string | null
           pricing_plan_id?: string | null
           status?: string | null
@@ -2028,12 +2036,16 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          admin_note?: string | null
           affiliate_code_used?: string | null
           affiliate_referral_id?: string | null
           billing_type?: string | null
+          comp_expires_at?: string | null
+          comp_granted_by?: string | null
           created_at?: string | null
           current_period_end?: string | null
           id?: string
+          is_comp?: boolean
           packet_id?: string | null
           pricing_plan_id?: string | null
           status?: string | null
