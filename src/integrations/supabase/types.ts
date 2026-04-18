@@ -3609,6 +3609,7 @@ export type Database = {
       profiles: {
         Row: {
           affiliate_id: string | null
+          avatar_path: string | null
           checkin_frequency: string | null
           checkin_opted_out: boolean | null
           checkin_status: string | null
@@ -3647,6 +3648,7 @@ export type Database = {
         }
         Insert: {
           affiliate_id?: string | null
+          avatar_path?: string | null
           checkin_frequency?: string | null
           checkin_opted_out?: boolean | null
           checkin_status?: string | null
@@ -3685,6 +3687,7 @@ export type Database = {
         }
         Update: {
           affiliate_id?: string | null
+          avatar_path?: string | null
           checkin_frequency?: string | null
           checkin_opted_out?: boolean | null
           checkin_status?: string | null
