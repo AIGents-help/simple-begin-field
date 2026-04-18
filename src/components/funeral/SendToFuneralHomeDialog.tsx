@@ -183,7 +183,25 @@ export const SendToFuneralHomeDialog: React.FC<Props> = ({ isOpen, onClose, reco
             <Bullet ok>Readings (if any)</Bullet>
             <Bullet ok={includes.flowers}>Flowers & arrangements</Bullet>
             <Bullet ok={includes.reception}>Reception wishes</Bullet>
+            <Bullet ok={photos.length > 0}>
+              Photos ({photos.length}) — compressed and attached
+            </Bullet>
           </div>
+
+          {photos.length > 0 && (
+            <label className="flex items-center justify-between gap-2 rounded-xl border border-stone-200 bg-white p-3 text-xs">
+              <span className="flex items-center gap-2 font-bold text-navy-muted">
+                <ImageIcon size={14} />
+                Attach {photos.length} photo{photos.length === 1 ? '' : 's'} to email
+              </span>
+              <input
+                type="checkbox"
+                checked={includePhotos}
+                onChange={(e) => setIncludePhotos(e.target.checked)}
+                className="h-4 w-4 accent-navy-muted"
+              />
+            </label>
+          )}
 
           <button
             type="button"

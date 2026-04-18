@@ -8,6 +8,12 @@ const corsHeaders = {
     'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+interface PhotoAttachment {
+  filename: string;
+  content: string; // base64
+  mime?: string;
+}
+
 interface Body {
   to: string;
   personName?: string;
@@ -16,6 +22,7 @@ interface Body {
   message?: string;
   pdfBase64: string;
   filename: string;
+  photoAttachments?: PhotoAttachment[];
 }
 
 const isEmail = (s: string) => typeof s === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
@@ -49,6 +56,19 @@ Deno.serve(async (req) => {
     if (!body.pdfBase64 || !body.filename) return json({ error: 'Missing PDF attachment' }, 400);
     if (body.pdfBase64.length > 8_000_000) {
       return json({ error: 'PDF too large (max ~6MB)' }, 400);
+    }
+
+    // Validate + cap total attachment payload (Resend limit ~40MB; keep safe at ~12MB base64)
+    const photos = Array.isArray(body.photoAttachments) ? body.photoAttachments : [];
+    let photoBase64Total = 0;
+    for (const p of photos) {
+      if (!p?.content || !p?.filename) {
+        return json({ error: 'Invalid photo attachment' }, 400);
+      }
+      photoBase64Total += p.content.length;
+    }
+    if (photoBase64Total > 12_000_000) {
+      return json({ error: 'Photo attachments too large (max ~9MB total)' }, 400);
     }
 
     // Verify packet membership using service role + caller id
