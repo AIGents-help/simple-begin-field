@@ -583,6 +583,54 @@ export type Database = {
         }
         Relationships: []
       }
+      document_templates: {
+        Row: {
+          complexity: string
+          created_at: string
+          description: string | null
+          guidance_notes: Json
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          state_specific: boolean
+          template_content: Json
+          template_type: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          complexity?: string
+          created_at?: string
+          description?: string | null
+          guidance_notes?: Json
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          state_specific?: boolean
+          template_content?: Json
+          template_type: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          complexity?: string
+          created_at?: string
+          description?: string | null
+          guidance_notes?: Json
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          state_specific?: boolean
+          template_content?: Json
+          template_type?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           category: string | null
@@ -3638,6 +3686,57 @@ export type Database = {
           },
         ]
       }
+      user_template_drafts: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          is_complete: boolean
+          last_saved_at: string
+          packet_id: string
+          placeholder_values: Json
+          share_token: string | null
+          share_token_expires_at: string | null
+          template_type: string
+          template_version: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_complete?: boolean
+          last_saved_at?: string
+          packet_id: string
+          placeholder_values?: Json
+          share_token?: string | null
+          share_token_expires_at?: string | null
+          template_type: string
+          template_version: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_complete?: boolean
+          last_saved_at?: string
+          packet_id?: string
+          placeholder_values?: Json
+          share_token?: string | null
+          share_token_expires_at?: string | null
+          template_type?: string
+          template_version?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       vehicle_records: {
         Row: {
           agent_contact: string | null
@@ -3781,6 +3880,10 @@ export type Database = {
           next_due_at: string
           status: string
         }[]
+      }
+      get_template_draft_by_share_token: {
+        Args: { p_token: string }
+        Returns: Json
       }
       has_trusted_access: {
         Args: { p_packet_id: string; p_section_key: string }
