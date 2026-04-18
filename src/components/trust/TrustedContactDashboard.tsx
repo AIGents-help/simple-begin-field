@@ -274,12 +274,22 @@ export const TrustedContactDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="text-xs font-bold text-stone-600 hover:text-navy-muted inline-flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-stone-50"
-        >
-          <LogOut className="w-4 h-4" /> Sign out
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleDownload}
+            disabled={downloading || permittedSections.length === 0}
+            className="text-xs font-bold text-white bg-navy-muted hover:bg-navy-muted/90 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg disabled:opacity-50"
+          >
+            {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {downloading ? 'Preparing…' : 'Download PDF'}
+          </button>
+          <button
+            onClick={handleSignOut}
+            className="text-xs font-bold text-stone-600 hover:text-navy-muted inline-flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-stone-50"
+          >
+            <LogOut className="w-4 h-4" /> Sign out
+          </button>
+        </div>
       </header>
 
       <div className="flex-1 flex flex-col lg:flex-row max-w-[1280px] w-full mx-auto">
