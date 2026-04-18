@@ -274,11 +274,13 @@ export const RecordCard = ({
         className="w-full text-left flex items-center justify-between active:scale-[0.99] transition-transform disabled:cursor-default"
       >
         <div className="flex items-center gap-4 min-w-0">
-          {Icon && (
+          {avatar ? (
+            <div className="shrink-0">{avatar}</div>
+          ) : Icon ? (
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isNA || isMuted ? 'bg-stone-100 text-stone-400' : 'bg-stone-50 text-navy-muted'}`}>
               <Icon size={20} />
             </div>
-          )}
+          ) : null}
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h4 className={`font-bold ${isNA ? 'text-stone-400 line-through' : isMuted ? 'text-stone-500' : 'text-navy-muted'}`}>{cleanTitle}</h4>
