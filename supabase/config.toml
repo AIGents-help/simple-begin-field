@@ -1,1 +1,7 @@
 project_id = "knpsulwayjkmvmhoterm"
+
+[functions.verify-checkin]
+verify_jwt = false
+
+[functions.process-checkins]
+verify_jwt = false
