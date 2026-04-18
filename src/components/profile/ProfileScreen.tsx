@@ -11,6 +11,10 @@ import { AlertPreferences } from '../notifications/AlertPreferences';
 import { EmergencyCardSettings } from '../emergency/EmergencyCardSettings';
 import { PlanUpgradeCard } from './PlanUpgradeCard';
 import { FamilyPlanManager } from '../family/FamilyPlanManager';
+import { PartnerCard } from './PartnerCard';
+import { ProfilePhotoUploader } from '../common/ProfilePhotoUploader';
+import { uploadService } from '../../services/uploadService';
+import { PersonAvatar } from '../common/PersonAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -181,12 +185,7 @@ export const ProfileScreen = () => {
                 Manage Household
               </button>
             </div>
-            {userMode === 'couple' && (
-              <div className="pt-4 border-t border-stone-100">
-                <p className="text-[10px] uppercase font-bold text-stone-400 mb-1">Partner</p>
-                <p className="text-sm font-bold text-navy-muted">{personB}</p>
-              </div>
-            )}
+            {userMode === 'couple' && <PartnerCard />}
           </Card>
         </div>
 
