@@ -106,6 +106,7 @@ export const AddEditSheet = ({
     const loadData = async () => {
       if (isOpen) {
         setErrors({});
+        setAutoFilledOrigins({});
         if (initialData) {
           let data = { ...initialData };
           if (data.entryOnly && !data.category) {
@@ -132,8 +133,19 @@ export const AddEditSheet = ({
             }
           }
 
+          // Apply cross-section federation defaults (silent pre-fill + chip).
+          // Only fills empty fields; never overwrites existing data.
+          if (activeTab) {
+            const isExisting = !!initialData.id && !initialData.entryOnly;
+            const { data: filled, origins } = applyDefaults(activeTab, data, isExisting);
+            data = filled;
+            setAutoFilledOrigins(origins);
+          }
+
           setFormData(data);
           setIsNA(data.is_na || data.status === 'not_applicable');
+          // Snapshot federated source values so we can detect changes after save
+          setOriginalSourceSnapshot(buildSourceSnapshot(activeTab, data));
           // Fetch existing document if editing
           if (currentPacket && activeTab && initialData.id) {
             const { data: docs } = await documentService.getDocuments(currentPacket.id, activeTab, initialData.id);
@@ -148,11 +160,12 @@ export const AddEditSheet = ({
           setIsNA(false);
           setSelectedFile(null);
           setInitialAttachment(null);
+          setOriginalSourceSnapshot({});
         }
       }
     };
     loadData();
-  }, [initialData, isOpen, currentPacket, activeTab]);
+  }, [initialData, isOpen, currentPacket, activeTab, applyDefaults]);
 
   const config = SECTIONS_CONFIG.find(s => s.id === activeTab);
 
