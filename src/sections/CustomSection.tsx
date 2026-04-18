@@ -228,12 +228,14 @@ const CustomSectionRecordModal: React.FC<{
   const [notes, setNotes] = useState('');
   const [date, setDate] = useState('');
   const [saving, setSaving] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setTitle(existing?.title ?? '');
       setNotes(existing?.notes ?? '');
       setDate(existing?.entry_date ?? '');
+      setSavedId(existing?.id ?? null);
     }
   }, [isOpen, existing]);
 
@@ -246,8 +248,8 @@ const CustomSectionRecordModal: React.FC<{
     }
     setSaving(true);
     try {
-      const saved = existing
-        ? await customSectionService.updateRecord(existing.id, {
+      const saved = existing || savedId
+        ? await customSectionService.updateRecord((existing?.id || savedId) as string, {
             title: title.trim(),
             notes: notes.trim() || null,
             entry_date: date || null,
@@ -259,9 +261,9 @@ const CustomSectionRecordModal: React.FC<{
             notes,
             entryDate: date || null,
           });
-      toast.success(existing ? 'Entry updated' : 'Entry added');
+      toast.success(existing || savedId ? 'Entry saved' : 'Entry added');
+      setSavedId(saved.id);
       onSaved(saved);
-      onClose();
     } catch (err: any) {
       toast.error(err?.message || 'Failed to save entry');
     } finally {
