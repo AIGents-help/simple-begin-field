@@ -230,10 +230,26 @@ export const RecordDocumentUpload: React.FC<Props> = ({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border-2 border-dashed border-stone-300 text-xs font-bold text-navy-muted hover:bg-white transition-colors disabled:opacity-50"
+          {...dropzoneProps}
+          className={`w-full flex flex-col items-center justify-center gap-1.5 px-3 py-4 rounded-lg border-2 border-dashed text-xs font-bold transition-all disabled:opacity-50 min-h-[88px] ${
+            isDragging
+              ? 'border-solid border-amber-500 bg-amber-50 text-amber-700 scale-[1.01]'
+              : 'border-stone-300 text-navy-muted hover:bg-white'
+          }`}
         >
-          {busy ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-          {busy ? 'Uploading…' : (uploadLabel || `Upload ${label}`)}
+          {busy ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+          <span>
+            {busy
+              ? 'Uploading…'
+              : isDragging
+                ? 'Drop to upload'
+                : isTouch
+                  ? (uploadLabel || `Tap to upload ${label}`)
+                  : 'Drag & drop or tap to upload'}
+          </span>
+          {!busy && !isDragging && (
+            <span className="text-[9px] uppercase tracking-wider text-stone-400 font-bold">PDF, JPG, PNG · Max 20MB</span>
+          )}
         </button>
       )}
 
