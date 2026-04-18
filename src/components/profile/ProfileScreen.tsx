@@ -6,6 +6,7 @@ import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
 import { CheckInPreferences } from '../checkin/CheckInPreferences';
 import { InactivityCheckInCard } from '../checkin/InactivityCheckInCard';
+import { AlertPreferences } from '../notifications/AlertPreferences';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -240,6 +241,8 @@ export const ProfileScreen = () => {
             )}
           </Card>
         </div>
+
+        <AlertPreferences />
 
         <CheckInPreferences />
 
