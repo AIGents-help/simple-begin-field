@@ -64,6 +64,7 @@ export type Database = {
           firm: string | null
           id: string
           is_na: boolean | null
+          license_expiry_date: string | null
           name: string | null
           notes: string | null
           packet_id: string | null
@@ -83,6 +84,7 @@ export type Database = {
           firm?: string | null
           id?: string
           is_na?: boolean | null
+          license_expiry_date?: string | null
           name?: string | null
           notes?: string | null
           packet_id?: string | null
@@ -102,6 +104,7 @@ export type Database = {
           firm?: string | null
           id?: string
           is_na?: boolean | null
+          license_expiry_date?: string | null
           name?: string | null
           notes?: string | null
           packet_id?: string | null
@@ -507,6 +510,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      document_alerts: {
+        Row: {
+          alert_sent_0: boolean
+          alert_sent_14: boolean
+          alert_sent_30: boolean
+          alert_sent_60: boolean
+          alert_sent_7: boolean
+          alert_sent_90: boolean
+          alert_sent_overdue: boolean
+          created_at: string
+          document_name: string | null
+          document_type: string
+          expiry_date: string
+          id: string
+          is_dismissed: boolean
+          last_alert_sent_at: string | null
+          packet_id: string
+          record_id: string
+          related_table: string
+          section_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_sent_0?: boolean
+          alert_sent_14?: boolean
+          alert_sent_30?: boolean
+          alert_sent_60?: boolean
+          alert_sent_7?: boolean
+          alert_sent_90?: boolean
+          alert_sent_overdue?: boolean
+          created_at?: string
+          document_name?: string | null
+          document_type: string
+          expiry_date: string
+          id?: string
+          is_dismissed?: boolean
+          last_alert_sent_at?: string | null
+          packet_id: string
+          record_id: string
+          related_table: string
+          section_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_sent_0?: boolean
+          alert_sent_14?: boolean
+          alert_sent_30?: boolean
+          alert_sent_60?: boolean
+          alert_sent_7?: boolean
+          alert_sent_90?: boolean
+          alert_sent_overdue?: boolean
+          created_at?: string
+          document_name?: string | null
+          document_type?: string
+          expiry_date?: string
+          id?: string
+          is_dismissed?: boolean
+          last_alert_sent_at?: string | null
+          packet_id?: string
+          record_id?: string
+          related_table?: string
+          section_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       documents: {
         Row: {
@@ -1113,6 +1185,7 @@ export type Database = {
           category: string
           created_at: string | null
           created_by: string | null
+          expiry_date: string | null
           id: string
           is_na: boolean | null
           notes: string | null
@@ -1126,6 +1199,7 @@ export type Database = {
           category: string
           created_at?: string | null
           created_by?: string | null
+          expiry_date?: string | null
           id?: string
           is_na?: boolean | null
           notes?: string | null
@@ -1139,6 +1213,7 @@ export type Database = {
           category?: string
           created_at?: string | null
           created_by?: string | null
+          expiry_date?: string | null
           id?: string
           is_na?: boolean | null
           notes?: string | null
@@ -1333,6 +1408,7 @@ export type Database = {
           document_type: string
           id: string
           is_na: boolean | null
+          last_reviewed_date: string | null
           notes: string | null
           original_location: string | null
           packet_id: string
@@ -1350,6 +1426,7 @@ export type Database = {
           document_type: string
           id?: string
           is_na?: boolean | null
+          last_reviewed_date?: string | null
           notes?: string | null
           original_location?: string | null
           packet_id: string
@@ -1367,6 +1444,7 @@ export type Database = {
           document_type?: string
           id?: string
           is_na?: boolean | null
+          last_reviewed_date?: string | null
           notes?: string | null
           original_location?: string | null
           packet_id?: string
@@ -1392,6 +1470,7 @@ export type Database = {
           group_number: string | null
           id: string
           insurance_provider: string | null
+          insurance_renewal_date: string | null
           is_na: boolean | null
           member_id: string | null
           notes: string | null
@@ -1411,6 +1490,7 @@ export type Database = {
           group_number?: string | null
           id?: string
           insurance_provider?: string | null
+          insurance_renewal_date?: string | null
           is_na?: boolean | null
           member_id?: string | null
           notes?: string | null
@@ -1430,6 +1510,7 @@ export type Database = {
           group_number?: string | null
           id?: string
           insurance_provider?: string | null
+          insurance_renewal_date?: string | null
           is_na?: boolean | null
           member_id?: string | null
           notes?: string | null
@@ -1464,6 +1545,7 @@ export type Database = {
           packet_id: string
           pharmacy: string | null
           prescribing_doctor: string | null
+          refill_due_date: string | null
           scope: string | null
           status: string | null
           updated_at: string
@@ -1479,6 +1561,7 @@ export type Database = {
           packet_id: string
           pharmacy?: string | null
           prescribing_doctor?: string | null
+          refill_due_date?: string | null
           scope?: string | null
           status?: string | null
           updated_at?: string
@@ -1494,6 +1577,7 @@ export type Database = {
           packet_id?: string
           pharmacy?: string | null
           prescribing_doctor?: string | null
+          refill_due_date?: string | null
           scope?: string | null
           status?: string | null
           updated_at?: string
@@ -1656,6 +1740,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_preferences: {
+        Row: {
+          alert_14_days: boolean
+          alert_30_days: boolean
+          alert_60_days: boolean
+          alert_7_days: boolean
+          alert_90_days: boolean
+          alert_on_day: boolean
+          alert_overdue: boolean
+          created_at: string
+          delivery_method: string
+          expiration_alerts_enabled: boolean
+          id: string
+          monitored_sections: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_14_days?: boolean
+          alert_30_days?: boolean
+          alert_60_days?: boolean
+          alert_7_days?: boolean
+          alert_90_days?: boolean
+          alert_on_day?: boolean
+          alert_overdue?: boolean
+          created_at?: string
+          delivery_method?: string
+          expiration_alerts_enabled?: boolean
+          id?: string
+          monitored_sections?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_14_days?: boolean
+          alert_30_days?: boolean
+          alert_60_days?: boolean
+          alert_7_days?: boolean
+          alert_90_days?: boolean
+          alert_on_day?: boolean
+          alert_overdue?: boolean
+          created_at?: string
+          delivery_method?: string
+          expiration_alerts_enabled?: boolean
+          id?: string
+          monitored_sections?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       packet_members: {
         Row: {
@@ -1976,6 +2111,7 @@ export type Database = {
           insurance_coverage_amount: number | null
           insurance_policy_number: string | null
           insurance_rider: boolean | null
+          insurance_rider_renewal_date: string | null
           is_na: boolean | null
           item_name: string | null
           last_appraisal_date: string | null
@@ -2046,6 +2182,7 @@ export type Database = {
           insurance_coverage_amount?: number | null
           insurance_policy_number?: string | null
           insurance_rider?: boolean | null
+          insurance_rider_renewal_date?: string | null
           is_na?: boolean | null
           item_name?: string | null
           last_appraisal_date?: string | null
@@ -2116,6 +2253,7 @@ export type Database = {
           insurance_coverage_amount?: number | null
           insurance_policy_number?: string | null
           insurance_rider?: boolean | null
+          insurance_rider_renewal_date?: string | null
           is_na?: boolean | null
           item_name?: string | null
           last_appraisal_date?: string | null
@@ -2713,6 +2851,7 @@ export type Database = {
           electric_monthly_estimate: number | null
           electric_phone: string | null
           estimated_value: number | null
+          flood_insurance_renewal_date: string | null
           garage_code: string | null
           gas_account_number: string | null
           gas_company_name: string | null
@@ -2725,6 +2864,7 @@ export type Database = {
           hoa_monthly_fee: number | null
           hoa_name: string | null
           hoa_phone: string | null
+          home_warranty_expiry_date: string | null
           id: string
           insurance_agent_name: string | null
           insurance_agent_phone: string | null
@@ -2746,6 +2886,7 @@ export type Database = {
           maintenance_contact_name: string | null
           maintenance_contact_phone: string | null
           mortgage_account_number: string | null
+          mortgage_arm_adjustment_date: string | null
           mortgage_interest_rate: number | null
           mortgage_lender_name: string | null
           mortgage_lender_phone: string | null
@@ -2779,6 +2920,7 @@ export type Database = {
           trash_recycling_account_number: string | null
           trash_recycling_pickup_day: string | null
           trash_recycling_provider: string | null
+          umbrella_policy_renewal_date: string | null
           updated_at: string | null
           utilities_account_numbers: Json | null
           water_sewer_account_number: string | null
@@ -2798,6 +2940,7 @@ export type Database = {
           electric_monthly_estimate?: number | null
           electric_phone?: string | null
           estimated_value?: number | null
+          flood_insurance_renewal_date?: string | null
           garage_code?: string | null
           gas_account_number?: string | null
           gas_company_name?: string | null
@@ -2810,6 +2953,7 @@ export type Database = {
           hoa_monthly_fee?: number | null
           hoa_name?: string | null
           hoa_phone?: string | null
+          home_warranty_expiry_date?: string | null
           id?: string
           insurance_agent_name?: string | null
           insurance_agent_phone?: string | null
@@ -2831,6 +2975,7 @@ export type Database = {
           maintenance_contact_name?: string | null
           maintenance_contact_phone?: string | null
           mortgage_account_number?: string | null
+          mortgage_arm_adjustment_date?: string | null
           mortgage_interest_rate?: number | null
           mortgage_lender_name?: string | null
           mortgage_lender_phone?: string | null
@@ -2864,6 +3009,7 @@ export type Database = {
           trash_recycling_account_number?: string | null
           trash_recycling_pickup_day?: string | null
           trash_recycling_provider?: string | null
+          umbrella_policy_renewal_date?: string | null
           updated_at?: string | null
           utilities_account_numbers?: Json | null
           water_sewer_account_number?: string | null
@@ -2883,6 +3029,7 @@ export type Database = {
           electric_monthly_estimate?: number | null
           electric_phone?: string | null
           estimated_value?: number | null
+          flood_insurance_renewal_date?: string | null
           garage_code?: string | null
           gas_account_number?: string | null
           gas_company_name?: string | null
@@ -2895,6 +3042,7 @@ export type Database = {
           hoa_monthly_fee?: number | null
           hoa_name?: string | null
           hoa_phone?: string | null
+          home_warranty_expiry_date?: string | null
           id?: string
           insurance_agent_name?: string | null
           insurance_agent_phone?: string | null
@@ -2916,6 +3064,7 @@ export type Database = {
           maintenance_contact_name?: string | null
           maintenance_contact_phone?: string | null
           mortgage_account_number?: string | null
+          mortgage_arm_adjustment_date?: string | null
           mortgage_interest_rate?: number | null
           mortgage_lender_name?: string | null
           mortgage_lender_phone?: string | null
@@ -2949,6 +3098,7 @@ export type Database = {
           trash_recycling_account_number?: string | null
           trash_recycling_pickup_day?: string | null
           trash_recycling_provider?: string | null
+          umbrella_policy_renewal_date?: string | null
           updated_at?: string | null
           utilities_account_numbers?: Json | null
           water_sewer_account_number?: string | null
@@ -3011,6 +3161,7 @@ export type Database = {
           account_number_encrypted: string | null
           account_number_masked: string | null
           account_type: string | null
+          beneficiary_last_reviewed_date: string | null
           beneficiary_notes: string | null
           category: string | null
           contact_info: string | null
@@ -3028,6 +3179,7 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          beneficiary_last_reviewed_date?: string | null
           beneficiary_notes?: string | null
           category?: string | null
           contact_info?: string | null
@@ -3045,6 +3197,7 @@ export type Database = {
           account_number_encrypted?: string | null
           account_number_masked?: string | null
           account_type?: string | null
+          beneficiary_last_reviewed_date?: string | null
           beneficiary_notes?: string | null
           category?: string | null
           contact_info?: string | null
@@ -3304,11 +3457,14 @@ export type Database = {
           created_at: string | null
           garaging_address: string | null
           id: string
+          inspection_due_date: string | null
           insurance: string | null
+          insurance_renewal_date: string | null
           is_na: boolean | null
           lender_name: string | null
           license_plate: string | null
           lien_info: string | null
+          loan_payoff_date: string | null
           make: string | null
           model: string | null
           monthly_payment: number | null
@@ -3316,6 +3472,7 @@ export type Database = {
           packet_id: string | null
           payoff_amount: number | null
           policy_number: string | null
+          registration_expiry_date: string | null
           scope: string | null
           state: string | null
           status: string | null
@@ -3329,11 +3486,14 @@ export type Database = {
           created_at?: string | null
           garaging_address?: string | null
           id?: string
+          inspection_due_date?: string | null
           insurance?: string | null
+          insurance_renewal_date?: string | null
           is_na?: boolean | null
           lender_name?: string | null
           license_plate?: string | null
           lien_info?: string | null
+          loan_payoff_date?: string | null
           make?: string | null
           model?: string | null
           monthly_payment?: number | null
@@ -3341,6 +3501,7 @@ export type Database = {
           packet_id?: string | null
           payoff_amount?: number | null
           policy_number?: string | null
+          registration_expiry_date?: string | null
           scope?: string | null
           state?: string | null
           status?: string | null
@@ -3354,11 +3515,14 @@ export type Database = {
           created_at?: string | null
           garaging_address?: string | null
           id?: string
+          inspection_due_date?: string | null
           insurance?: string | null
+          insurance_renewal_date?: string | null
           is_na?: boolean | null
           lender_name?: string | null
           license_plate?: string | null
           lien_info?: string | null
+          loan_payoff_date?: string | null
           make?: string | null
           model?: string | null
           monthly_payment?: number | null
@@ -3366,6 +3530,7 @@ export type Database = {
           packet_id?: string | null
           payoff_amount?: number | null
           policy_number?: string | null
+          registration_expiry_date?: string | null
           scope?: string | null
           state?: string | null
           status?: string | null
@@ -3453,6 +3618,18 @@ export type Database = {
         }[]
       }
       touch_last_login: { Args: never; Returns: undefined }
+      upsert_document_alert: {
+        Args: {
+          p_document_name: string
+          p_document_type: string
+          p_expiry_date: string
+          p_packet_id: string
+          p_record_id: string
+          p_related_table: string
+          p_section_key: string
+        }
+        Returns: undefined
+      }
       validate_referral_code: {
         Args: { code_input: string }
         Returns: {
