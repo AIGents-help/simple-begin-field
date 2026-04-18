@@ -177,6 +177,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setState(prev => ({ ...prev, onboarded: false }));
   }, []);
 
+  // Reload custom sections whenever the active packet changes
+  useEffect(() => {
+    if (currentPacket?.id) {
+      void refreshCustomSections();
+    } else {
+      setCustomSections([]);
+    }
+  }, [currentPacket?.id, refreshCustomSections]);
+
   const hydrateUserState = React.useCallback(async (authUser: User | null) => {
     setUser(authUser);
 
