@@ -321,6 +321,29 @@ export const MedicalSection: React.FC<Props> = ({ onRefresh }) => {
           />
         ))}
       </Group>
+
+      {legacyRecords.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">
+              Legacy Records <span className="text-stone-400">({legacyRecords.length})</span>
+            </h3>
+          </div>
+          <p className="text-xs text-stone-500">
+            These records were created before the Medical section was updated. View them as-is or move each one to the correct category.
+          </p>
+          <div className="space-y-3">
+            {legacyRecords.map((r) => (
+              <LegacyMedicalRecordCard
+                key={r.id}
+                record={r}
+                onMigrated={fetchAll}
+                onDeleted={handleDeletedRecord}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };
