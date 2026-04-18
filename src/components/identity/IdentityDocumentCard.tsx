@@ -207,7 +207,8 @@ export const IdentityDocumentCard: React.FC<IdentityDocumentCardProps> = ({
     const ok = await confirm({
       title: 'Are you sure?',
       description: 'This will permanently remove this document record.',
-      confirmText: 'Delete',
+      confirmLabel: 'Delete',
+      variant: 'danger',
     });
     if (!ok) return;
     if (isDraft(data.id)) {
@@ -294,10 +295,13 @@ export const IdentityDocumentCard: React.FC<IdentityDocumentCardProps> = ({
                     <FileText size={14} /> Attach scans or photos. Stored privately in your packet.
                   </div>
                   <RecordDocumentUpload
-                    sectionKey="identity"
                     packetId={packetId}
-                    recordId={data.id}
-                    scope={(data.scope as any) || (scope as any)}
+                    relatedTable="info_records"
+                    relatedRecordId={data.id}
+                    category={String(data.category)}
+                    label={`${title} document`}
+                    description="Upload a scan or photo of this document."
+                    isPrivate
                   />
                 </AccordionContent>
               </AccordionItem>

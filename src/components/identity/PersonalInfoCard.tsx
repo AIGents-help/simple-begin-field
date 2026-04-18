@@ -26,7 +26,7 @@ const FIELDS_CONTACT = [
   { name: 'primary_phone', label: 'Primary phone', type: 'tel', placeholder: '+1 555 123 4567' },
 ];
 
-type ProfileLike = Record<string, any>;
+type ProfileLike = Record<string, any> & { id: string };
 
 const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <label className="block">
