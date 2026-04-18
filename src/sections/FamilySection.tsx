@@ -2,14 +2,22 @@ import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
-import { User, List, GitBranch } from 'lucide-react';
+import { User, List, GitBranch, Heart } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { FamilyTreeView } from '../components/family/FamilyTreeView';
+import { SpouseProfileSheet } from '../components/family/SpouseProfileSheet';
 import { sectionService } from '../services/sectionService';
+import { StorageImage } from '../components/common/StorageImage';
 
 export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
+  const [spouseSheetOpen, setSpouseSheetOpen] = useState(false);
+  const [editingSpouse, setEditingSpouse] = useState<any | null>(null);
+  const refreshRef = React.useRef<(() => void) | null>(null);
   const { bumpCompletion } = useAppContext();
+
+  const isSpouse = (record: any) =>
+    (record?.relationship || '').toLowerCase() === 'spouse';
 
   const handleDelete = async (record: any, refresh: () => void) => {
     if (!record?.id) {
@@ -26,6 +34,33 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
     bumpCompletion();
     toast.success('Family member deleted.', { duration: 3000, position: 'bottom-center' });
   };
+
+  const openSpouseSheet = (records: any[], record?: any) => {
+    if (record) {
+      setEditingSpouse(record);
+      setSpouseSheetOpen(true);
+      return;
+    }
+    // Adding new — enforce single-active-spouse rule
+    const activeSpouse = records.find(
+      (r) => isSpouse(r) && !r.is_deceased && !['divorced', 'separated'].includes((r.marital_status || '').toLowerCase())
+    );
+    if (activeSpouse) {
+      toast.error('You already have an active spouse on file. Mark them as divorced, separated, widowed, or deceased before adding another.', {
+        duration: 6000,
+        position: 'bottom-center',
+      });
+      return;
+    }
+    setEditingSpouse(null);
+    setSpouseSheetOpen(true);
+  };
+
+  // Hand-rolled add button so we can intercept "Add Spouse" via the relationship picker
+  // For now, the "Add Family Member" button still flows through the generic sheet.
+  // When the user picks "Spouse" from the relationship dropdown there, the generic sheet
+  // saves a basic record — but they can also tap a spouse card to open the rich editor.
+  // To make spouse-add explicit, we surface a dedicated Add Spouse CTA at the top of the list.
 
   return (
     <div>
@@ -58,24 +93,105 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
       </div>
 
       {viewMode === 'list' ? (
-        <SectionScreenTemplate onAddClick={onAddClick} onRefresh={onRefresh}>
-          {(records, _docs, refresh) => (
-            <div className="space-y-4">
-              {records.map(record => (
-                <RecordCard
-                  key={record.id}
-                  title={record.name}
-                  subtitle={buildSubtitle(record.relationship, record.phone, record.email)}
-                  subtitlePlaceholder="No contact details added"
-                  icon={User}
-                  badge={record.birthday ? 'Birthday' : undefined}
-                  data={record}
-                  onEdit={() => onAddClick(undefined, record)}
-                  onDelete={() => handleDelete(record, refresh)}
-                />
-              ))}
-            </div>
-          )}
+        <SectionScreenTemplate
+          onAddClick={(file, data, options) => {
+            // If the prefilled data already says Spouse, route to the rich sheet
+            if (data?.relationship && (data.relationship as string).toLowerCase() === 'spouse') {
+              setEditingSpouse(data);
+              setSpouseSheetOpen(true);
+              return;
+            }
+            onAddClick(file, data, options);
+          }}
+          onRefresh={(fn) => {
+            refreshRef.current = fn;
+            if (onRefresh) onRefresh(fn);
+          }}
+        >
+          {(records, _docs, refresh) => {
+            const hasSpouse = records.some((r) => isSpouse(r));
+            return (
+              <div className="space-y-4">
+                {/* Dedicated "Add Spouse" CTA when there is no spouse yet */}
+                {!hasSpouse && (
+                  <button
+                    type="button"
+                    onClick={() => openSpouseSheet(records)}
+                    className="w-full p-4 border-2 border-dashed border-rose-200 rounded-2xl flex items-center justify-center gap-2 text-rose-500 hover:border-rose-400 hover:bg-rose-50/40 transition-colors"
+                  >
+                    <Heart size={18} />
+                    <span className="font-bold text-sm">Add Spouse / Partner</span>
+                  </button>
+                )}
+
+                {records.map((record) => {
+                  const spouse = isSpouse(record);
+                  const subtitleParts = spouse
+                    ? [
+                        record.preferred_name ? `"${record.preferred_name}"` : '',
+                        record.marriage_date ? `Married ${new Date(record.marriage_date).getFullYear()}` : '',
+                        record.phone,
+                        record.email,
+                      ]
+                    : [record.relationship, record.phone, record.email];
+
+                  const badge = spouse
+                    ? (record.marital_status && record.marital_status !== 'married'
+                        ? record.marital_status.charAt(0).toUpperCase() + record.marital_status.slice(1)
+                        : 'Spouse')
+                    : record.birthday
+                    ? 'Birthday'
+                    : undefined;
+
+                  // Custom avatar for spouses with a photo
+                  if (spouse && record.photo_path) {
+                    return (
+                      <div key={record.id} className="relative">
+                        <RecordCard
+                          title={record.name}
+                          subtitle={buildSubtitle(...subtitleParts)}
+                          subtitlePlaceholder="No contact details added"
+                          icon={Heart}
+                          badge={badge}
+                          data={record}
+                          onEdit={() => openSpouseSheet(records, record)}
+                          onDelete={() => handleDelete(record, refresh)}
+                        />
+                        {/* Avatar overlay on top of the icon slot */}
+                        <div className={`absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none ${record.is_deceased ? 'grayscale' : ''}`}>
+                          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                            <StorageImage
+                              path={record.photo_path}
+                              alt={record.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <RecordCard
+                      key={record.id}
+                      title={record.name}
+                      subtitle={buildSubtitle(...subtitleParts)}
+                      subtitlePlaceholder="No contact details added"
+                      icon={spouse ? Heart : User}
+                      badge={badge}
+                      data={record}
+                      onEdit={() =>
+                        spouse
+                          ? openSpouseSheet(records, record)
+                          : onAddClick(undefined, record)
+                      }
+                      onDelete={() => handleDelete(record, refresh)}
+                    />
+                  );
+                })}
+              </div>
+            );
+          }}
         </SectionScreenTemplate>
       ) : (
         <div className="p-6 pb-32">
@@ -85,10 +201,27 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
           </div>
           <FamilyTreeView
             onAddMember={() => onAddClick?.()}
-            onEditMember={(member) => onAddClick?.(undefined, member)}
+            onEditMember={(member) => {
+              if (isSpouse(member)) {
+                setEditingSpouse(member);
+                setSpouseSheetOpen(true);
+              } else {
+                onAddClick?.(undefined, member);
+              }
+            }}
           />
         </div>
       )}
+
+      <SpouseProfileSheet
+        isOpen={spouseSheetOpen}
+        onClose={() => setSpouseSheetOpen(false)}
+        spouse={editingSpouse}
+        onSaved={() => {
+          // Refresh the family list (template exposed its refresh via onRefresh)
+          refreshRef.current?.();
+        }}
+      />
     </div>
   );
 };
