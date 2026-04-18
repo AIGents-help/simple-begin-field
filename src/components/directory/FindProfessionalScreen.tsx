@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Briefcase, Search, Star, MapPin, Phone, Loader2, ChevronRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { useAppContext } from '@/context/AppContext';
 
 const CATEGORIES = [
   'Estate Attorney',
@@ -27,14 +28,16 @@ interface ProfessionalResult {
 }
 
 export const FindProfessionalScreen = () => {
+  const { directoryQuery, setDirectoryQuery } = useAppContext() as any;
   const [zip, setZip] = useState('');
   const [category, setCategory] = useState('');
   const [results, setResults] = useState<ProfessionalResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const autoSearchedRef = useRef(false);
 
-  const handleSearch = async () => {
-    if (!zip.trim() || !category) {
+  const runSearch = async (zipValue: string, categoryValue: string) => {
+    if (!zipValue.trim() || !categoryValue) {
       toast.error('Please enter a ZIP code and select a category');
       return;
     }
@@ -42,7 +45,7 @@ export const FindProfessionalScreen = () => {
     setSearched(true);
     try {
       const { data, error } = await supabase.functions.invoke('find-professionals', {
-        body: { zip: zip.trim(), category },
+        body: { zip: zipValue.trim(), category: categoryValue },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -54,6 +57,32 @@ export const FindProfessionalScreen = () => {
       setLoading(false);
     }
   };
+
+  const handleSearch = () => runSearch(zip, category);
+
+  // Consume one-shot directoryQuery from context. Auto-searches when a ZIP
+  // is already entered; otherwise just pre-fills the category.
+  useEffect(() => {
+    if (!directoryQuery || autoSearchedRef.current) return;
+    autoSearchedRef.current = true;
+    setCategory(directoryQuery);
+    setDirectoryQuery?.(null);
+    if (zip.trim()) {
+      void runSearch(zip, directoryQuery);
+    } else {
+      toast.info('Enter your ZIP code to find ' + directoryQuery + ' near you');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [directoryQuery]);
+
+  // Compose dropdown options: surface the supplied query if not in the
+  // built-in CATEGORIES list so the select still shows the active term.
+  const dropdownCategories = React.useMemo(() => {
+    if (category && !CATEGORIES.includes(category)) {
+      return [category, ...CATEGORIES];
+    }
+    return CATEGORIES;
+  }, [category]);
 
   return (
     <div className="p-4 md:p-6 max-w-[800px] mx-auto space-y-6">
@@ -92,7 +121,7 @@ export const FindProfessionalScreen = () => {
               className="w-full p-3 bg-white rounded-xl border border-stone-200 focus:border-stone-400 outline-none text-sm"
             >
               <option value="">Select a category...</option>
-              {CATEGORIES.map(c => (
+              {dropdownCategories.map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>

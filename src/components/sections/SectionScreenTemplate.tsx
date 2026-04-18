@@ -8,6 +8,8 @@ import { sectionService } from '../../services/sectionService';
 import { documentService } from '../../services/documentService';
 
 import { SectionRecommendations } from './SectionRecommendations';
+import { FindProfessionalPrompt } from '../directory/FindProfessionalPrompt';
+import { resolveSectionQuery, resolveRecordQuery } from '../../config/professionalPromptMap';
 
 import { CategoryOption } from '../upload/types';
 
@@ -185,6 +187,10 @@ export const SectionScreenTemplate = ({
               <Plus size={18} />
               {config.addButtonLabel}
             </button>
+            <FindProfessionalPrompt
+              query={resolveSectionQuery(activeTab)}
+              variant="block"
+            />
           </div>
         )
       )}
@@ -238,6 +244,7 @@ export const RecordCard = ({
   data?: any;
   subtitlePlaceholder?: string;
 }) => {
+  const { activeTab } = useAppContext();
   const isNA = data?.is_na || data?.status === 'not_applicable';
   // Person/animal lifecycle dimming — applies to family/pets/trusted contacts (is_deceased)
   // and advisors (advisor_status !== 'active').
@@ -262,6 +269,10 @@ export const RecordCard = ({
     : advisorStatus === 'former'
     ? 'Former'
     : null;
+
+  // For N/A records, surface a "Find a Professional" prompt with a query
+  // resolved from the record's content (falls back to the section default).
+  const proQuery = isNA && activeTab ? resolveRecordQuery(activeTab, data) : null;
 
   return (
     <div
@@ -338,6 +349,9 @@ export const RecordCard = ({
           <ChevronRight size={18} className="text-stone-300 group-hover:text-navy-muted transition-colors" />
         </div>
       </button>
+      {proQuery && (
+        <FindProfessionalPrompt query={proQuery} variant="inline" />
+      )}
     </div>
   );
 };
