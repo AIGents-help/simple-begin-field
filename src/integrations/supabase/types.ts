@@ -1861,6 +1861,66 @@ export type Database = {
         }
         Relationships: []
       }
+      packet_download_history: {
+        Row: {
+          created_at: string
+          download_type: string
+          downloaded_by: string | null
+          downloader_email: string | null
+          downloader_role: string
+          file_name: string | null
+          format_option: string
+          id: string
+          include_sensitive: boolean
+          notes: string | null
+          packet_id: string
+          sections_included: string[]
+        }
+        Insert: {
+          created_at?: string
+          download_type?: string
+          downloaded_by?: string | null
+          downloader_email?: string | null
+          downloader_role?: string
+          file_name?: string | null
+          format_option?: string
+          id?: string
+          include_sensitive?: boolean
+          notes?: string | null
+          packet_id: string
+          sections_included?: string[]
+        }
+        Update: {
+          created_at?: string
+          download_type?: string
+          downloaded_by?: string | null
+          downloader_email?: string | null
+          downloader_role?: string
+          file_name?: string | null
+          format_option?: string
+          id?: string
+          include_sensitive?: boolean
+          notes?: string | null
+          packet_id?: string
+          sections_included?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packet_download_history_downloaded_by_fkey"
+            columns: ["downloaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "packet_download_history_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       packet_members: {
         Row: {
           created_at: string | null
