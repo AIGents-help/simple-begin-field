@@ -3,6 +3,13 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+export type PdfDownloadType =
+  | 'full_packet'
+  | 'section'
+  | 'admin'
+  | 'funeral_instructions'
+  | 'emergency_medical';
+
 export interface PdfGenOptions {
   packetId?: string;            // defaults to caller's own packet on the server
   sections?: string[];          // empty/undefined = all sections
@@ -10,7 +17,7 @@ export interface PdfGenOptions {
   format?: 'full' | 'summary';  // default 'full'
   includeCover?: boolean;       // default true
   includeWatermark?: boolean;   // default true
-  downloadType?: 'full_packet' | 'section' | 'admin';
+  downloadType?: PdfDownloadType;
 }
 
 export interface DownloadHistoryRow {
