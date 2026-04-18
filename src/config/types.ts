@@ -20,7 +20,7 @@ export type SectionId =
 
 export type UserScope = 'personA' | 'personB' | 'shared';
 export type UserMode = 'single' | 'couple';
-export type View = 'dashboard' | 'sections' | 'profile' | 'search' | 'household' | 'invite' | 'security' | 'trust' | 'pricing' | 'affiliate' | 'directory' | 'admin';
+export type View = 'dashboard' | 'sections' | 'profile' | 'search' | 'household' | 'invite' | 'security' | 'trust' | 'pricing' | 'affiliate' | 'directory' | 'admin' | 'estate';
 export type OnboardingStep = 'welcome' | 'setup' | 'names' | 'trust' | 'start';
 
 export interface Section {
