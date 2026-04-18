@@ -86,7 +86,26 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [completionVersion, setCompletionVersion] = useState(0);
   const bumpCompletion = React.useCallback(() => setCompletionVersion(v => v + 1), []);
   const [directoryQuery, setDirectoryQuery] = useState<string | null>(null);
+  const [customSections, setCustomSections] = useState<CustomSection[]>([]);
+  const [activeCustomSectionId, setActiveCustomSectionId] = useState<string | null>(null);
   const currentPacketRef = React.useRef<any | null>(null);
+
+  const refreshCustomSections = useCallback(async () => {
+    if (!currentPacketRef.current?.id) {
+      setCustomSections([]);
+      return;
+    }
+    try {
+      const list = await customSectionService.list(currentPacketRef.current.id);
+      setCustomSections(list);
+    } catch (err) {
+      console.error('[AppContext] refreshCustomSections failed', err);
+    }
+  }, []);
+
+  const setActiveCustomSection = useCallback((id: string | null) => {
+    setActiveCustomSectionId(id);
+  }, []);
 
   const {
     loading: billingLoading,
