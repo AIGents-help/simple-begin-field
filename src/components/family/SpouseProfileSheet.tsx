@@ -503,6 +503,41 @@ export const SpouseProfileSheet: React.FC<Props> = ({ isOpen, onClose, spouse, o
                 </div>
               </Section>
 
+              {/* Documents — conditional on marital status */}
+              {currentPacket && (() => {
+                const status = (form.marital_status || 'married').toLowerCase();
+                const showMarriageCert = ['married', 'separated', 'widowed'].includes(status);
+                const showDivorceDecree = ['divorced', 'separated'].includes(status);
+                if (!showMarriageCert && !showDivorceDecree) return null;
+                return (
+                  <Section id="documents" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
+                    <p className="text-[11px] text-stone-500 italic">
+                      Documents are attached directly to this spouse record. They appear here only — never as standalone entries.
+                    </p>
+                    {showMarriageCert && (
+                      <RecordDocumentUpload
+                        packetId={currentPacket.id}
+                        relatedTable="family_members"
+                        relatedRecordId={spouse?.id ?? null}
+                        category="marriage_certificate"
+                        label="Marriage Certificate"
+                        description="Official certificate from this marriage (PDF, JPG, PNG)"
+                      />
+                    )}
+                    {showDivorceDecree && (
+                      <RecordDocumentUpload
+                        packetId={currentPacket.id}
+                        relatedTable="family_members"
+                        relatedRecordId={spouse?.id ?? null}
+                        category="divorce_decree"
+                        label="Divorce Decree"
+                        description="Final divorce decree or separation order (PDF, JPG, PNG)"
+                      />
+                    )}
+                  </Section>
+                );
+              })()}
+
               <Section id="lifecycle" openSection={openSection} setOpenSection={(v) => setOpenSection(v as SectionKey)}>
                 <LifeStatusToggle
                   value={!!form.is_deceased}
