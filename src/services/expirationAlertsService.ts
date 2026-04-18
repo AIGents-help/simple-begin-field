@@ -53,4 +53,92 @@ export const expirationAlertsService = {
       } as UpcomingExpiration;
     });
   },
+
+  /**
+   * ADMIN: Count of alert emails sent today (any threshold flag flipped today).
+   */
+  async adminAlertsSentToday(): Promise<number> {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const { count, error } = await supabase
+      .from('document_alerts')
+      .select('id', { count: 'exact', head: true })
+      .gte('last_alert_sent_at', startOfDay.toISOString());
+    if (error) throw error;
+    return count || 0;
+  },
+
+  /**
+   * ADMIN: Users with at least one overdue (non-dismissed) document.
+   */
+  async adminOverdueUsers(): Promise<Array<{ user_id: string; email: string | null; full_name: string | null; overdue_count: number }>> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const { data, error } = await supabase
+      .from('document_alerts')
+      .select('user_id')
+      .eq('is_dismissed', false)
+      .lt('expiry_date', today.toISOString().slice(0, 10));
+    if (error) throw error;
+
+    const counts = new Map<string, number>();
+    (data || []).forEach((r: any) => {
+      counts.set(r.user_id, (counts.get(r.user_id) || 0) + 1);
+    });
+    if (counts.size === 0) return [];
+
+    const userIds = Array.from(counts.keys());
+    const { data: profiles, error: pErr } = await supabase
+      .from('profiles')
+      .select('id, email, full_name')
+      .in('id', userIds);
+    if (pErr) throw pErr;
+
+    return (profiles || []).map((p: any) => ({
+      user_id: p.id,
+      email: p.email,
+      full_name: p.full_name,
+      overdue_count: counts.get(p.id) || 0,
+    })).sort((a, b) => b.overdue_count - a.overdue_count);
+  },
+
+  /**
+   * ADMIN: Aggregate counts of expiring document types across all users (next 90d + overdue).
+   */
+  async adminTopExpiringTypes(): Promise<Array<{ document_type: string; count: number }>> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const horizon = new Date(today);
+    horizon.setDate(today.getDate() + 90);
+    const overdueStart = new Date(today);
+    overdueStart.setDate(today.getDate() - 30);
+
+    const { data, error } = await supabase
+      .from('document_alerts')
+      .select('document_type')
+      .eq('is_dismissed', false)
+      .gte('expiry_date', overdueStart.toISOString().slice(0, 10))
+      .lte('expiry_date', horizon.toISOString().slice(0, 10));
+    if (error) throw error;
+
+    const counts = new Map<string, number>();
+    (data || []).forEach((r: any) => {
+      counts.set(r.document_type, (counts.get(r.document_type) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([document_type, count]) => ({ document_type, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+  },
+
+  /**
+   * ADMIN: Trigger a manual alert run for a single user (calls the edge function).
+   */
+  async adminSendManualAlert(userId: string): Promise<void> {
+    const { data, error } = await supabase.functions.invoke('process-expiration-alerts', {
+      body: { manual_user_id: userId },
+    });
+    if (error) throw error;
+    if ((data as any)?.error) throw new Error((data as any).error);
+  },
 };
