@@ -236,7 +236,7 @@ export const AddEditSheet = ({
   const config = SECTIONS_CONFIG.find(s => s.id === activeTab);
 
   // Section-specific field definitions
-  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string; options?: string[]; rows?: number }[] | null => {
+  const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string; options?: string[]; rows?: number; list?: string }[] | null => {
     switch (activeTab) {
       case 'family': {
         const rel = (formData.relationship || initialData?.relationship || '').toLowerCase();
