@@ -113,10 +113,18 @@ export const HavenAssistant = () => {
     }
   };
 
-  const sendMessage = async () => {
-    const text = input.trim();
+  const SUGGESTED_PROMPTS = [
+    'What should I add next?',
+    'What are my biggest gaps?',
+    'Help me understand why this matters',
+    'What would happen if I died today?',
+    'What documents should I upload?',
+  ];
+
+  const sendMessage = async (overrideText?: string) => {
+    const text = (overrideText ?? input).trim();
     if (!text || loading) return;
-    setInput('');
+    if (!overrideText) setInput('');
 
     const newMessages: ChatMessage[] = [...messages, { role: 'user', content: text }];
     setMessages(newMessages);
