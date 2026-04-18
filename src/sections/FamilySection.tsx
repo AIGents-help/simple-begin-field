@@ -14,6 +14,9 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
   const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
   const [spouseSheetOpen, setSpouseSheetOpen] = useState(false);
   const [editingSpouse, setEditingSpouse] = useState<any | null>(null);
+  // Bumping this triggers FamilyTreeView to re-fetch family_members so the
+  // tree never shows stale data after edits/saves/deletes.
+  const [treeRefreshKey, setTreeRefreshKey] = useState(0);
   const refreshRef = React.useRef<(() => void) | null>(null);
   const { bumpCompletion } = useAppContext();
   const confirm = useConfirm();
@@ -41,6 +44,7 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
       return;
     }
     refresh();
+    setTreeRefreshKey((k) => k + 1);
     bumpCompletion();
     toast.success('Family member deleted.', { duration: 3000, position: 'bottom-center' });
   };
@@ -124,7 +128,14 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
           }}
           onRefresh={(fn) => {
             refreshRef.current = fn;
-            if (onRefresh) onRefresh(fn);
+            // Wrap the upstream refresh so any save coming through AppShell's
+            // AddEditSheet (non-spouse family edits) also bumps the tree key
+            // and the tree refetches automatically.
+            const wrapped = (newRecord?: any) => {
+              fn(newRecord);
+              setTreeRefreshKey((k) => k + 1);
+            };
+            if (onRefresh) onRefresh(wrapped);
           }}
         >
           {(records, _docs, refresh) => {
@@ -145,6 +156,8 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
 
                 {records.map((record) => {
                   const spouse = isSpouse(record);
+                  const status = (record.marital_status || 'married').toLowerCase();
+                  const isCurrentSpouse = spouse && status === 'married';
                   const subtitleParts = spouse
                     ? [
                         record.preferred_name ? `"${record.preferred_name}"` : '',
@@ -154,10 +167,18 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
                       ]
                     : [record.relationship, record.phone, record.email];
 
+                  // Spouse status → human-readable badge
+                  // Married → "Spouse", Divorced/Separated → "Ex-Spouse",
+                  // Widowed → "Widowed Spouse", anything else → titlecased status.
+                  const spouseBadge = (() => {
+                    if (status === 'married') return 'Spouse';
+                    if (status === 'divorced' || status === 'separated') return 'Ex-Spouse';
+                    if (status === 'widowed') return 'Widowed Spouse';
+                    return status.charAt(0).toUpperCase() + status.slice(1);
+                  })();
+
                   const badge = spouse
-                    ? (record.marital_status && record.marital_status !== 'married'
-                        ? record.marital_status.charAt(0).toUpperCase() + record.marital_status.slice(1)
-                        : 'Spouse')
+                    ? spouseBadge
                     : record.birthday
                     ? 'Birthday'
                     : undefined;
@@ -219,6 +240,7 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
             <p className="text-xs text-stone-500">Visual overview of your family connections.</p>
           </div>
           <FamilyTreeView
+            refreshKey={treeRefreshKey}
             onAddMember={() => onAddClick?.()}
             onEditMember={(member) => {
               if (isSpouse(member)) {
@@ -239,6 +261,8 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
         onSaved={() => {
           // Refresh the family list (template exposed its refresh via onRefresh)
           refreshRef.current?.();
+          // Force the tree view to re-fetch so it never shows stale data
+          setTreeRefreshKey((k) => k + 1);
         }}
       />
     </div>

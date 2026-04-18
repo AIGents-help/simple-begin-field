@@ -13,6 +13,8 @@ interface FamilyMember {
   is_deceased?: boolean | null;
   date_of_death?: string | null;
   category?: string | null; // e.g. "Maternal" / "Paternal" / "Mother" / "Father"
+  marital_status?: string | null; // for spouses: married | separated | divorced | widowed
+  [key: string]: any; // Allow full-row hydration
 }
 
 const HavenOwl = () => <HavenOwlSvg size={120} className="mx-auto" />;
@@ -115,6 +117,12 @@ function classify(member: FamilyMember): { gen: GenIndex; side: 'left' | 'right'
 interface FamilyTreeViewProps {
   onEditMember?: (member: any) => void;
   onAddMember?: (parentId?: string) => void;
+  /**
+   * Bumping this number forces the tree to re-fetch family members from the
+   * database. The parent component should increment it after any save/delete
+   * so the tree never shows stale data.
+   */
+  refreshKey?: number;
 }
 
 const validYear = (raw: string | null | undefined): string => {
@@ -125,7 +133,7 @@ const validYear = (raw: string | null | undefined): string => {
   return y >= 1900 ? y.toString() : '';
 };
 
-export const FamilyTreeView = ({ onEditMember, onAddMember }: FamilyTreeViewProps) => {
+export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: FamilyTreeViewProps) => {
   const { currentPacket } = useAppContext();
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
@@ -133,19 +141,21 @@ export const FamilyTreeView = ({ onEditMember, onAddMember }: FamilyTreeViewProp
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchMembers = async () => {
       if (!currentPacket) return;
       setLoading(true);
+      // Select all columns so the edit handler can pre-fill the form with
+      // the complete record (phone, email, address, marital_status, etc.)
       const { data } = await supabase
         .from('family_members')
-        .select('id, name, relationship, birthday, parent_member_id, is_deceased, date_of_death, category')
+        .select('*')
         .eq('packet_id', currentPacket.id)
         .order('created_at', { ascending: true });
       setMembers((data as any[]) || []);
       setLoading(false);
     };
-    fetch();
-  }, [currentPacket]);
+    fetchMembers();
+  }, [currentPacket, refreshKey]);
 
   const rootName = currentPacket?.person_a_name || 'You';
 
@@ -374,7 +384,18 @@ export const FamilyTreeView = ({ onEditMember, onAddMember }: FamilyTreeViewProp
               const isUser = !!n.isUser;
               const deceased = !isUser && !!member?.is_deceased;
               const name = isUser ? rootName : member?.name || '';
-              const label = isUser ? 'You' : member?.relationship || '';
+              // Relabel spouses based on marital status so the tree never shows
+              // a divorced/widowed person as a current "Spouse".
+              const rawRel = isUser ? 'You' : member?.relationship || '';
+              const status = (member?.marital_status || '').toLowerCase();
+              const isSpouseLike = ['spouse', 'partner', 'husband', 'wife'].includes(rawRel.toLowerCase());
+              const label = isUser
+                ? 'You'
+                : isSpouseLike && (status === 'divorced' || status === 'separated')
+                ? 'Ex-Spouse'
+                : isSpouseLike && status === 'widowed'
+                ? 'Widowed'
+                : rawRel;
               const year = validYear(member?.birthday);
               const deathYear = validYear(member?.date_of_death);
               const fillColor = isUser ? '#0f1d3a' : deceased ? '#6b7280' : '#1a2744';
