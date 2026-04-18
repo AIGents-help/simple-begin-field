@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { HomeInventoryVideo } from './HomeInventoryVideo';
+import { AIValuationPanel } from '@/components/common/AIValuationPanel';
 
 type RealEstateProperty = Record<string, any> & {
   id: string;
@@ -590,14 +591,17 @@ export const RealEstatePropertyCard: React.FC<PropertyCardProps> = ({
       }
 
       const savedRecord = normalizeProperty(result.data as RealEstateProperty);
+      const wasNewRecord = isDraftId(property.id);
       setFormData(savedRecord);
       setHasChanges(false);
-      onSaved(savedRecord, isDraftId(property.id) ? property.id : undefined);
+      onSaved(savedRecord, wasNewRecord ? property.id : undefined);
       bumpCompletion();
       toast.success(`${savedRecord.property_label || 'Property'} saved.`, {
         duration: 3000,
         position: 'bottom-center',
       });
+      // Collapse on save for new records; keep open when editing existing.
+      if (wasNewRecord && expanded) onToggle();
     } catch (error: any) {
       console.error('Failed to save property', error);
       toast.error(`Failed to save property: ${error?.message || 'Unknown error'}`, {
@@ -688,6 +692,17 @@ export const RealEstatePropertyCard: React.FC<PropertyCardProps> = ({
                   onChange={setFieldValue}
                   revealedFields={revealedFields}
                   onToggleReveal={toggleReveal}
+                />
+                <AIValuationPanel
+                  variant="real_estate"
+                  enabled={Boolean(String(formData.address || '').trim().length >= 5)}
+                  disabledHint="Enter the property's full address to use AI estimation."
+                  input={() => ({
+                    property_type: formData.property_type ?? undefined,
+                    address: formData.address ?? '',
+                    year_built: formData.year_purchased ?? undefined,
+                  })}
+                  onAccept={(v) => setFieldValue('estimated_value', v)}
                 />
               </AccordionContent>
             </AccordionItem>
