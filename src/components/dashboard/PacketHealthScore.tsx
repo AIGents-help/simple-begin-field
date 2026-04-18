@@ -122,7 +122,7 @@ export const PacketHealthScore: React.FC<{ packetId: string }> = ({ packetId }) 
             return (
               <button
                 key={s.key}
-                onClick={() => { setTab(s.key); setView('sections'); }}
+                onClick={() => { setTab(s.key as any); setView('sections'); }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-stone-50 transition-colors text-left"
               >
                 <div className="w-32 shrink-0 flex items-center gap-1.5">
