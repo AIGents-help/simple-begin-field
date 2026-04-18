@@ -128,7 +128,14 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
           }}
           onRefresh={(fn) => {
             refreshRef.current = fn;
-            if (onRefresh) onRefresh(fn);
+            // Wrap the upstream refresh so any save coming through AppShell's
+            // AddEditSheet (non-spouse family edits) also bumps the tree key
+            // and the tree refetches automatically.
+            const wrapped = (newRecord?: any) => {
+              fn(newRecord);
+              setTreeRefreshKey((k) => k + 1);
+            };
+            if (onRefresh) onRefresh(wrapped);
           }}
         >
           {(records, _docs, refresh) => {
