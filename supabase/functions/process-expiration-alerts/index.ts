@@ -40,6 +40,19 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    // Optional manual mode: { manual_user_id: "..." } sends a one-off summary
+    // of every currently pending (non-dismissed) alert for that user, ignoring
+    // threshold-day matching. Used by the admin "Send manual alert" button.
+    let manualUserId: string | null = null;
+    try {
+      if (req.method === "POST") {
+        const body = await req.json().catch(() => ({}));
+        manualUserId = body?.manual_user_id || null;
+      }
+    } catch (_) {
+      manualUserId = null;
+    }
+
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
@@ -49,12 +62,16 @@ serve(async (req) => {
     const horizonEnd = new Date(today);
     horizonEnd.setUTCDate(today.getUTCDate() + 90);
 
-    const { data: alerts, error: alertsErr } = await supabase
+    let alertsQuery = supabase
       .from("document_alerts")
       .select("*")
       .eq("is_dismissed", false)
       .gte("expiry_date", horizonStart.toISOString().slice(0, 10))
       .lte("expiry_date", horizonEnd.toISOString().slice(0, 10));
+
+    if (manualUserId) alertsQuery = alertsQuery.eq("user_id", manualUserId);
+
+    const { data: alerts, error: alertsErr } = await alertsQuery;
 
     if (alertsErr) throw alertsErr;
 
@@ -65,12 +82,18 @@ serve(async (req) => {
       const expiry = new Date(alert.expiry_date + "T00:00:00Z");
       const diff = daysBetween(today, expiry);
 
-      // Find the most urgent threshold this alert hits today, that hasn't been sent yet
+      // In manual mode include every pending alert, label with closest threshold
       let hit: typeof THRESHOLDS[0] | null = null;
-      for (const t of THRESHOLDS) {
-        if (diff === t.days && !alert[t.flag]) {
-          hit = t;
-          break;
+      if (manualUserId) {
+        hit = THRESHOLDS.reduce<typeof THRESHOLDS[0] | null>((best, t) =>
+          best === null || Math.abs(t.days - diff) < Math.abs(best.days - diff) ? t : best,
+        null);
+      } else {
+        for (const t of THRESHOLDS) {
+          if (diff === t.days && !alert[t.flag]) {
+            hit = t;
+            break;
+          }
         }
       }
       if (!hit) continue;
