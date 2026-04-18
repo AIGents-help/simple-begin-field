@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X, TrendingUp, ArrowRight, FileText } from 'lucide-react';
+import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X, TrendingUp, ArrowRight, FileText, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
@@ -271,6 +271,21 @@ export const ProfileScreen = () => {
               <div className="text-left">
                 <p className="text-sm font-bold text-navy-muted">Legal Document Templates</p>
                 <p className="text-[11px] text-stone-500">Starter Wills, POAs, healthcare directives, and more</p>
+              </div>
+            </div>
+            <ArrowRight size={16} className="text-stone-400 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+          <button
+            onClick={() => setView('partner')}
+            className="mt-3 w-full flex items-center justify-between p-4 bg-white border border-stone-200 rounded-2xl hover:border-navy-muted/30 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600">
+                <Heart size={18} />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-bold text-navy-muted">Partner Collaboration</p>
+                <p className="text-[11px] text-stone-500">Invite your partner and choose what to share</p>
               </div>
             </div>
             <ArrowRight size={16} className="text-stone-400 group-hover:translate-x-0.5 transition-transform" />

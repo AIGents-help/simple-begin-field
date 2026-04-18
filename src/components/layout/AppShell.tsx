@@ -26,6 +26,7 @@ import { SectionId } from '../../config/types';
 import { HavenAssistant } from '../haven/HavenAssistant';
 import { EstateSummaryPage } from '../estate/EstateSummaryPage';
 import { TemplatesScreen } from '../templates/TemplatesScreen';
+import { PartnerSettings } from '../couple/PartnerSettings';
 
 export const AppShell = () => {
   const { onboarded, view, setView, loading, user, profile, setTab } = useAppContext();
@@ -147,6 +148,8 @@ export const AppShell = () => {
         return <EstateSummaryPage />;
       case 'templates':
         return <TemplatesScreen />;
+      case 'partner':
+        return <PartnerSettings />;
       default:
         return <DashboardScreen />;
     }

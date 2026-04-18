@@ -20,6 +20,7 @@ import { DownloadPacketButton } from '../download/DownloadPacketButton';
 import { usePacketCompletion } from '../../hooks/usePacketCompletion';
 import { healthScoreService, HealthScore } from '../../services/healthScoreService';
 import { EstateSummaryCard } from '../estate/EstateSummaryCard';
+import { PartnerStatusCard } from '../couple/PartnerStatusCard';
 
 export const DashboardScreen = () => {
   const { setView, setTab, currentPacket, userDisplayName, completionVersion } = useAppContext();
@@ -127,6 +128,9 @@ export const DashboardScreen = () => {
           />
         </div>
       </div>
+
+      {/* Partner status (only renders when an active couple link exists) */}
+      <PartnerStatusCard />
 
       {/* Packet Health Score */}
       {currentPacket && <PacketHealthScore packetId={currentPacket.id} />}

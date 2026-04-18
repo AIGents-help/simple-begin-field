@@ -79,12 +79,7 @@ export const PartnerSettings: React.FC = () => {
         </p>
       </div>
 
-      <PlanGate
-        feature="couple"
-        requiredPlan="couple_yearly"
-        title="Partner collaboration is a Couple feature"
-        description="Upgrade to a Couple plan to invite your partner, share sections, and coordinate your packets together."
-      >
+      <PlanGate feature="partner">
         {loading ? (
           <div className="flex items-center justify-center py-16 text-stone-400">
             <Loader2 className="animate-spin mr-2" size={20} /> Loading...
