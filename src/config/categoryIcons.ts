@@ -11,7 +11,7 @@ import {
   PawPrint,
   Flower2, BookOpen, Music,
   Image as ImageIcon, Mic, Lightbulb,
-  Package,
+  Package, Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 import { SectionId } from './types';
@@ -125,8 +125,21 @@ export function getCategoryIcon(section: SectionId | string, record: any): Lucid
       if (has('advice', 'wisdom', 'lesson')) return Lightbulb;
       return Mail;
     }
-    case 'property':
+    case 'property': {
+      if (has('jewelry', 'watch', 'ring', 'necklace')) return Crown;
+      if (has('art', 'paint', 'sculpture')) return ImageIcon;
+      if (has('firearm', 'weapon', 'gun', 'rifle')) return Shield;
+      if (has('music', 'instrument', 'guitar', 'piano')) return Music;
+      if (has('sport', 'gym', 'bike', 'fitness')) return Activity;
+      if (has('antique', 'furniture')) return Building;
+      if (has('electronic', 'tech', 'computer', 'camera')) return Video;
+      if (has('vehicle', 'atv', 'boat', 'motorcycle')) return Car;
+      if (has('coin', 'currency', 'bullion')) return DollarSign;
+      if (has('wine', 'spirit', 'whiskey', 'bourbon')) return Flower2;
+      if (has('book', 'manuscript', 'rare')) return BookOpen;
+      if (has('hobby', 'craft', 'collection', 'memorabilia')) return Sparkles;
       return Package;
+    }
     default:
       return FileText;
   }

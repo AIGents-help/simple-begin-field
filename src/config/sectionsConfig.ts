@@ -92,10 +92,10 @@ export const SECTIONS_CONFIG: Section[] = [
   },
   { 
     id: 'property', 
-    label: 'Property', 
+    label: 'Personal Property & Collectibles', 
     icon: Package, 
-    description: 'Meaningful assets and intended recipients.',
-    emptyStateText: 'No personal property listed yet.',
+    description: 'Tangible assets — jewelry, art, collections, instruments, antiques, and more.',
+    emptyStateText: 'No personal property or collectibles listed yet.',
     addButtonLabel: 'Add Item'
   },
   { 

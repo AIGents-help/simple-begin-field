@@ -1490,54 +1490,177 @@ export type Database = {
           },
         ]
       }
-      personal_property_records: {
+      personal_property_photos: {
         Row: {
-          beneficiary: string | null
-          category: string | null
-          created_at: string | null
-          description: string | null
-          estimated_value: number | null
+          caption: string | null
+          created_at: string
+          display_order: number | null
+          file_path: string
           id: string
-          is_na: boolean | null
-          item_name: string | null
-          location: string | null
-          notes: string | null
-          packet_id: string | null
-          scope: string | null
-          status: string | null
-          updated_at: string | null
+          is_hero: boolean | null
+          packet_id: string
+          property_record_id: string
+          updated_at: string
         }
         Insert: {
-          beneficiary?: string | null
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          estimated_value?: number | null
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          file_path: string
           id?: string
-          is_na?: boolean | null
-          item_name?: string | null
-          location?: string | null
-          notes?: string | null
-          packet_id?: string | null
-          scope?: string | null
-          status?: string | null
-          updated_at?: string | null
+          is_hero?: boolean | null
+          packet_id: string
+          property_record_id: string
+          updated_at?: string
         }
         Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          file_path?: string
+          id?: string
+          is_hero?: boolean | null
+          packet_id?: string
+          property_record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_property_photos_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personal_property_photos_property_record_id_fkey"
+            columns: ["property_record_id"]
+            isOneToOne: false
+            referencedRelation: "personal_property_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      personal_property_records: {
+        Row: {
+          acquired_from: string | null
+          acquisition_method: string | null
+          acquisition_price: number | null
+          appraised_value: number | null
+          appraiser_company: string | null
+          appraiser_name: string | null
+          beneficiary: string | null
+          brand: string | null
+          category: string | null
+          chain_of_custody: string | null
+          condition: string | null
+          created_at: string | null
+          description: string | null
+          disposition_action: string | null
+          estimated_sale_price: number | null
+          estimated_value: number | null
+          has_certificate_of_authenticity: boolean | null
+          id: string
+          insurance_company: string | null
+          insurance_coverage_amount: number | null
+          insurance_policy_number: string | null
+          insurance_rider: boolean | null
+          is_na: boolean | null
+          item_name: string | null
+          last_appraisal_date: string | null
+          location: string | null
+          model_serial: string | null
+          notes: string | null
+          packet_id: string | null
+          preferred_selling_method: string | null
+          scope: string | null
+          sentimental_notes: string | null
+          special_handling: string | null
+          specific_recipient: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          year_acquired: number | null
+        }
+        Insert: {
+          acquired_from?: string | null
+          acquisition_method?: string | null
+          acquisition_price?: number | null
+          appraised_value?: number | null
+          appraiser_company?: string | null
+          appraiser_name?: string | null
           beneficiary?: string | null
+          brand?: string | null
           category?: string | null
+          chain_of_custody?: string | null
+          condition?: string | null
           created_at?: string | null
           description?: string | null
+          disposition_action?: string | null
+          estimated_sale_price?: number | null
           estimated_value?: number | null
+          has_certificate_of_authenticity?: boolean | null
           id?: string
+          insurance_company?: string | null
+          insurance_coverage_amount?: number | null
+          insurance_policy_number?: string | null
+          insurance_rider?: boolean | null
           is_na?: boolean | null
           item_name?: string | null
+          last_appraisal_date?: string | null
           location?: string | null
+          model_serial?: string | null
           notes?: string | null
           packet_id?: string | null
+          preferred_selling_method?: string | null
           scope?: string | null
+          sentimental_notes?: string | null
+          special_handling?: string | null
+          specific_recipient?: string | null
           status?: string | null
+          title?: string | null
           updated_at?: string | null
+          year_acquired?: number | null
+        }
+        Update: {
+          acquired_from?: string | null
+          acquisition_method?: string | null
+          acquisition_price?: number | null
+          appraised_value?: number | null
+          appraiser_company?: string | null
+          appraiser_name?: string | null
+          beneficiary?: string | null
+          brand?: string | null
+          category?: string | null
+          chain_of_custody?: string | null
+          condition?: string | null
+          created_at?: string | null
+          description?: string | null
+          disposition_action?: string | null
+          estimated_sale_price?: number | null
+          estimated_value?: number | null
+          has_certificate_of_authenticity?: boolean | null
+          id?: string
+          insurance_company?: string | null
+          insurance_coverage_amount?: number | null
+          insurance_policy_number?: string | null
+          insurance_rider?: boolean | null
+          is_na?: boolean | null
+          item_name?: string | null
+          last_appraisal_date?: string | null
+          location?: string | null
+          model_serial?: string | null
+          notes?: string | null
+          packet_id?: string | null
+          preferred_selling_method?: string | null
+          scope?: string | null
+          sentimental_notes?: string | null
+          special_handling?: string | null
+          specific_recipient?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          year_acquired?: number | null
         }
         Relationships: [
           {
