@@ -4406,94 +4406,328 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number | null
+          file_path: string
+          id: string
+          is_hero: boolean | null
+          packet_id: string
+          updated_at: string
+          vehicle_record_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          file_path: string
+          id?: string
+          is_hero?: boolean | null
+          packet_id: string
+          updated_at?: string
+          vehicle_record_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          file_path?: string
+          id?: string
+          is_hero?: boolean | null
+          packet_id?: string
+          updated_at?: string
+          vehicle_record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_photos_packet_id_fkey"
+            columns: ["packet_id"]
+            isOneToOne: false
+            referencedRelation: "packets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_photos_vehicle_record_id_fkey"
+            columns: ["vehicle_record_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_records: {
         Row: {
           agent_contact: string | null
+          appraised_value: number | null
+          asking_price: number | null
+          body_style: string | null
           category: string | null
+          condition_notes: string | null
+          coverage_type: string | null
           created_at: string | null
+          disposition_action: string | null
+          disposition_instructions: string | null
+          disposition_recipient: string | null
+          donation_organization: string | null
           estimated_value: number | null
+          exterior_color: string | null
+          finance_status: string | null
+          garage_opener_code: string | null
           garaging_address: string | null
+          has_garage_opener: boolean | null
           id: string
           inspection_due_date: string | null
           insurance: string | null
+          insurance_agent_name: string | null
+          insurance_agent_phone: string | null
+          insurance_provider: string | null
           insurance_renewal_date: string | null
+          interest_rate: number | null
+          interior_color: string | null
           is_na: boolean | null
+          key_fob_notes: string | null
+          key_location: string | null
+          known_issues: string | null
+          last_oil_change_date: string | null
+          last_oil_change_mileage: number | null
+          last_tire_rotation_date: string | null
+          lease_end_date: string | null
+          lease_mileage_allowance: number | null
+          lease_mileage_overage: number | null
+          lease_start_date: string | null
+          lease_turnin_notes: string | null
+          leasing_company: string | null
+          lender_account_number: string | null
           lender_name: string | null
+          lender_phone: string | null
           license_plate: string | null
           lien_info: string | null
           loan_payoff_date: string | null
+          loan_start_date: string | null
           make: string | null
+          mechanic_name: string | null
+          mechanic_phone: string | null
           model: string | null
           monthly_payment: number | null
+          next_service_due_date: string | null
+          next_service_due_mileage: number | null
           notes: string | null
+          number_of_keys: number | null
+          odometer_reading: number | null
+          odometer_recorded_date: string | null
+          owner_is_deceased: boolean | null
+          ownership_type: string | null
           packet_id: string | null
+          parking_location: string | null
           payoff_amount: number | null
           policy_number: string | null
+          premium_amount: number | null
+          premium_frequency: string | null
+          primary_driver: string | null
+          purchase_date: string | null
+          purchase_price: number | null
+          purchased_from: string | null
           registration_expiry_date: string | null
+          registration_state: string | null
+          remaining_balance: number | null
+          roadside_assistance: boolean | null
+          roadside_phone: string | null
           scope: string | null
+          sentimental_notes: string | null
+          service_history_notes: string | null
           state: string | null
           status: string | null
+          tire_brand: string | null
+          tire_size: string | null
+          title_holder_name: string | null
+          title_status: string | null
+          trim_package: string | null
           updated_at: string | null
+          valuation_reference_date: string | null
           vin: string | null
           year: string | null
         }
         Insert: {
           agent_contact?: string | null
+          appraised_value?: number | null
+          asking_price?: number | null
+          body_style?: string | null
           category?: string | null
+          condition_notes?: string | null
+          coverage_type?: string | null
           created_at?: string | null
+          disposition_action?: string | null
+          disposition_instructions?: string | null
+          disposition_recipient?: string | null
+          donation_organization?: string | null
           estimated_value?: number | null
+          exterior_color?: string | null
+          finance_status?: string | null
+          garage_opener_code?: string | null
           garaging_address?: string | null
+          has_garage_opener?: boolean | null
           id?: string
           inspection_due_date?: string | null
           insurance?: string | null
+          insurance_agent_name?: string | null
+          insurance_agent_phone?: string | null
+          insurance_provider?: string | null
           insurance_renewal_date?: string | null
+          interest_rate?: number | null
+          interior_color?: string | null
           is_na?: boolean | null
+          key_fob_notes?: string | null
+          key_location?: string | null
+          known_issues?: string | null
+          last_oil_change_date?: string | null
+          last_oil_change_mileage?: number | null
+          last_tire_rotation_date?: string | null
+          lease_end_date?: string | null
+          lease_mileage_allowance?: number | null
+          lease_mileage_overage?: number | null
+          lease_start_date?: string | null
+          lease_turnin_notes?: string | null
+          leasing_company?: string | null
+          lender_account_number?: string | null
           lender_name?: string | null
+          lender_phone?: string | null
           license_plate?: string | null
           lien_info?: string | null
           loan_payoff_date?: string | null
+          loan_start_date?: string | null
           make?: string | null
+          mechanic_name?: string | null
+          mechanic_phone?: string | null
           model?: string | null
           monthly_payment?: number | null
+          next_service_due_date?: string | null
+          next_service_due_mileage?: number | null
           notes?: string | null
+          number_of_keys?: number | null
+          odometer_reading?: number | null
+          odometer_recorded_date?: string | null
+          owner_is_deceased?: boolean | null
+          ownership_type?: string | null
           packet_id?: string | null
+          parking_location?: string | null
           payoff_amount?: number | null
           policy_number?: string | null
+          premium_amount?: number | null
+          premium_frequency?: string | null
+          primary_driver?: string | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          purchased_from?: string | null
           registration_expiry_date?: string | null
+          registration_state?: string | null
+          remaining_balance?: number | null
+          roadside_assistance?: boolean | null
+          roadside_phone?: string | null
           scope?: string | null
+          sentimental_notes?: string | null
+          service_history_notes?: string | null
           state?: string | null
           status?: string | null
+          tire_brand?: string | null
+          tire_size?: string | null
+          title_holder_name?: string | null
+          title_status?: string | null
+          trim_package?: string | null
           updated_at?: string | null
+          valuation_reference_date?: string | null
           vin?: string | null
           year?: string | null
         }
         Update: {
           agent_contact?: string | null
+          appraised_value?: number | null
+          asking_price?: number | null
+          body_style?: string | null
           category?: string | null
+          condition_notes?: string | null
+          coverage_type?: string | null
           created_at?: string | null
+          disposition_action?: string | null
+          disposition_instructions?: string | null
+          disposition_recipient?: string | null
+          donation_organization?: string | null
           estimated_value?: number | null
+          exterior_color?: string | null
+          finance_status?: string | null
+          garage_opener_code?: string | null
           garaging_address?: string | null
+          has_garage_opener?: boolean | null
           id?: string
           inspection_due_date?: string | null
           insurance?: string | null
+          insurance_agent_name?: string | null
+          insurance_agent_phone?: string | null
+          insurance_provider?: string | null
           insurance_renewal_date?: string | null
+          interest_rate?: number | null
+          interior_color?: string | null
           is_na?: boolean | null
+          key_fob_notes?: string | null
+          key_location?: string | null
+          known_issues?: string | null
+          last_oil_change_date?: string | null
+          last_oil_change_mileage?: number | null
+          last_tire_rotation_date?: string | null
+          lease_end_date?: string | null
+          lease_mileage_allowance?: number | null
+          lease_mileage_overage?: number | null
+          lease_start_date?: string | null
+          lease_turnin_notes?: string | null
+          leasing_company?: string | null
+          lender_account_number?: string | null
           lender_name?: string | null
+          lender_phone?: string | null
           license_plate?: string | null
           lien_info?: string | null
           loan_payoff_date?: string | null
+          loan_start_date?: string | null
           make?: string | null
+          mechanic_name?: string | null
+          mechanic_phone?: string | null
           model?: string | null
           monthly_payment?: number | null
+          next_service_due_date?: string | null
+          next_service_due_mileage?: number | null
           notes?: string | null
+          number_of_keys?: number | null
+          odometer_reading?: number | null
+          odometer_recorded_date?: string | null
+          owner_is_deceased?: boolean | null
+          ownership_type?: string | null
           packet_id?: string | null
+          parking_location?: string | null
           payoff_amount?: number | null
           policy_number?: string | null
+          premium_amount?: number | null
+          premium_frequency?: string | null
+          primary_driver?: string | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          purchased_from?: string | null
           registration_expiry_date?: string | null
+          registration_state?: string | null
+          remaining_balance?: number | null
+          roadside_assistance?: boolean | null
+          roadside_phone?: string | null
           scope?: string | null
+          sentimental_notes?: string | null
+          service_history_notes?: string | null
           state?: string | null
           status?: string | null
+          tire_brand?: string | null
+          tire_size?: string | null
+          title_holder_name?: string | null
+          title_status?: string | null
+          trim_package?: string | null
           updated_at?: string | null
+          valuation_reference_date?: string | null
           vin?: string | null
           year?: string | null
         }
