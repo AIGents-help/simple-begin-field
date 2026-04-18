@@ -11,9 +11,12 @@ import {
   ExternalLink,
   CheckCircle2,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Eye
 } from 'lucide-react';
 import { StatusPill } from './DashboardComponents';
+import { AssignPlanModal } from './AssignPlanModal';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DetailPanelProps {
   title: string;
@@ -39,7 +42,51 @@ export const DetailPanel: React.FC<DetailPanelProps> = ({ title, children, onClo
   );
 };
 
-export const CustomerDetail: React.FC<{ customer: any; onClose: () => void }> = ({ customer, onClose }) => {
+interface CustomerDetailProps {
+  customer: any;
+  onClose: () => void;
+  onViewPacket?: (packet: any) => void;
+}
+
+export const CustomerDetail: React.FC<CustomerDetailProps> = ({ customer, onClose, onViewPacket }) => {
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [livePurchase, setLivePurchase] = useState<any>(customer.purchases?.[0] || null);
+  const [loadingPacket, setLoadingPacket] = useState(false);
+
+  const handlePlanAssigned = (next: { plan_key: string; plan_name: string; status: string }) => {
+    // Update the billing summary inline without page refresh
+    setLivePurchase({
+      ...(livePurchase || {}),
+      status: next.status,
+      pricing_plans: { ...(livePurchase?.pricing_plans || {}), name: next.plan_name, plan_key: next.plan_key },
+    });
+  };
+
+  const handleViewPacket = async () => {
+    const packetStub = customer.packets?.[0];
+    if (!packetStub) return;
+    if (!onViewPacket) return;
+    setLoadingPacket(true);
+    try {
+      // Fetch full packet record so PacketDetail can render
+      const { data, error } = await supabase
+        .from('packets')
+        .select(`
+          *,
+          profiles ( full_name, email ),
+          packet_members ( user_id, role )
+        `)
+        .eq('id', packetStub.id)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) onViewPacket(data);
+    } catch (err) {
+      console.error('Failed to load packet:', err);
+    } finally {
+      setLoadingPacket(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <button onClick={onClose} className="flex items-center gap-2 text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors">
@@ -83,11 +130,18 @@ export const CustomerDetail: React.FC<{ customer: any; onClose: () => void }> = 
                   <div className="flex items-center gap-3">
                     <Package className="w-5 h-5 text-stone-400" />
                     <div>
-                      <p className="text-sm font-medium text-stone-900">{customer.packets[0].title}</p>
+                      <p className="text-sm font-medium text-stone-900">{customer.packets[0].title || 'The Survivor Packet'}</p>
                       <p className="text-xs text-stone-400 uppercase tracking-wider">{customer.packets[0].household_mode} Mode</p>
                     </div>
                   </div>
-                  <button className="text-xs font-bold text-stone-900 underline">View Packet</button>
+                  <button
+                    onClick={handleViewPacket}
+                    disabled={loadingPacket}
+                    className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] text-xs font-bold text-stone-900 hover:bg-stone-100 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    {loadingPacket ? 'Loading...' : 'View Packet'}
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
@@ -115,18 +169,24 @@ export const CustomerDetail: React.FC<{ customer: any; onClose: () => void }> = 
 
         <div className="space-y-6">
           <DetailPanel title="Billing Summary">
-            {customer.purchases?.[0] ? (
+            {livePurchase ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-stone-500">Current Plan</span>
-                  <span className="text-sm font-medium text-stone-900">{customer.purchases[0].pricing_plans?.name}</span>
+                  <span className="text-sm font-medium text-stone-900">{livePurchase.pricing_plans?.name || 'Free'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-stone-500">Status</span>
-                  <StatusPill status={customer.purchases[0].status} type="success" />
+                  <StatusPill status={livePurchase.status || 'free'} type={livePurchase.status === 'canceled' ? 'error' : 'success'} />
                 </div>
-                <div className="pt-4 border-t border-stone-100">
-                  <button className="w-full flex items-center justify-center gap-2 py-2 bg-stone-900 text-white rounded-lg text-xs font-medium">
+                <div className="pt-4 border-t border-stone-100 space-y-2">
+                  <button
+                    onClick={() => setShowAssignModal(true)}
+                    className="w-full py-2 min-h-[40px] border border-stone-200 rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-50 transition-colors"
+                  >
+                    Assign Plan Manually
+                  </button>
+                  <button className="w-full flex items-center justify-center gap-2 py-2 min-h-[40px] bg-stone-900 text-white rounded-lg text-xs font-medium hover:bg-stone-800 transition-colors">
                     <ExternalLink className="w-3 h-3" />
                     View in Stripe
                   </button>
@@ -135,7 +195,10 @@ export const CustomerDetail: React.FC<{ customer: any; onClose: () => void }> = 
             ) : (
               <div className="text-center py-4">
                 <p className="text-sm text-stone-400 italic mb-4">No active subscription</p>
-                <button className="w-full py-2 border border-stone-200 rounded-lg text-xs font-medium text-stone-600 hover:bg-stone-50">
+                <button
+                  onClick={() => setShowAssignModal(true)}
+                  className="w-full py-2 min-h-[40px] border border-stone-200 rounded-lg text-xs font-medium text-stone-700 hover:bg-stone-50 transition-colors"
+                >
                   Assign Plan Manually
                 </button>
               </div>
@@ -156,6 +219,18 @@ export const CustomerDetail: React.FC<{ customer: any; onClose: () => void }> = 
           </DetailPanel>
         </div>
       </div>
+
+      <AssignPlanModal
+        isOpen={showAssignModal}
+        onClose={() => setShowAssignModal(false)}
+        customer={{
+          id: customer.id,
+          full_name: customer.full_name,
+          email: customer.email,
+          purchases: livePurchase ? [livePurchase] : [],
+        }}
+        onSuccess={handlePlanAssigned}
+      />
     </div>
   );
 };
