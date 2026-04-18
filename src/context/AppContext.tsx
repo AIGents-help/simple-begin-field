@@ -38,6 +38,11 @@ interface AppContextType extends AppState {
   // bumpCompletion() so every completion display refreshes together.
   completionVersion: number;
   bumpCompletion: () => void;
+  // One-shot search term consumed by the Find a Professional directory.
+  // Setters across the app pre-populate this when the user taps a "Find a
+  // Professional" prompt, then the directory clears it after auto-searching.
+  directoryQuery: string | null;
+  setDirectoryQuery: (q: string | null) => void;
 }
 
 const defaultState: AppState = {
@@ -71,6 +76,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<AppState>(defaultState);
   const [completionVersion, setCompletionVersion] = useState(0);
   const bumpCompletion = React.useCallback(() => setCompletionVersion(v => v + 1), []);
+  const [directoryQuery, setDirectoryQuery] = useState<string | null>(null);
   const currentPacketRef = React.useRef<any | null>(null);
 
   const {
@@ -256,6 +262,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     signOut,
     completionVersion,
     bumpCompletion,
+    directoryQuery,
+    setDirectoryQuery,
   }), [
     state, 
     user, 
@@ -275,6 +283,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     refreshBilling,
     completionVersion,
     bumpCompletion,
+    directoryQuery,
   ]);
 
 
