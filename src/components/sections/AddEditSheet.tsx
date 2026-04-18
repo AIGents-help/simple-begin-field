@@ -99,24 +99,90 @@ export const AddEditSheet = ({
   // Section-specific field definitions
   const getSectionFields = (): { name: string; label: string; required?: boolean; type?: string; placeholder?: string; options?: string[]; rows?: number }[] | null => {
     switch (activeTab) {
-      case 'family':
-        return [
+      case 'family': {
+        const rel = (formData.relationship || initialData?.relationship || '').toLowerCase();
+
+        // Base fields shared by ALL family member types
+        const baseFields: any[] = [
+          { name: 'relationship', label: 'Relationship', required: true, type: 'select', options: ['Spouse', 'Partner', 'Child', 'Parent', 'Sibling', 'Grandparent', 'Grandchild', 'In-Law', 'Friend', 'Other'] },
           { name: 'first_name', label: 'First Name', required: true, placeholder: 'e.g. Jane' },
           { name: 'middle_name', label: 'Middle Name', placeholder: 'Optional' },
           { name: 'last_name', label: 'Last Name', required: true, placeholder: 'e.g. Doe' },
           { name: 'suffix', label: 'Suffix', placeholder: 'Jr., Sr., III, etc.' },
           { name: 'preferred_name', label: 'Preferred Name / Nickname', placeholder: 'What they go by' },
-          { name: 'relationship', label: 'Relationship', required: true, type: 'select', options: ['Spouse', 'Partner', 'Child', 'Parent', 'Sibling', 'Grandparent', 'Grandchild', 'Friend', 'Other'] },
-          { name: 'category', label: 'Parent Type', type: 'select', options: ['Mother', 'Father', 'Step-parent', 'Adoptive Parent', 'Biological Parent', 'Guardian', 'Other'] },
           { name: 'birthday', label: 'Date of Birth', type: 'date' },
           { name: 'place_of_birth', label: 'Place of Birth', placeholder: 'City, State' },
+          { name: 'gender', label: 'Gender', type: 'select', options: ['Female', 'Male', 'Non-binary', 'Prefer not to say', 'Other'] },
           { name: 'phone', label: 'Primary Phone', type: 'tel', placeholder: '(555) 123-4567' },
           { name: 'email', label: 'Primary Email', type: 'email', placeholder: 'jane@example.com' },
           { name: 'address', label: 'Current Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
-          { name: 'occupation', label: 'Occupation', placeholder: 'e.g. Teacher, Retired' },
-          { name: 'employer', label: 'Employer', placeholder: 'Company name (optional)' },
+        ];
+
+        // Relationship-specific fields, inserted before Notes
+        const extras: any[] = [];
+
+        if (rel === 'spouse' || rel === 'partner') {
+          extras.push(
+            { name: 'marital_status', label: 'Marital Status', type: 'select', options: ['married', 'separated', 'divorced', 'widowed'] },
+            { name: 'marriage_date', label: 'Date of Marriage', type: 'date' },
+            { name: 'marriage_place', label: 'Place of Marriage', placeholder: 'City, State' },
+            { name: 'occupation', label: 'Occupation', placeholder: 'e.g. Teacher, Retired' },
+            { name: 'employer', label: 'Employer', placeholder: 'Company name (optional)' },
+            { name: 'ssn_masked', label: 'SSN (last 4 digits)', placeholder: 'XXX-XX-1234' },
+          );
+        } else if (rel === 'parent') {
+          extras.push(
+            { name: 'category', label: 'Parent Type', type: 'select', options: ['Biological', 'Adoptive', 'Step-parent', 'Guardian'] },
+            { name: 'parent_role', label: 'Which Parent', type: 'select', options: ['Mother', 'Father', 'Other'] },
+            { name: 'occupation', label: 'Occupation (or Retired)', placeholder: 'e.g. Teacher, Retired' },
+            { name: 'employer', label: 'Employer', placeholder: 'Company name (optional)' },
+            { name: 'ssn_masked', label: 'SSN (last 4 digits)', placeholder: 'XXX-XX-1234' },
+          );
+        } else if (rel === 'child' || rel === 'grandchild') {
+          extras.push(
+            { name: 'category', label: 'Relationship Type', type: 'select', options: ['Biological', 'Adopted', 'Step-child', 'Foster'] },
+            { name: 'is_dependent', label: 'Is a Dependent', type: 'select', options: ['Yes', 'No'] },
+            { name: 'is_beneficiary', label: 'Is a Beneficiary', type: 'select', options: ['Yes', 'No'] },
+            { name: 'has_special_needs', label: 'Has Special Needs', type: 'select', options: ['No', 'Yes'] },
+            { name: 'special_needs_notes', label: 'Special Needs / Care Instructions', type: 'textarea', placeholder: 'Description and care instructions', rows: 2 },
+            { name: 'lives_with_me', label: 'Lives With Me', type: 'select', options: ['Yes', 'No'] },
+            { name: 'school_name', label: 'School Name (if minor)', placeholder: 'School name' },
+            { name: 'guardian_name', label: 'Guardian Name (if minor)', placeholder: 'Designated guardian' },
+            { name: 'guardian_relationship', label: 'Guardian Relationship', placeholder: 'e.g. Aunt, Family friend' },
+            { name: 'guardian_phone', label: 'Guardian Phone', type: 'tel', placeholder: '(555) 123-4567' },
+            { name: 'ssn_masked', label: 'SSN (last 4 digits)', placeholder: 'XXX-XX-1234' },
+          );
+        } else if (rel === 'sibling') {
+          extras.push(
+            { name: 'category', label: 'Relationship Type', type: 'select', options: ['Biological', 'Half', 'Step', 'Adopted'] },
+            { name: 'spouse_name', label: 'Spouse Name (if married)', placeholder: 'Optional' },
+            { name: 'has_children', label: 'Has Children', type: 'select', options: ['No', 'Yes'] },
+            { name: 'occupation', label: 'Occupation', placeholder: 'e.g. Teacher, Retired' },
+            { name: 'ssn_masked', label: 'SSN (last 4 digits)', placeholder: 'XXX-XX-1234' },
+          );
+        } else if (rel === 'grandparent') {
+          extras.push(
+            { name: 'category', label: 'Which Side', type: 'select', options: ['Maternal', 'Paternal'] },
+            { name: 'grandparent_type', label: 'Relationship Type', type: 'select', options: ['Biological', 'Step', 'Adoptive'] },
+            { name: 'occupation', label: 'Occupation (or Retired)', placeholder: 'e.g. Retired' },
+            { name: 'ssn_masked', label: 'SSN (last 4 digits)', placeholder: 'XXX-XX-1234' },
+          );
+        } else if (rel === 'in-law') {
+          extras.push(
+            { name: 'category', label: 'In-Law Type', type: 'select', options: ['Mother-in-law', 'Father-in-law', 'Sister-in-law', 'Brother-in-law', 'Daughter-in-law', 'Son-in-law', 'Other'] },
+          );
+        } else if (rel === 'other') {
+          extras.push(
+            { name: 'category', label: 'Relationship Description', placeholder: 'e.g. Aunt, Cousin, Godparent' },
+          );
+        }
+
+        const tail: any[] = [
           { name: 'reminder_notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
+
+        return [...baseFields, ...extras, ...tail];
+      }
       case 'medical':
         return [
           { name: 'provider_name', label: 'Provider Name', required: true, placeholder: 'e.g. Dr. Smith' },
