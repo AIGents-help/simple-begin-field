@@ -210,6 +210,9 @@ export const TrustedContactsManager: React.FC = () => {
       assigned_sections: c.assigned_sections || [],
       notify_on_updates: c.notify_on_updates !== false,
     });
+    setPhotoFile(null);
+    setPhotoCleared(false);
+    setEditingPhotoPath(c.photo_path || null);
     setModalOpen(true);
   };
 
@@ -302,7 +305,7 @@ export const TrustedContactsManager: React.FC = () => {
           <p className="text-xs text-stone-500 mt-1">People you trust to access your Survivor Packet</p>
         </div>
         <button
-          onClick={() => { setEditingId(null); setForm(emptyForm); setModalOpen(true); }}
+          onClick={() => { setEditingId(null); setForm(emptyForm); setPhotoFile(null); setPhotoCleared(false); setEditingPhotoPath(null); setModalOpen(true); }}
           className="flex items-center gap-2 px-4 py-2 bg-navy-muted text-white rounded-xl text-sm font-bold hover:bg-navy-muted/90 transition-colors"
         >
           <UserPlus size={16} />
