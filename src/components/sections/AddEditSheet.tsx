@@ -105,6 +105,16 @@ const RECORD_DOC_SLOTS: Record<string, { table: string; slots: { category: strin
       { category: 'insurance_card', label: 'Insurance Card', description: 'Front and back of card' },
     ],
   },
+  property: {
+    table: 'personal_property_records',
+    slots: [
+      { category: 'appraisal', label: 'Appraisal Certificate', description: 'Most recent professional appraisal (PDF)' },
+      { category: 'receipt', label: 'Receipt / Proof of Purchase', description: 'Original purchase receipt' },
+      { category: 'authenticity', label: 'Certificate of Authenticity', description: 'COA or provenance documentation' },
+      { category: 'insurance_rider', label: 'Insurance Rider / Policy', description: 'Coverage document for this item' },
+      { category: 'other', label: 'Other Document', description: 'Any other relevant document' },
+    ],
+  },
 };
 
 export const AddEditSheet = ({ 
@@ -382,12 +392,45 @@ export const AddEditSheet = ({
         ];
       case 'property':
         return [
-          { name: 'item_name', label: 'Item Name', required: true, placeholder: 'e.g. Grandmother\'s Ring' },
-          { name: 'description', label: 'Description', placeholder: 'Brief description' },
-          { name: 'location', label: 'Location', placeholder: 'Where is it stored?' },
-          { name: 'estimated_value', label: 'Estimated Value', placeholder: '$0.00' },
-          { name: 'beneficiary', label: 'Intended Recipient', placeholder: 'Who should receive this?' },
-          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+          { name: 'title', label: 'Item Name / Title', required: true, placeholder: "e.g. Grandmother's diamond ring" },
+          { name: 'category', label: 'Category', type: 'select', options: [
+            'Jewelry & Watches', 'Art & Paintings', 'Collectibles & Memorabilia',
+            'Firearms & Weapons', 'Musical Instruments', 'Sports Equipment',
+            'Hobby Equipment', 'Antiques & Furniture', 'Electronics & Technology',
+            'Vehicles (non-titled)', 'Coins & Currency', 'Wine & Spirits',
+            'Books & Manuscripts', 'Other'
+          ]},
+          { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Make, model, year, condition, provenance, history...', rows: 3 },
+          { name: 'brand', label: 'Brand / Manufacturer', placeholder: 'e.g. Rolex, Steinway' },
+          { name: 'model_serial', label: 'Model / Serial Number', placeholder: 'Model or serial #' },
+          { name: 'year_acquired', label: 'Year Acquired', type: 'number', placeholder: 'e.g. 2015' },
+          { name: 'acquisition_price', label: 'Acquisition Price ($)', type: 'number', placeholder: '0.00' },
+          { name: 'estimated_value', label: 'Current Estimated Value ($)', type: 'number', placeholder: '0.00' },
+          { name: 'appraised_value', label: 'Appraised Value ($)', type: 'number', placeholder: '0.00' },
+          { name: 'last_appraisal_date', label: 'Date of Last Appraisal', type: 'date' },
+          { name: 'condition', label: 'Condition', type: 'select', options: ['Mint', 'Excellent', 'Good', 'Fair', 'Poor'] },
+          { name: 'location', label: 'Location', placeholder: 'e.g. Master bedroom safe, Storage unit B12' },
+          // Appraisal
+          { name: 'appraiser_name', label: 'Appraiser Name', placeholder: 'Person who appraised this item' },
+          { name: 'appraiser_company', label: 'Appraisal Company', placeholder: 'Firm or auction house' },
+          // Insurance
+          { name: 'insurance_rider', label: 'Separately Insured (Rider)', type: 'select', options: ['No', 'Yes'] },
+          { name: 'insurance_company', label: 'Insurance Company', placeholder: 'If item has its own rider' },
+          { name: 'insurance_policy_number', label: 'Insurance Policy Number', placeholder: 'Policy #' },
+          { name: 'insurance_coverage_amount', label: 'Coverage Amount ($)', type: 'number', placeholder: '0.00' },
+          // Ownership & Provenance
+          { name: 'acquisition_method', label: 'How Acquired', type: 'select', options: ['Purchased', 'Inherited', 'Gifted', 'Found', 'Other'] },
+          { name: 'acquired_from', label: 'Acquired From', placeholder: 'Dealer, auction house, person' },
+          { name: 'has_certificate_of_authenticity', label: 'Has Certificate of Authenticity', type: 'select', options: ['No', 'Yes'] },
+          { name: 'chain_of_custody', label: 'Chain of Custody / History', type: 'textarea', placeholder: 'Ownership history and provenance notes...', rows: 3 },
+          // Disposition
+          { name: 'disposition_action', label: 'What Should Happen To This Item', type: 'select', options: ['Sell', 'Keep in family', 'Donate', 'Auction', 'Destroy / discard', 'Per my Will'] },
+          { name: 'specific_recipient', label: 'Specific Recipient', placeholder: 'Name (family or other)', list: 'family-recipients' },
+          { name: 'estimated_sale_price', label: 'Estimated Sale Price ($)', type: 'number', placeholder: '0.00' },
+          { name: 'preferred_selling_method', label: 'Preferred Selling Method', type: 'select', options: ['Private sale', 'Auction', 'Estate sale', 'Online marketplace'] },
+          { name: 'sentimental_notes', label: 'Sentimental Notes (visible to trusted person)', type: 'textarea', placeholder: 'Why this item matters...', rows: 3 },
+          { name: 'special_handling', label: 'Special Handling Instructions', type: 'textarea', placeholder: 'Fragile, climate-sensitive, etc.', rows: 2 },
+          { name: 'notes', label: 'Additional Notes', type: 'textarea', placeholder: 'Anything else...', rows: 2 },
         ];
       case 'pets':
         return [
