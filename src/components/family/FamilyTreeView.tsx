@@ -4,6 +4,7 @@ import { HavenOwlSvg } from '@/components/haven/HavenOwlSvg';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadService } from '@/services/uploadService';
+import { PersonAvatar } from '@/components/common/PersonAvatar';
 
 interface FamilyMember {
   id: string;
@@ -22,7 +23,8 @@ const HavenOwl = () => <HavenOwlSvg size={120} className="mx-auto" />;
 
 // ── Node card dimensions ──
 const NODE_W = 140;
-const NODE_H = 72;
+const NODE_H = 130;
+const AVATAR_SIZE = 48;
 const H_GAP = 24;
 const V_GAP = 70;
 
@@ -415,20 +417,47 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
                     stroke={strokeColor}
                     strokeWidth={isUser ? 2 : 0}
                   />
+                  {/* Avatar (photo or monogram) */}
+                  <foreignObject
+                    x={x + (NODE_W - AVATAR_SIZE) / 2}
+                    y={y + 10}
+                    width={AVATAR_SIZE}
+                    height={AVATAR_SIZE}
+                  >
+                    <PersonAvatar
+                      photoPath={isUser ? null : member?.photo_path}
+                      name={name}
+                      isDeceased={deceased}
+                      size={AVATAR_SIZE}
+                      ring={isUser}
+                    />
+                  </foreignObject>
+                  {deceased && (
+                    <text
+                      x={x + NODE_W / 2 + AVATAR_SIZE / 2 - 4}
+                      y={y + 18}
+                      fill="#c9a84c"
+                      fontSize="14"
+                      fontWeight="700"
+                      fontFamily="inherit"
+                    >
+                      †
+                    </text>
+                  )}
                   <text
                     x={x + NODE_W / 2}
-                    y={y + 22}
+                    y={y + 10 + AVATAR_SIZE + 16}
                     textAnchor="middle"
                     fill="white"
                     fontSize="12"
                     fontWeight="700"
                     fontFamily="inherit"
                   >
-                    {displayName.length > 16 ? displayName.slice(0, 15) + '…' : displayName}
+                    {name.length > 16 ? name.slice(0, 15) + '…' : name}
                   </text>
                   <text
                     x={x + NODE_W / 2}
-                    y={y + 40}
+                    y={y + 10 + AVATAR_SIZE + 32}
                     textAnchor="middle"
                     fill={deceased ? '#d4d4d4' : '#c9a84c'}
                     fontSize="10"
@@ -440,7 +469,7 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
                   {(year || deathYear) && (
                     <text
                       x={x + NODE_W / 2}
-                      y={y + 56}
+                      y={y + 10 + AVATAR_SIZE + 46}
                       textAnchor="middle"
                       fill="#bbbbbb"
                       fontSize="9"
@@ -457,8 +486,8 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
                       onClick={() => onEditMember?.(member)}
                       role="button"
                     >
-                      <circle cx={x + NODE_W - 10} cy={y + 10} r={10} fill="#2a3a5c" />
-                      <foreignObject x={x + NODE_W - 17} y={y + 3} width={14} height={14}>
+                      <circle cx={x + NODE_W - 12} cy={y + 12} r={10} fill="#2a3a5c" />
+                      <foreignObject x={x + NODE_W - 19} y={y + 5} width={14} height={14}>
                         <Pencil size={10} color="#c9a84c" />
                       </foreignObject>
                     </g>
