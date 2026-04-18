@@ -420,6 +420,139 @@ export type Database = {
         }
         Relationships: []
       }
+      couple_activity: {
+        Row: {
+          action_type: Database["public"]["Enums"]["couple_activity_action"]
+          couple_link_id: string
+          created_at: string
+          description: string | null
+          id: string
+          record_id: string | null
+          record_table: string | null
+          section_key: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["couple_activity_action"]
+          couple_link_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          record_id?: string | null
+          record_table?: string | null
+          section_key?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["couple_activity_action"]
+          couple_link_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          record_id?: string | null
+          record_table?: string | null
+          section_key?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couple_activity_couple_link_id_fkey"
+            columns: ["couple_link_id"]
+            isOneToOne: false
+            referencedRelation: "couple_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couple_links: {
+        Row: {
+          created_at: string
+          id: string
+          initiated_by: string
+          invite_email: string | null
+          invite_expires_at: string | null
+          invite_token: string | null
+          linked_at: string | null
+          status: Database["public"]["Enums"]["couple_link_status"]
+          unlinked_at: string | null
+          unlinked_by: string | null
+          updated_at: string
+          user_id_1: string
+          user_id_2: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          initiated_by: string
+          invite_email?: string | null
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          linked_at?: string | null
+          status?: Database["public"]["Enums"]["couple_link_status"]
+          unlinked_at?: string | null
+          unlinked_by?: string | null
+          updated_at?: string
+          user_id_1: string
+          user_id_2?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          initiated_by?: string
+          invite_email?: string | null
+          invite_expires_at?: string | null
+          invite_token?: string | null
+          linked_at?: string | null
+          status?: Database["public"]["Enums"]["couple_link_status"]
+          unlinked_at?: string | null
+          unlinked_by?: string | null
+          updated_at?: string
+          user_id_1?: string
+          user_id_2?: string | null
+        }
+        Relationships: []
+      }
+      couple_permissions: {
+        Row: {
+          couple_link_id: string
+          created_at: string
+          granting_user_id: string
+          id: string
+          permission_level: Database["public"]["Enums"]["couple_permission_level"]
+          receiving_user_id: string
+          section_key: string
+          updated_at: string
+        }
+        Insert: {
+          couple_link_id: string
+          created_at?: string
+          granting_user_id: string
+          id?: string
+          permission_level?: Database["public"]["Enums"]["couple_permission_level"]
+          receiving_user_id: string
+          section_key: string
+          updated_at?: string
+        }
+        Update: {
+          couple_link_id?: string
+          created_at?: string
+          granting_user_id?: string
+          id?: string
+          permission_level?: Database["public"]["Enums"]["couple_permission_level"]
+          receiving_user_id?: string
+          section_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couple_permissions_couple_link_id_fkey"
+            columns: ["couple_link_id"]
+            isOneToOne: false
+            referencedRelation: "couple_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_cards: {
         Row: {
           card_type: string | null
@@ -3881,6 +4014,8 @@ export type Database = {
           status: string
         }[]
       }
+      get_couple_link_id: { Args: { p_user_id?: string }; Returns: string }
+      get_partner_id: { Args: { p_user_id?: string }; Returns: string }
       get_template_draft_by_share_token: {
         Args: { p_token: string }
         Returns: Json
@@ -3888,6 +4023,14 @@ export type Database = {
       get_template_for_share: {
         Args: { p_template_type: string; p_version: string }
         Returns: Json
+      }
+      has_couple_access: {
+        Args: {
+          p_min_level?: Database["public"]["Enums"]["couple_permission_level"]
+          p_owner_user_id: string
+          p_section_key: string
+        }
+        Returns: boolean
       }
       has_trusted_access: {
         Args: { p_packet_id: string; p_section_key: string }
@@ -3908,10 +4051,30 @@ export type Database = {
           token: string
         }[]
       }
+      log_couple_activity: {
+        Args: {
+          p_action: Database["public"]["Enums"]["couple_activity_action"]
+          p_description?: string
+          p_record_id?: string
+          p_record_table?: string
+          p_section_key?: string
+          p_user_id?: string
+        }
+        Returns: undefined
+      }
       manual_check_in: { Args: never; Returns: undefined }
       mark_checkin_triggered: {
         Args: { p_event_id: string }
         Returns: undefined
+      }
+      packet_owner: { Args: { p_packet_id: string }; Returns: string }
+      partner_can_access_packet_section: {
+        Args: {
+          p_min_level?: Database["public"]["Enums"]["couple_permission_level"]
+          p_packet_id: string
+          p_section_key: string
+        }
+        Returns: boolean
       }
       run_inactivity_release_sweep: {
         Args: never
@@ -3920,6 +4083,10 @@ export type Database = {
           packet_id: string
           released_contact_id: string
         }[]
+      }
+      seed_default_couple_permissions: {
+        Args: { p_link_id: string }
+        Returns: undefined
       }
       touch_last_login: { Args: never; Returns: undefined }
       upsert_document_alert: {
@@ -3950,7 +4117,16 @@ export type Database = {
       viewer_released_packet_ids: { Args: never; Returns: string[] }
     }
     Enums: {
-      [_ in never]: never
+      couple_activity_action:
+        | "added"
+        | "edited"
+        | "deleted"
+        | "uploaded"
+        | "permission_changed"
+        | "linked"
+        | "unlinked"
+      couple_link_status: "pending" | "active" | "unlinked"
+      couple_permission_level: "hidden" | "view" | "collaborate"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4077,6 +4253,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      couple_activity_action: [
+        "added",
+        "edited",
+        "deleted",
+        "uploaded",
+        "permission_changed",
+        "linked",
+        "unlinked",
+      ],
+      couple_link_status: ["pending", "active", "unlinked"],
+      couple_permission_level: ["hidden", "view", "collaborate"],
+    },
   },
 } as const
