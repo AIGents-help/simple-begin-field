@@ -19,6 +19,7 @@ import { AutoFilledIndicator } from '../common/AutoFilledIndicator';
 import { useFederatedDefaults } from '../../hooks/useFederatedDefaults';
 import { PropertyPhotoGallery } from '../property/PropertyPhotoGallery';
 import { PropertyFamilyDatalist } from '../property/PropertyFamilyDatalist';
+import { MaskedInput } from '../common/MaskedInput';
 
 // ---------------------------------------------------------------------------
 // Cross-section federation: snapshot which fields on a source record drive
