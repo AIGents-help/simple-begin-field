@@ -81,6 +81,23 @@ export const PricingPage = () => {
             <PricingCard key={plan.id} plan={plan} isCurrent={planKey === plan.id} />
           ))}
         </div>
+
+        <div className="mt-16 flex flex-col items-center gap-3 text-center">
+          <button
+            onClick={() => navigate('/')}
+            className="inline-flex items-center justify-center gap-2 min-h-[44px] px-6 py-3 bg-white border-2 border-navy-muted text-navy-muted rounded-2xl font-bold text-sm hover:bg-navy-muted hover:text-white transition-all shadow-sm"
+          >
+            <Home size={16} />
+            <span>Return to My Packet</span>
+            <ArrowRight size={16} />
+          </button>
+          <button
+            onClick={handleBack}
+            className="text-xs text-stone-500 hover:text-navy-muted underline underline-offset-4 font-medium min-h-[44px] px-3"
+          >
+            Or go back to the previous page
+          </button>
+        </div>
       </div>
     </div>
   );
