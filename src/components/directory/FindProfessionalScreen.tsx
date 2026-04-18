@@ -121,7 +121,7 @@ export const FindProfessionalScreen = () => {
               className="w-full p-3 bg-white rounded-xl border border-stone-200 focus:border-stone-400 outline-none text-sm"
             >
               <option value="">Select a category...</option>
-              {CATEGORIES.map(c => (
+              {dropdownCategories.map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
