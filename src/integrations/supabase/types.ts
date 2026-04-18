@@ -2265,7 +2265,9 @@ export type Database = {
           category: string | null
           conditions: string | null
           created_at: string | null
+          details: Json
           dnr_status: string | null
+          expiry_date: string | null
           group_number: string | null
           id: string
           insurance_group_number: string | null
@@ -2274,12 +2276,15 @@ export type Database = {
           insurance_provider: string | null
           insurance_renewal_date: string | null
           is_na: boolean | null
+          legacy_notes: string | null
           member_id: string | null
+          next_appointment_date: string | null
           notes: string | null
           organ_donor: boolean | null
           packet_id: string | null
           phone: string | null
           provider_name: string
+          record_type: string | null
           referring_physician: string | null
           scope: string | null
           specialty: string | null
@@ -2293,7 +2298,9 @@ export type Database = {
           category?: string | null
           conditions?: string | null
           created_at?: string | null
+          details?: Json
           dnr_status?: string | null
+          expiry_date?: string | null
           group_number?: string | null
           id?: string
           insurance_group_number?: string | null
@@ -2302,12 +2309,15 @@ export type Database = {
           insurance_provider?: string | null
           insurance_renewal_date?: string | null
           is_na?: boolean | null
+          legacy_notes?: string | null
           member_id?: string | null
+          next_appointment_date?: string | null
           notes?: string | null
           organ_donor?: boolean | null
           packet_id?: string | null
           phone?: string | null
           provider_name: string
+          record_type?: string | null
           referring_physician?: string | null
           scope?: string | null
           specialty?: string | null
@@ -2321,7 +2331,9 @@ export type Database = {
           category?: string | null
           conditions?: string | null
           created_at?: string | null
+          details?: Json
           dnr_status?: string | null
+          expiry_date?: string | null
           group_number?: string | null
           id?: string
           insurance_group_number?: string | null
@@ -2330,12 +2342,15 @@ export type Database = {
           insurance_provider?: string | null
           insurance_renewal_date?: string | null
           is_na?: boolean | null
+          legacy_notes?: string | null
           member_id?: string | null
+          next_appointment_date?: string | null
           notes?: string | null
           organ_donor?: boolean | null
           packet_id?: string | null
           phone?: string | null
           provider_name?: string
+          record_type?: string | null
           referring_physician?: string | null
           scope?: string | null
           specialty?: string | null
@@ -2354,50 +2369,83 @@ export type Database = {
       }
       medications: {
         Row: {
+          condition_treated: string | null
           created_at: string
+          details: Json
           dose: string | null
+          dose_unit: string | null
           frequency: string | null
           id: string
+          is_critical: boolean
+          is_generic_available: boolean | null
           is_na: boolean | null
+          legacy_notes: string | null
           name: string
           notes: string | null
           packet_id: string
           pharmacy: string | null
+          pharmacy_phone: string | null
           prescribing_doctor: string | null
+          prescription_number: string | null
           refill_due_date: string | null
+          route: string | null
           scope: string | null
+          side_effects: string | null
+          special_instructions: string | null
           status: string | null
           updated_at: string
         }
         Insert: {
+          condition_treated?: string | null
           created_at?: string
+          details?: Json
           dose?: string | null
+          dose_unit?: string | null
           frequency?: string | null
           id?: string
+          is_critical?: boolean
+          is_generic_available?: boolean | null
           is_na?: boolean | null
+          legacy_notes?: string | null
           name: string
           notes?: string | null
           packet_id: string
           pharmacy?: string | null
+          pharmacy_phone?: string | null
           prescribing_doctor?: string | null
+          prescription_number?: string | null
           refill_due_date?: string | null
+          route?: string | null
           scope?: string | null
+          side_effects?: string | null
+          special_instructions?: string | null
           status?: string | null
           updated_at?: string
         }
         Update: {
+          condition_treated?: string | null
           created_at?: string
+          details?: Json
           dose?: string | null
+          dose_unit?: string | null
           frequency?: string | null
           id?: string
+          is_critical?: boolean
+          is_generic_available?: boolean | null
           is_na?: boolean | null
+          legacy_notes?: string | null
           name?: string
           notes?: string | null
           packet_id?: string
           pharmacy?: string | null
+          pharmacy_phone?: string | null
           prescribing_doctor?: string | null
+          prescription_number?: string | null
           refill_due_date?: string | null
+          route?: string | null
           scope?: string | null
+          side_effects?: string | null
+          special_instructions?: string | null
           status?: string | null
           updated_at?: string
         }
