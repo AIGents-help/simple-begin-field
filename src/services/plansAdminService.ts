@@ -49,6 +49,12 @@ export interface SubscriberRow {
   purchase_id: string | null;
   admin_note: string | null;
   pricing_plan_id: string | null;
+  billing_type: string | null;
+  household_mode: string | null;
+  stripe_subscription_id: string | null;
+  paused_at: string | null;
+  pause_resumes_at: string | null;
+  pause_note: string | null;
 }
 
 export const plansAdminService = {
