@@ -27,9 +27,21 @@ import { DocumentGapsCard } from '../couple/DocumentGapsCard';
 import { CombinedFamilyTreeCard } from '../couple/CombinedFamilyTreeCard';
 import { CoupleActivityFeed } from '../couple/CoupleActivityFeed';
 import { FriendlyCompetitionBadge } from '../couple/FriendlyCompetitionBadge';
+import { getCustomSectionIcon } from '../../config/customSectionIcons';
+import { CustomSectionModal } from '../sections/CustomSectionModal';
 
 export const DashboardScreen = () => {
-  const { setView, setTab, currentPacket, userDisplayName, completionVersion } = useAppContext();
+  const {
+    setView,
+    setTab,
+    currentPacket,
+    userDisplayName,
+    completionVersion,
+    customSections,
+    refreshCustomSections,
+    setActiveCustomSection,
+  } = useAppContext();
+  const [showCreateCustom, setShowCreateCustom] = useState(false);
 
   // SINGLE SOURCE OF TRUTH for completion (header badge, progress bar,
   // ring, AND each folder card all read from this hook).
