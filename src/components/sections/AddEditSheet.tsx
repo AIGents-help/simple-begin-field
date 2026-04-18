@@ -818,25 +818,42 @@ export const AddEditSheet = ({
                         if (field.type === 'select' && initialData?.[field.name] && formData[field.name]) return false;
                         return true;
                       })
-                      .map((field) => (
+                      .map((field) => {
+                        const origin = autoFilledOrigins[field.name];
+                        const clearOrigin = () => {
+                          if (!origin) return;
+                          setAutoFilledOrigins((prev) => {
+                            const next = { ...prev };
+                            delete next[field.name];
+                            return next;
+                          });
+                        };
+                        const handleChange = (val: any) => {
+                          setFormData({ ...formData, [field.name]: val });
+                          if (origin) clearOrigin();
+                        };
+                        return (
                       <div key={field.name} className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
-                          {field.label} {field.required && <span className="text-red-500">*</span>}
-                        </label>
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
+                            {field.label} {field.required && <span className="text-red-500">*</span>}
+                          </label>
+                          {origin ? <AutoFilledIndicator sourceLabel={origin} onClear={() => { clearOrigin(); setFormData({ ...formData, [field.name]: '' }); }} /> : null}
+                        </div>
                         {field.type === 'textarea' ? (
                           <textarea
                             rows={field.rows || 3}
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm resize-none font-medium"
                             value={formData[field.name] || ''}
-                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            onChange={(e) => handleChange(e.target.value)}
                             disabled={loading}
                           />
                         ) : field.type === 'select' && field.options ? (
                           <select
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium appearance-none"
                             value={formData[field.name] || ''}
-                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            onChange={(e) => handleChange(e.target.value)}
                             disabled={loading}
                           >
                             <option value="">Select {field.label.toLowerCase()}...</option>
@@ -850,7 +867,7 @@ export const AddEditSheet = ({
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
                             className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium"
                             value={formData[field.name] || ''}
-                            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                            onChange={(e) => handleChange(e.target.value)}
                             disabled={loading}
                           />
                         )}
@@ -858,7 +875,8 @@ export const AddEditSheet = ({
                           <p className="text-xs font-bold text-red-500 mt-1">{errors[field.name]}</p>
                         )}
                       </div>
-                    ))}
+                        );
+                      })}
 
                     <FileAttachmentField
                       sectionKey={activeTab || ''}
