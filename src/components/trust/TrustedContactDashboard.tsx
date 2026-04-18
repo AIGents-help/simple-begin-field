@@ -6,7 +6,7 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { trustedContactPortalService } from '@/services/trustedContactPortalService';
-import { generateTrustedContactPDF } from '@/services/trustedContactPdfService';
+import { packetPdfService } from '@/services/packetPdfService';
 import { SECTIONS_CONFIG } from '@/config/sectionsConfig';
 
 /**
@@ -170,9 +170,13 @@ export const TrustedContactDashboard: React.FC = () => {
     }
     setDownloading(true);
     try {
-      const ownerName = activePacket?.packets?.person_a_name || 'Owner';
-      await generateTrustedContactPDF(activePacketId, ownerName, permittedSections);
-      toast.success('Packet PDF downloaded');
+      await packetPdfService.generate({
+        packetId: activePacketId,
+        sections: permittedSections,
+        redactSensitive: true,
+        downloadType: 'full_packet',
+      });
+      toast.success('Permitted sections downloaded');
     } catch (err: any) {
       console.error('PDF export:', err);
       toast.error(err?.message || 'Failed to generate PDF');
@@ -281,7 +285,7 @@ export const TrustedContactDashboard: React.FC = () => {
             className="text-xs font-bold text-white bg-navy-muted hover:bg-navy-muted/90 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg disabled:opacity-50"
           >
             {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-            {downloading ? 'Preparing…' : 'Download PDF'}
+            {downloading ? 'Preparing…' : 'Download Permitted Sections'}
           </button>
           <button
             onClick={handleSignOut}
