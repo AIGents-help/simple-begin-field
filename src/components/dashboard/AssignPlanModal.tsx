@@ -43,10 +43,13 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
   const [adminNote, setAdminNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [grantAdmin, setGrantAdmin] = useState(false);
+  const [confirmAdmin, setConfirmAdmin] = useState(false);
 
   const currentPurchase = customer.purchases?.[0];
   const currentPlanName = currentPurchase?.pricing_plans?.name || 'Free';
   const hasStripeSub = Boolean(currentPurchase?.stripe_subscription_id);
+  const isCurrentlyAdmin = customer.role === 'admin';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -56,6 +59,8 @@ export const AssignPlanModal: React.FC<AssignPlanModalProps> = ({
     setCompReason('');
     setCompExpiry('');
     setAdminNote('');
+    setGrantAdmin(false);
+    setConfirmAdmin(false);
     setLoadingPlans(true);
     plansAdminService
       .listPlans()
