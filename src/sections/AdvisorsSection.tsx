@@ -8,6 +8,7 @@ import { ProfessionalFinder } from '../components/directory/ProfessionalFinder';
 import { sectionService } from '../services/sectionService';
 import { useConfirm } from '../context/ConfirmDialogContext';
 import { getCategoryIcon } from '../config/categoryIcons';
+import { PersonAvatar } from '../components/common/PersonAvatar';
 
 export const AdvisorsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const [activeView, setActiveView] = useState<'list' | 'find'>('list');
@@ -74,7 +75,14 @@ export const AdvisorsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?:
                   title={record.name}
                   subtitle={buildSubtitle(record.advisor_type, record.firm, record.phone)}
                   subtitlePlaceholder="No contact details added"
-                  icon={getCategoryIcon('advisors', record)}
+                  avatar={
+                    <PersonAvatar
+                      photoPath={record.photo_path}
+                      name={record.name}
+                      isDeceased={record.advisor_status === 'deceased'}
+                      size={52}
+                    />
+                  }
                   badge={record.advisor_type}
                   data={record}
                   onEdit={() => onAddClick(undefined, record)}
