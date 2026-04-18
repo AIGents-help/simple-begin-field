@@ -329,7 +329,14 @@ export const TrustedContactsManager: React.FC = () => {
           {contacts.map(c => (
             <div key={c.id} className={`paper-sheet p-5 ${c.is_deceased ? 'opacity-75 bg-stone-50/40' : ''}`}>
               <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <PersonAvatar
+                    photoPath={c.photo_path}
+                    name={c.contact_name}
+                    isDeceased={!!c.is_deceased}
+                    size={52}
+                  />
+                  <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className={`text-base font-bold ${c.is_deceased ? 'text-stone-500' : 'text-navy-muted'}`}>{c.contact_name}</h3>
                     {c.is_deceased && (
