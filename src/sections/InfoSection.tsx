@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader2, Plus, AlertTriangle, ShieldAlert, Check } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { cn } from '@/lib/utils';
 import { CategoryOption } from '../components/upload/types';
 import {
   identityService,
