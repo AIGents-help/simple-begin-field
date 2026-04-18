@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Loader2, Flower2 } from 'lucide-react';
+import { Loader2, Flower2, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppContext } from '../context/AppContext';
@@ -9,6 +9,7 @@ import { FuneralMusicList } from '../components/funeral/FuneralMusicList';
 import { FuneralReadings } from '../components/funeral/FuneralReadings';
 import { FuneralPhotoGallery } from '../components/funeral/FuneralPhotoGallery';
 import { SendToFuneralHomeDialog } from '../components/funeral/SendToFuneralHomeDialog';
+import { QuickDownloadButton } from '../components/download/QuickDownloadButton';
 
 /**
  * FuneralSection — single structured editor per packet (one funeral_records row).
@@ -110,13 +111,22 @@ export const FuneralSection = ({
 
   return (
     <div className="p-6 pb-32 space-y-4">
-      <div className="mb-2">
-        <h2 className="text-2xl font-serif font-bold text-navy-muted mb-2 flex items-center gap-2">
-          <Flower2 size={22} /> Funeral Wishes
-        </h2>
-        <p className="text-sm text-stone-500">
-          Service preferences, obituary, eulogy, music, readings, and a send-to-funeral-home package.
-        </p>
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-serif font-bold text-navy-muted mb-2 flex items-center gap-2">
+            <Flower2 size={22} /> Funeral Wishes
+          </h2>
+          <p className="text-sm text-stone-500">
+            Service preferences, obituary, eulogy, music, readings, and a send-to-funeral-home package.
+          </p>
+        </div>
+        <QuickDownloadButton
+          downloadType="funeral_instructions"
+          packetId={currentPacket?.id}
+          label="Download Funeral Instructions"
+          icon={FileDown}
+          variant="outline"
+        />
       </div>
 
       <FuneralWishesEditor
