@@ -22,6 +22,9 @@ interface AppContextType extends AppState {
   isPaid: boolean;
   isCouple: boolean;
   isLifetime: boolean;
+  featureTier: 'basic' | 'full';
+  planCategory: 'free' | 'individual' | 'couple' | 'family' | 'corporate' | 'gift';
+  isFullFeature: boolean;
   currentPlan: PricingPlan;
   refreshBilling: () => Promise<void>;
   setState: React.Dispatch<React.SetStateAction<AppState>>;
@@ -86,6 +89,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     isPaid,
     isCouple,
     isLifetime,
+    featureTier,
+    planCategory,
+    isFullFeature,
     currentPlan,
     refreshBilling
   } = useBilling(user);
@@ -256,6 +262,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     isPaid,
     isCouple,
     isLifetime,
+    featureTier,
+    planCategory,
+    isFullFeature,
     currentPlan,
     refreshBilling,
     setState, 
@@ -286,6 +295,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     isPaid,
     isCouple,
     isLifetime,
+    featureTier,
+    planCategory,
+    isFullFeature,
     currentPlan,
     refreshBilling,
     completionVersion,
