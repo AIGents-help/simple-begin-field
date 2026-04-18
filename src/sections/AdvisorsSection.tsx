@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
-import { ShieldCheck, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { ProfessionalFinder } from '../components/directory/ProfessionalFinder';
 import { sectionService } from '../services/sectionService';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { getCategoryIcon } from '../config/categoryIcons';
 
 export const AdvisorsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const [activeView, setActiveView] = useState<'list' | 'find'>('list');
@@ -73,7 +74,7 @@ export const AdvisorsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?:
                   title={record.name}
                   subtitle={buildSubtitle(record.advisor_type, record.firm, record.phone)}
                   subtitlePlaceholder="No contact details added"
-                  icon={ShieldCheck}
+                  icon={getCategoryIcon('advisors', record)}
                   badge={record.advisor_type}
                   data={record}
                   onEdit={() => onAddClick(undefined, record)}

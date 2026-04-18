@@ -2,10 +2,10 @@ import React from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
-import { Car } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { sectionService } from '../services/sectionService';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { getCategoryIcon } from '../config/categoryIcons';
 
 export const VehiclesSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const { bumpCompletion } = useAppContext();
@@ -46,7 +46,7 @@ export const VehiclesSection = ({ onAddClick, onRefresh }: { onAddClick: (file?:
                   record.vin ? `VIN: ${record.vin}` : ''
                 )}
                 subtitlePlaceholder="No license or VIN added"
-                icon={Car}
+                icon={getCategoryIcon('vehicles', record)}
                 data={record}
                 onEdit={() => onAddClick(undefined, record)}
                 onDelete={() => handleDelete(record, refresh)}

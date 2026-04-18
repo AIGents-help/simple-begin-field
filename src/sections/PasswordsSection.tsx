@@ -2,10 +2,11 @@ import React from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate, RecordCard } from '../components/sections/SectionScreenTemplate';
-import { Key, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { sectionService } from '../services/sectionService';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { getCategoryIcon } from '../config/categoryIcons';
 
 export const PasswordsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const { bumpCompletion } = useAppContext();
@@ -50,7 +51,7 @@ export const PasswordsSection = ({ onAddClick, onRefresh }: { onAddClick: (file?
                 title={record.service_name}
                 subtitle={record.username}
                 subtitlePlaceholder="No username added"
-                icon={Key}
+                icon={getCategoryIcon('passwords', record)}
                 badge={record.requires_reauth ? 'Secure' : undefined}
                 data={record}
                 onEdit={() => onAddClick(undefined, record)}

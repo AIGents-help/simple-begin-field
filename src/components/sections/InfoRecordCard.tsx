@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileText, Paperclip, ChevronRight, Eye, Edit2, Trash2, ClipboardList } from 'lucide-react';
+import { getCategoryIcon } from '@/config/categoryIcons';
 import { format } from 'date-fns';
 import { formatHumanDate, isValidDisplayDate } from '@/lib/formatDate';
 
@@ -168,9 +169,19 @@ export const InfoRecordCard = ({ record, hasFile, onClick, onEdit, onDelete, onV
 
       <div className="flex items-center justify-between">
         <div className="flex-1 pr-4">
-          <h4 className={`font-bold text-lg mb-2 ${isNA ? 'text-stone-400 line-through' : 'text-navy-muted'}`}>
-            {displayTitle || 'Untitled Record'}
-          </h4>
+          <div className="flex items-center gap-3 mb-2">
+            {(() => {
+              const Icon = getCategoryIcon('info', record);
+              return (
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isNA ? 'bg-stone-100 text-stone-400' : 'bg-stone-50 text-navy-muted'}`}>
+                  <Icon size={18} />
+                </div>
+              );
+            })()}
+            <h4 className={`font-bold text-lg ${isNA ? 'text-stone-400 line-through' : 'text-navy-muted'}`}>
+              {displayTitle || 'Untitled Record'}
+            </h4>
+          </div>
           
           {isEntryType && entryData && !isNA ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 mb-3">

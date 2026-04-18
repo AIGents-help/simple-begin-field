@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
 import { User, List, GitBranch, Heart } from 'lucide-react';
+import { getCategoryIcon } from '../config/categoryIcons';
 import { CategoryOption } from '../components/upload/types';
 import { FamilyTreeView } from '../components/family/FamilyTreeView';
 import { SpouseProfileSheet } from '../components/family/SpouseProfileSheet';
@@ -217,7 +218,7 @@ export const FamilySection = ({ onAddClick, onRefresh }: { onAddClick: (file?: F
                       title={record.name}
                       subtitle={buildSubtitle(...subtitleParts)}
                       subtitlePlaceholder="No contact details added"
-                      icon={spouse ? Heart : User}
+                      icon={spouse ? Heart : getCategoryIcon('family', record)}
                       badge={badge}
                       data={record}
                       onEdit={() =>

@@ -2,10 +2,10 @@ import React from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate, RecordCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
-import { CreditCard } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { sectionService } from '../services/sectionService';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { getCategoryIcon } from '../config/categoryIcons';
 
 export const BankingSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const { bumpCompletion } = useAppContext();
@@ -42,7 +42,7 @@ export const BankingSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: 
               title={record.institution}
               subtitle={buildSubtitle(record.account_type, record.account_number_masked)}
               subtitlePlaceholder="No account details added"
-              icon={CreditCard}
+              icon={getCategoryIcon('banking', record)}
               badge={record.scope === 'shared' ? 'Shared' : undefined}
               data={record}
               onEdit={() => onAddClick(undefined, record)}

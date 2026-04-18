@@ -2,6 +2,7 @@ import React from 'react';
 import { toast } from 'sonner';
 import { SectionScreenTemplate, RecordCard } from '../components/sections/SectionScreenTemplate';
 import { Lock, ShieldCheck } from 'lucide-react';
+// Private section keeps the Lock icon for all records to reinforce privacy.
 import { CategoryOption } from '../components/upload/types';
 import { sectionService } from '../services/sectionService';
 import { useAppContext } from '../context/AppContext';

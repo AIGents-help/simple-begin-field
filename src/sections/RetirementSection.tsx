@@ -2,10 +2,10 @@ import React from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate, RecordCard, DocumentUploadCard, buildSubtitle } from '../components/sections/SectionScreenTemplate';
-import { Briefcase } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { sectionService } from '../services/sectionService';
 import { useConfirm } from '../context/ConfirmDialogContext';
+import { getCategoryIcon } from '../config/categoryIcons';
 
 export const RetirementSection = ({ onAddClick, onRefresh }: { onAddClick: (file?: File, data?: any, options?: CategoryOption[]) => void, onRefresh?: (fn: () => void) => void }) => {
   const { bumpCompletion } = useAppContext();
@@ -42,7 +42,7 @@ export const RetirementSection = ({ onAddClick, onRefresh }: { onAddClick: (file
               title={record.institution || record.account_type}
               subtitle={buildSubtitle(record.account_type, record.beneficiary_notes, record.account_number_masked)}
               subtitlePlaceholder="No account details added"
-              icon={Briefcase}
+              icon={getCategoryIcon('retirement', record)}
               data={record}
               onEdit={() => onAddClick(undefined, record)}
               onDelete={() => handleDelete(record, refresh)}
