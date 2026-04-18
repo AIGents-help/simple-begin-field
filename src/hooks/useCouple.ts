@@ -12,6 +12,7 @@ interface PartnerSummary {
   full_name: string | null;
   email: string | null;
   last_login_at: string | null;
+  avatar_path: string | null;
 }
 
 export interface UseCoupleResult {
