@@ -23,6 +23,7 @@ import { MaskedInput } from '../common/MaskedInput';
 import { ProfilePhotoUploader } from '../common/ProfilePhotoUploader';
 import { uploadService } from '../../services/uploadService';
 import { AIValuationPanel } from '../common/AIValuationPanel';
+import { GenderSelect } from '../common/GenderSelect';
 
 // ---------------------------------------------------------------------------
 // Cross-section federation: snapshot which fields on a source record drive
