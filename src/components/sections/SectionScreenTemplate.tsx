@@ -8,6 +8,8 @@ import { sectionService } from '../../services/sectionService';
 import { documentService } from '../../services/documentService';
 
 import { SectionRecommendations } from './SectionRecommendations';
+import { FindProfessionalPrompt } from '../directory/FindProfessionalPrompt';
+import { resolveSectionQuery, resolveRecordQuery } from '../../config/professionalPromptMap';
 
 import { CategoryOption } from '../upload/types';
 
