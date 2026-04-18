@@ -14,6 +14,7 @@ import { AdminAffiliates, AdminInvites } from './components/dashboard/AdminAffil
 import { AdminTools } from './components/dashboard/AdminTools';
 import { AdminPlans } from './components/dashboard/AdminPlans';
 import { AdminActivityLog } from './components/dashboard/AdminActivityLog';
+import { AdminSettings } from './components/dashboard/AdminSettings';
 import { MyReferrals, MyLinks, MyPayouts } from './components/dashboard/ProfessionalScreens';
 import { AttorneyPortal } from './components/dashboard/AttorneyPortal';
 import { useAppContext } from './context/AppContext';
@@ -46,7 +47,7 @@ const DashboardRoutes = () => {
             <Route path="plans" element={<AdminPlans />} />
             <Route path="activity" element={<AdminActivityLog />} />
             <Route path="tools" element={<AdminTools />} />
-            <Route path="settings" element={<div className="p-8 text-stone-400 italic">Admin Settings Coming Soon</div>} />
+            <Route path="settings" element={<AdminSettings />} />
           </>
         )}
         {isProfessional && (
