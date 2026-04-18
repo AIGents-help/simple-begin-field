@@ -383,8 +383,14 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
               {/* Photo */}
               <div className="flex flex-col items-center gap-3 py-2">
-                <div className="relative">
-                  <div className="w-24 h-24 rounded-full bg-stone-200 overflow-hidden flex items-center justify-center border-2 border-stone-300">
+                <div className="relative" {...photoDropzone.dropzoneProps}>
+                  <div
+                    className={`w-24 h-24 rounded-full bg-stone-200 overflow-hidden flex items-center justify-center border-2 transition-all ${
+                      photoDropzone.isDragging
+                        ? 'border-amber-500 ring-4 ring-amber-200 scale-105'
+                        : 'border-stone-300'
+                    }`}
+                  >
                     {photoPreview || photoSignedUrl ? (
                       <img
                         src={photoPreview || photoSignedUrl!}
@@ -411,7 +417,13 @@ export const PetProfileSheet: React.FC<Props> = ({ isOpen, onClose, pet, onSaved
                     onChange={handlePhotoSelect}
                   />
                 </div>
-                <p className="text-xs text-stone-500">Tap camera to add a photo</p>
+                <p className="text-xs text-stone-500">
+                  {photoDropzone.isDragging
+                    ? 'Drop to upload'
+                    : photoDropzone.isTouch
+                      ? 'Tap camera to add a photo'
+                      : 'Tap camera or drag & drop a photo'}
+                </p>
               </div>
 
               {/* Living / Deceased toggle */}
