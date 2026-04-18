@@ -14,6 +14,40 @@ import { CategoryOption, FileMetadata } from '../upload/types';
 import { INFO_CATEGORY_OPTIONS } from '../../config/categories';
 import { LifeStatusToggle, AdvisorStatusToggle } from '../common/LifeStatusToggle';
 import { DeathCertificateUpload } from '../common/DeathCertificateUpload';
+import { RecordDocumentUpload } from '../common/RecordDocumentUpload';
+
+// Per-section document slots — documents are attached to the parent record
+// instead of existing as standalone entries. Each entry maps to a category
+// stored on the documents row (related_table + related_record_id + category).
+const RECORD_DOC_SLOTS: Record<string, { table: string; slots: { category: string; label: string; description?: string }[] }> = {
+  vehicles: {
+    table: 'vehicle_records',
+    slots: [
+      { category: 'title', label: 'Vehicle Title', description: 'Proof of ownership' },
+      { category: 'registration', label: 'Registration', description: 'Current state registration' },
+      { category: 'insurance', label: 'Insurance Card', description: 'Active policy card' },
+      { category: 'loan_documents', label: 'Loan Documents', description: 'Lien or financing paperwork' },
+    ],
+  },
+  'real-estate': {
+    table: 'real_estate_records',
+    slots: [
+      { category: 'deed', label: 'Property Deed', description: 'Recorded deed' },
+      { category: 'mortgage', label: 'Mortgage Statement', description: 'Most recent statement' },
+      { category: 'title', label: 'Title Documents', description: 'Title insurance / report' },
+      { category: 'insurance', label: 'Home Insurance Policy', description: 'Active homeowners policy' },
+      { category: 'tax_bill', label: 'Property Tax Bill', description: 'Most recent tax statement' },
+      { category: 'hoa', label: 'HOA Information', description: 'HOA documents and dues' },
+      { category: 'lease', label: 'Lease Agreement', description: 'For rental properties' },
+    ],
+  },
+  medical: {
+    table: 'medical_records',
+    slots: [
+      { category: 'insurance_card', label: 'Insurance Card', description: 'Front and back of card' },
+    ],
+  },
+};
 
 export const AddEditSheet = ({ 
   isOpen, 
@@ -737,6 +771,32 @@ export const AddEditSheet = ({
                       disabled={loading}
                       isPrivate={activeTab === 'private'}
                     />
+
+                    {/* Per-record document slots (Vehicles, Real Estate, Medical, etc.) */}
+                    {activeTab && currentPacket && RECORD_DOC_SLOTS[activeTab] && (
+                      <div className="space-y-3 pt-2">
+                        <div>
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">Documents</h3>
+                          <p className="text-[10px] text-stone-400 mt-0.5">
+                            {initialData?.id
+                              ? 'Attach documents for this specific record'
+                              : 'Save this record first, then upload its documents'}
+                          </p>
+                        </div>
+                        {RECORD_DOC_SLOTS[activeTab].slots.map((slot) => (
+                          <RecordDocumentUpload
+                            key={slot.category}
+                            packetId={currentPacket.id}
+                            relatedTable={RECORD_DOC_SLOTS[activeTab].table}
+                            relatedRecordId={initialData?.id ?? null}
+                            category={slot.category}
+                            label={slot.label}
+                            description={slot.description}
+                            isPrivate={activeTab === 'medical'}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </>
                 )}
 

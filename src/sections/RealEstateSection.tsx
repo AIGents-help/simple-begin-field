@@ -1,7 +1,7 @@
 import React from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
-import { SectionScreenTemplate, RecordCard, DocumentUploadCard } from '../components/sections/SectionScreenTemplate';
+import { SectionScreenTemplate, RecordCard } from '../components/sections/SectionScreenTemplate';
 import { Home as HomeIcon } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { HomeInventoryVideo } from '../components/realestate/HomeInventoryVideo';
@@ -15,11 +15,8 @@ export const RealEstateSection = ({ onAddClick, onRefresh }: { onAddClick: (file
   const handleDelete = async (record: any, refresh: () => void) => {
     if (!record?.id) return;
     const ok = await confirm({
-
       title: 'Delete this record?',
-
       description: `Delete "${record.property_label || 'this property'}"? This action cannot be undone.`,
-
     });
 
     if (!ok) return;
@@ -35,7 +32,7 @@ export const RealEstateSection = ({ onAddClick, onRefresh }: { onAddClick: (file
 
   return (
     <SectionScreenTemplate onAddClick={onAddClick} onRefresh={onRefresh}>
-      {(records, docs, refresh) => (
+      {(records, _docs, refresh) => (
         <div className="space-y-6">
           {records.map(record => (
             <React.Fragment key={record.id}>
@@ -58,24 +55,6 @@ export const RealEstateSection = ({ onAddClick, onRefresh }: { onAddClick: (file
               )}
             </React.Fragment>
           ))}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">Documents</h3>
-            <DocumentUploadCard
-              label="Property Deed"
-              status={docs.some(d => d.category === 'deed') ? 'uploaded' : 'missing'}
-              isNA={records.some(r => r.status === 'not_applicable' && r.property_label === 'Property Deed')}
-            />
-            <DocumentUploadCard
-              label="Mortgage Statement"
-              status={docs.some(d => d.category === 'mortgage') ? 'uploaded' : 'missing'}
-              isNA={records.some(r => r.status === 'not_applicable' && r.property_label === 'Mortgage Statement')}
-            />
-            <DocumentUploadCard
-              label="Property Tax Bill"
-              status={docs.some(d => d.category === 'tax_bill') ? 'uploaded' : 'missing'}
-              isNA={records.some(r => r.status === 'not_applicable' && r.property_label === 'Property Tax Documents')}
-            />
-          </div>
         </div>
       )}
     </SectionScreenTemplate>

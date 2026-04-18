@@ -92,14 +92,11 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       { label: 'Preferred Hospital', prefill: { provider_name: 'Preferred Hospital' } },
       { label: 'End-of-life Treatment Wishes', prefill: { provider_name: 'End-of-life Treatment Wishes' } },
     ],
+    // Insurance Card is attached to each medical provider record.
+    // Other clinical documents (Advance Directive, Living Will, HIPAA, Medical POA, DNR)
+    // belong in the Legal section attached to the relevant attorney/agent.
     documents: [
-      { label: 'Insurance Card', prefill: { title: 'Insurance Card' } },
       { label: 'Medication List', prefill: { title: 'Medication List' } },
-      { label: 'Advance Directive', prefill: { title: 'Advance Directive' } },
-      { label: 'Living Will', prefill: { title: 'Living Will' } },
-      { label: 'HIPAA Authorization', prefill: { title: 'HIPAA Authorization' } },
-      { label: 'Medical POA', prefill: { title: 'Medical POA' } },
-      { label: 'DNR', prefill: { title: 'DNR' } },
       { label: 'Recent Care Plan Summary', prefill: { title: 'Care Plan Summary' } },
     ],
     contacts: [
@@ -127,15 +124,9 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       { label: 'Insurance Details', prefill: { property_label: 'Insurance Details' } },
       { label: 'Security System Info', prefill: { property_label: 'Security System' } },
     ],
-    documents: [
-      { label: 'Deed', prefill: { property_label: 'Property Deed' } },
-      { label: 'Mortgage Statement', prefill: { property_label: 'Mortgage Statement' } },
-      { label: 'Title Documents', prefill: { property_label: 'Title Documents' } },
-      { label: 'Home Insurance Policy', prefill: { property_label: 'Home Insurance Policy' } },
-      { label: 'Property Tax Documents', prefill: { property_label: 'Property Tax Documents' } },
-      { label: 'HOA Information', prefill: { property_label: 'HOA Information' } },
-      { label: 'Lease Agreements', prefill: { property_label: 'Lease Agreement' } },
-    ],
+    // Deed, Mortgage, Title, Insurance, Tax, HOA, and Lease docs are attached
+    // directly to each property record (see RECORD_DOC_SLOTS in AddEditSheet).
+    documents: [],
     contacts: [
       { label: 'Realtor', prefill: { name: 'Realtor' } },
       { label: 'Mortgage Lender', prefill: { name: 'Mortgage Lender' } },
@@ -218,11 +209,9 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
       { label: 'Insurance', prefill: { insurance: 'Insurance' } },
       { label: 'Loan / Lien Details', prefill: { lien_info: 'Loan Details' } },
     ],
+    // Title, Registration, Insurance Card, and Loan Documents are attached
+    // directly to each vehicle record (see RECORD_DOC_SLOTS in AddEditSheet).
     documents: [
-      { label: 'Title', prefill: { model: 'Vehicle Title' } },
-      { label: 'Registration', prefill: { model: 'Registration' } },
-      { label: 'Insurance Card', prefill: { model: 'Insurance Card' } },
-      { label: 'Loan Documents', prefill: { model: 'Loan Documents' } },
       { label: 'Service Records', prefill: { model: 'Service Records' } },
     ],
     contacts: [
