@@ -101,12 +101,20 @@ export const AddEditSheet = ({
     switch (activeTab) {
       case 'family':
         return [
-          { name: 'name', label: 'Full Name', required: true, placeholder: 'e.g. Jane Doe' },
+          { name: 'first_name', label: 'First Name', required: true, placeholder: 'e.g. Jane' },
+          { name: 'middle_name', label: 'Middle Name', placeholder: 'Optional' },
+          { name: 'last_name', label: 'Last Name', required: true, placeholder: 'e.g. Doe' },
+          { name: 'suffix', label: 'Suffix', placeholder: 'Jr., Sr., III, etc.' },
+          { name: 'preferred_name', label: 'Preferred Name / Nickname', placeholder: 'What they go by' },
           { name: 'relationship', label: 'Relationship', required: true, type: 'select', options: ['Spouse', 'Partner', 'Child', 'Parent', 'Sibling', 'Grandparent', 'Grandchild', 'Friend', 'Other'] },
-          { name: 'phone', label: 'Phone Number', type: 'tel', placeholder: '(555) 123-4567' },
-          { name: 'email', label: 'Email Address', type: 'email', placeholder: 'jane@example.com' },
-          { name: 'address', label: 'Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
-          { name: 'birthday', label: 'Birthday', type: 'date' },
+          { name: 'category', label: 'Parent Type', type: 'select', options: ['Mother', 'Father', 'Step-parent', 'Adoptive Parent', 'Biological Parent', 'Guardian', 'Other'] },
+          { name: 'birthday', label: 'Date of Birth', type: 'date' },
+          { name: 'place_of_birth', label: 'Place of Birth', placeholder: 'City, State' },
+          { name: 'phone', label: 'Primary Phone', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'email', label: 'Primary Email', type: 'email', placeholder: 'jane@example.com' },
+          { name: 'address', label: 'Current Address', type: 'textarea', placeholder: '123 Main St, City, State', rows: 2 },
+          { name: 'occupation', label: 'Occupation', placeholder: 'e.g. Teacher, Retired' },
+          { name: 'employer', label: 'Employer', placeholder: 'Company name (optional)' },
           { name: 'reminder_notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
         ];
       case 'medical':
