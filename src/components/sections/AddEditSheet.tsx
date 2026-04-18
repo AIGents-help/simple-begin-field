@@ -771,6 +771,32 @@ export const AddEditSheet = ({
                       disabled={loading}
                       isPrivate={activeTab === 'private'}
                     />
+
+                    {/* Per-record document slots (Vehicles, Real Estate, Medical, etc.) */}
+                    {activeTab && currentPacket && RECORD_DOC_SLOTS[activeTab] && (
+                      <div className="space-y-3 pt-2">
+                        <div>
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500">Documents</h3>
+                          <p className="text-[10px] text-stone-400 mt-0.5">
+                            {initialData?.id
+                              ? 'Attach documents for this specific record'
+                              : 'Save this record first, then upload its documents'}
+                          </p>
+                        </div>
+                        {RECORD_DOC_SLOTS[activeTab].slots.map((slot) => (
+                          <RecordDocumentUpload
+                            key={slot.category}
+                            packetId={currentPacket.id}
+                            relatedTable={RECORD_DOC_SLOTS[activeTab].table}
+                            relatedRecordId={initialData?.id ?? null}
+                            category={slot.category}
+                            label={slot.label}
+                            description={slot.description}
+                            isPrivate={activeTab === 'medical'}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </>
                 )}
 
