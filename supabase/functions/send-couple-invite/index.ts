@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const LOOPS_URL = 'https://app.loops.so/api/v1/events/send';
 const RESEND_URL = 'https://api.resend.com/emails';
-const RESEND_FROM = 'The Survivor Packet <onboarding@resend.dev>';
+const RESEND_FROM = 'The Survivor Packet <hello@survivorpacket.com>';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
