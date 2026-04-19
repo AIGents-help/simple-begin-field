@@ -578,6 +578,10 @@ export const EmergencyCardSettings: React.FC = () => {
         qrPngDataUrl={qrPreview}
         emergencyUrl={emergencyUrl}
       />
+
+      {shopOpen && emergencyUrl && (
+        <QrShopSheet emergencyUrl={emergencyUrl} onClose={() => setShopOpen(false)} />
+      )}
     </div>
   );
 };
