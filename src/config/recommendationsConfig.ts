@@ -10,6 +10,10 @@ export interface SectionRecommendations {
   documents: RecommendationItem[];
   contacts: RecommendationItem[];
   considerations: string[];
+  /** Optional about content for sections using the new "About This Section" format */
+  aboutContent?: {
+    paragraphs: string[];
+  };
 }
 
 export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommendations>> = {
