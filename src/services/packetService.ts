@@ -94,6 +94,9 @@ export const packetService = {
   },
 
   async getPacketMembers(packetId: string) {
+    if (isDemoMode()) {
+      return { data: [], error: null };
+    }
     const { data, error } = await supabase
       .from('packet_members')
       .select(`
@@ -106,6 +109,16 @@ export const packetService = {
   },
 
   async getSectionCompletion(packetId: string) {
+    if (isDemoMode()) {
+      const data = Object.entries(DEMO_SECTION_COMPLETION).map(([section_key, value]) => ({
+        packet_id: DEMO_PACKET.id,
+        section_key,
+        scope: 'personA',
+        status: value.hasContent ? 'complete' : 'empty',
+        percent_complete: value.percent,
+      }));
+      return { data, error: null };
+    }
     const { data, error } = await supabase
       .from('section_completion')
       .select('*')

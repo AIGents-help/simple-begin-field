@@ -26,8 +26,7 @@ export const expirationAlertsService = {
    * Includes overdue (negative days) so users see them first.
    */
   async getUpcoming(packetId: string, limit = 3): Promise<UpcomingExpiration[]> {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
-      // Demo packet has no live expirations — return empty list.
+    if (isDemoMode()) {
       return [];
     }
     const today = new Date();
