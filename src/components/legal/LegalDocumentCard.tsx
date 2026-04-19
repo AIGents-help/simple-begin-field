@@ -705,6 +705,24 @@ export const LegalDocumentCard: React.FC<Props> = ({
 
       {expanded && (
         <div className="border-t border-stone-100 p-4 space-y-5 bg-stone-50/40">
+          {showPersonHint && (
+            <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 flex items-start gap-2">
+              <span className="text-base leading-none mt-0.5" aria-hidden>💡</span>
+              <p className="text-xs text-blue-900 flex-1">
+                <span className="font-semibold">Tip:</span> This document often applies to a specific person.
+                Consider also attaching it to their record in the Family or Medical section so it appears on their profile.
+              </p>
+              <button
+                type="button"
+                onClick={() => setHintDismissed(true)}
+                className="p-1 -m-1 text-blue-700/70 hover:text-blue-900 transition-colors shrink-0"
+                aria-label="Dismiss tip"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-widest text-stone-500">
               {KIND_LABELS[kind]} details
