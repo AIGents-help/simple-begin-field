@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { packetService } from '../../services/packetService';
 import { ConsentCheckbox } from '../trust/TrustComponents';
 import { useLocation, Link } from 'react-router-dom';
+import { ExploreSampleButton } from '../demo/ExploreSampleButton';
 
 const OnboardingFlowComponent = () => {
   const { setState, user, setCurrentPacket } = useAppContext();
@@ -262,6 +263,8 @@ const OnboardingFlowComponent = () => {
               >
                 Sign In
               </button>
+
+              <ExploreSampleButton />
             </div>
           </motion.div>
         );

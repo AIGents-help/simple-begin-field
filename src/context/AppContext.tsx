@@ -7,6 +7,8 @@ import { User } from '@supabase/supabase-js';
 import { useBilling } from '../hooks/useBilling';
 import { PricingPlan } from '../config/pricingConfig';
 import { customSectionService, CustomSection } from '../services/customSectionService';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PROFILE, DEMO_PACKET, DEMO_USER_ID } from '../demo/morganFamilyData';
 
 interface AppContextType extends AppState {
   user: User | null;
@@ -217,6 +219,25 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let isMounted = true;
+
+    // Demo mode: bypass auth entirely and inject the Morgan family packet.
+    if (isDemoMode()) {
+      const demoUser = { id: DEMO_USER_ID, email: DEMO_PROFILE.email } as unknown as User;
+      setUser(demoUser);
+      setProfile(DEMO_PROFILE);
+      setPackets([DEMO_PACKET]);
+      setCurrentPacket(DEMO_PACKET);
+      setState(prev => ({
+        ...prev,
+        onboarded: true,
+        userMode: 'single',
+        personA: 'James Morgan',
+        personB: 'Person B',
+        view: 'dashboard',
+      }));
+      setLoading(false);
+      return () => { isMounted = false; };
+    }
 
     const initializeAuth = async () => {
       const { data, error } = await supabase.auth.getSession();

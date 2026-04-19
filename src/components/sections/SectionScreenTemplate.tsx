@@ -6,6 +6,7 @@ import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { ScopeToggle } from '../layout/ScopeToggle';
 import { sectionService } from '../../services/sectionService';
 import { documentService } from '../../services/documentService';
+import { isDemoMode } from '../../demo/demoMode';
 
 import { SectionRecommendations } from './SectionRecommendations';
 import { FindProfessionalPrompt } from '../directory/FindProfessionalPrompt';
@@ -79,6 +80,7 @@ export const SectionScreenTemplate = ({
 
   if (!config) return null;
 
+  const demoMode = isDemoMode();
   const hasData = records.length > 0 || docs.length > 0;
 
   return (
@@ -88,7 +90,7 @@ export const SectionScreenTemplate = ({
           <h2 className="text-2xl font-serif font-bold text-navy-muted mb-2">{config.label}</h2>
           <p className="text-sm text-stone-500">{config.description}</p>
         </div>
-        {activeTab !== 'affiliate' && activeTab !== 'funeral' && currentPacket?.id && (
+        {!demoMode && activeTab !== 'affiliate' && activeTab !== 'funeral' && currentPacket?.id && (
           <div className="flex flex-wrap items-center gap-2">
             {activeTab === 'medical' && (
               <QuickDownloadButton
@@ -188,13 +190,15 @@ export const SectionScreenTemplate = ({
       ) : hasData ? (
         <div className="space-y-4">
           {children && children(records, docs, fetchData)}
-          <button 
-            onClick={() => onAddClick?.()}
-            className="w-full py-4 border-2 border-dashed border-stone-200 rounded-2xl flex items-center justify-center gap-2 text-stone-400 hover:border-navy-muted hover:text-navy-muted transition-colors"
-          >
-            <Plus size={18} />
-            <span className="font-bold text-sm">{config.addButtonLabel}</span>
-          </button>
+          {!demoMode && (
+            <button 
+              onClick={() => onAddClick?.()}
+              className="w-full py-4 border-2 border-dashed border-stone-200 rounded-2xl flex items-center justify-center gap-2 text-stone-400 hover:border-navy-muted hover:text-navy-muted transition-colors"
+            >
+              <Plus size={18} />
+              <span className="font-bold text-sm">{config.addButtonLabel}</span>
+            </button>
+          )}
         </div>
       ) : (
         emptyState || (
@@ -204,17 +208,21 @@ export const SectionScreenTemplate = ({
             </div>
             <h3 className="text-lg font-bold text-navy-muted mb-2">{config.emptyStateText}</h3>
             <p className="text-sm text-stone-500 mb-6">Keep your family prepared by organizing your {config.label.toLowerCase()} information here.</p>
-            <button 
-              onClick={() => onAddClick?.()}
-              className="px-6 py-3 bg-navy-muted text-white rounded-xl font-bold text-sm flex items-center gap-2"
-            >
-              <Plus size={18} />
-              {config.addButtonLabel}
-            </button>
-            <FindProfessionalPrompt
-              query={resolveSectionQuery(activeTab)}
-              variant="block"
-            />
+            {!demoMode && (
+              <button 
+                onClick={() => onAddClick?.()}
+                className="px-6 py-3 bg-navy-muted text-white rounded-xl font-bold text-sm flex items-center gap-2"
+              >
+                <Plus size={18} />
+                {config.addButtonLabel}
+              </button>
+            )}
+            {!demoMode && (
+              <FindProfessionalPrompt
+                query={resolveSectionQuery(activeTab)}
+                variant="block"
+              />
+            )}
           </div>
         )
       )}
@@ -269,6 +277,7 @@ export const RecordCard = ({
   subtitlePlaceholder?: string;
 }) => {
   const { activeTab } = useAppContext();
+  const demoMode = isDemoMode();
   const isNA = data?.is_na || data?.status === 'not_applicable';
   // Person/animal lifecycle dimming — applies to family/pets/trusted contacts (is_deceased)
   // and advisors (advisor_status !== 'active').
@@ -346,7 +355,7 @@ export const RecordCard = ({
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0 ml-2">
-          {onEdit && (
+          {!demoMode && onEdit && (
             <span
               role="button"
               tabIndex={0}
@@ -358,7 +367,7 @@ export const RecordCard = ({
               <Edit2 size={14} />
             </span>
           )}
-          {onDelete && (
+          {!demoMode && onDelete && (
             <span
               role="button"
               tabIndex={0}

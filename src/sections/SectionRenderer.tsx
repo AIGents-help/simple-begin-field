@@ -21,6 +21,9 @@ import { LegalSection } from '../sections/LegalSection';
 import { CustomSection } from '../sections/CustomSection';
 import { PrivateLockGate } from '../components/private/PrivateLockGate';
 import { PlanGate } from '../components/billing/PlanGate';
+import { DemoSectionInfoButton } from '../components/demo/DemoSectionInfoButton';
+import { DemoCTAFooter } from '../components/demo/DemoCTAFooter';
+import { isDemoMode } from '../demo/demoMode';
 
 import { CategoryOption } from '../components/upload/types';
 
@@ -100,11 +103,26 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
   // pb-28 on mobile to clear the BottomNav (BottomNav is ~88px incl. safe area)
   const containerClass = "px-4 pt-44 pb-28 sm:px-6 sm:pt-44 lg:p-8 lg:pt-8 lg:pb-8";
 
+  const demoMode = isDemoMode();
+
   // Affiliate section and Custom sections are accessible to all logged-in users regardless of plan
   if (activeTab === 'affiliate' || activeTab === 'custom') {
     return (
       <div className={containerClass}>
         {renderSection()}
+        {demoMode && <DemoCTAFooter />}
+        {demoMode && <DemoSectionInfoButton />}
+      </div>
+    );
+  }
+
+  // Demo mode bypasses plan gating since the demo is meant to showcase everything.
+  if (demoMode) {
+    return (
+      <div className={containerClass}>
+        {renderSection()}
+        <DemoCTAFooter />
+        <DemoSectionInfoButton />
       </div>
     );
   }

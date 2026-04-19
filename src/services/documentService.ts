@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import { uploadService } from './uploadService';
 import { FileMetadata } from '../components/upload/types';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID } from '../demo/morganFamilyData';
 
 export interface DocumentMetadata {
   packetId: string;
@@ -14,6 +16,10 @@ export interface DocumentMetadata {
 
 export const documentService = {
   async getDocuments(packetId: string, sectionKey?: string, recordId?: string) {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return { data: [], error: null };
+    }
+
     let query = supabase
       .from('documents')
       .select('*')
