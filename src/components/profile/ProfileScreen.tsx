@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X, TrendingUp, ArrowRight, FileText, Heart } from 'lucide-react';
+import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X, TrendingUp, ArrowRight, FileText, Heart, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
