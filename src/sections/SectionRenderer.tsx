@@ -98,10 +98,10 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
     }
   };
 
-  // Mobile sticky stack: MobileTopBar (69px) + FolderTabNav (~100px) ≈ 169px → pt-[170px]
+  // Mobile sticky stack: MobileTopBar (69px) + FolderTabNav (~48px) ≈ 117px → pt-[120px]
   // Desktop (lg+): no sticky stack → normal padding
   // pb-28 on mobile to clear the BottomNav (~88px incl. safe area)
-  const containerClass = "px-4 pt-[170px] pb-28 sm:px-6 sm:pt-[170px] lg:p-8 lg:pt-8 lg:pb-8";
+  const containerClass = "px-4 pt-[120px] pb-28 sm:px-6 sm:pt-[120px] lg:p-8 lg:pt-8 lg:pb-8";
 
   const demoMode = isDemoMode();
 
