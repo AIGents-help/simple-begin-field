@@ -8,6 +8,8 @@ const corsHeaders = {
 };
 
 const LOOPS_URL = 'https://app.loops.so/api/v1/events/send';
+const RESEND_URL = 'https://api.resend.com/emails';
+const RESEND_FROM = 'The Survivor Packet <onboarding@resend.dev>';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -17,6 +19,7 @@ Deno.serve(async (req) => {
     const SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const ANON_KEY     = Deno.env.get('SUPABASE_ANON_KEY')!;
     const LOOPS_API_KEY = Deno.env.get('LOOPS_API_KEY');
+    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -113,7 +116,56 @@ Deno.serve(async (req) => {
     const baseUrl = req.headers.get('origin') || 'https://app.survivorpacket.com';
     const inviteUrl = `${baseUrl}/couple/invite/${token}`;
 
-    if (LOOPS_API_KEY) {
+    let emailSent = false;
+    let emailError: string | null = null;
+
+    // Prefer Resend (works immediately without domain verification)
+    if (RESEND_API_KEY) {
+      try {
+        const partnerName = partnerProfile?.full_name || partnerEmail.split('@')[0];
+        const html = `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; color: #1f2937;">
+            <h1 style="font-size: 22px; margin: 0 0 16px; color: #0f172a;">${escapeHtml(ownerName)} invited you to The Survivor Packet</h1>
+            <p style="font-size: 15px; line-height: 1.6; color: #475569;">
+              Hi ${escapeHtml(partnerName)}, ${escapeHtml(ownerName)} would like to collaborate with you on their Survivor Packet —
+              a private place to organize the documents, accounts, and wishes your family would need.
+            </p>
+            <p style="text-align: center; margin: 32px 0;">
+              <a href="${inviteUrl}" style="display: inline-block; background: #0f172a; color: #ffffff; padding: 14px 28px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">
+                Accept invitation
+              </a>
+            </p>
+            <p style="font-size: 13px; color: #94a3b8; line-height: 1.6;">
+              This invitation expires in 14 days. If the button above doesn't work, copy and paste this link into your browser:<br />
+              <a href="${inviteUrl}" style="color: #475569; word-break: break-all;">${inviteUrl}</a>
+            </p>
+          </div>
+        `;
+        const resendRes = await fetch(RESEND_URL, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: RESEND_FROM,
+            to: [partnerEmail],
+            subject: `${ownerName} invited you to The Survivor Packet`,
+            html,
+          }),
+        });
+        const txt = await resendRes.text();
+        console.log(`Resend couple_invitation -> ${partnerEmail}: ${resendRes.status} ${txt}`);
+        if (resendRes.ok) {
+          emailSent = true;
+        } else {
+          emailError = `Resend ${resendRes.status}: ${txt}`;
+        }
+      } catch (e: any) {
+        emailError = e?.message || String(e);
+        console.error('Resend send failed:', e);
+      }
+    } else if (LOOPS_API_KEY) {
       try {
         const loopsRes = await fetch(LOOPS_URL, {
           method: 'POST',
@@ -133,14 +185,18 @@ Deno.serve(async (req) => {
         });
         const txt = await loopsRes.text();
         console.log(`Loops couple_invitation -> ${partnerEmail}: ${loopsRes.status} ${txt}`);
-      } catch (e) {
-        console.error('Loops send failed (non-fatal):', e);
+        if (loopsRes.ok) emailSent = true;
+        else emailError = `Loops ${loopsRes.status}: ${txt}`;
+      } catch (e: any) {
+        emailError = e?.message || String(e);
+        console.error('Loops send failed:', e);
       }
     } else {
-      console.warn('LOOPS_API_KEY not configured — invite created but email skipped.');
+      console.warn('No email provider configured — invite created but email skipped.');
+      emailError = 'No email provider configured';
     }
 
-    return json({ ok: true, linkId, inviteUrl, partnerHasAccount: !!partnerProfile });
+    return json({ ok: true, linkId, inviteUrl, partnerHasAccount: !!partnerProfile, emailSent, emailError });
   } catch (err: any) {
     console.error('send-couple-invite error:', err);
     return json({ error: err?.message || 'Unknown error' }, 500);
@@ -152,4 +208,13 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
+}
+
+function escapeHtml(s: string): string {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
