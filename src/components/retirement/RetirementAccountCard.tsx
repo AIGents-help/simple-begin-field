@@ -516,13 +516,13 @@ export const RetirementAccountCard: React.FC<Props> = ({
                   </div>
                   {!isDraft && (
                     <div className="sm:col-span-2">
-                      <Label>Beneficiary form (upload)</Label>
                       <RecordDocumentUpload
                         packetId={packetId}
                         relatedTable="retirement_records"
                         relatedRecordId={account.id}
                         category="beneficiary_form"
-                        scope={scope}
+                        label="Beneficiary form"
+                        description="Upload signed beneficiary designation"
                       />
                     </div>
                   )}
@@ -750,36 +750,27 @@ export const RetirementAccountCard: React.FC<Props> = ({
                 <AccordionTrigger className="text-sm font-medium">Documents</AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-3 pb-2">
-                    <div>
-                      <Label>Most recent statement</Label>
-                      <RecordDocumentUpload
-                        packetId={packetId}
-                        relatedTable="retirement_records"
-                        relatedRecordId={account.id}
-                        category="statement"
-                        scope={scope}
-                      />
-                    </div>
-                    <div>
-                      <Label>Plan summary document</Label>
-                      <RecordDocumentUpload
-                        packetId={packetId}
-                        relatedTable="retirement_records"
-                        relatedRecordId={account.id}
-                        category="plan_summary"
-                        scope={scope}
-                      />
-                    </div>
-                    <div>
-                      <Label>Correspondence</Label>
-                      <RecordDocumentUpload
-                        packetId={packetId}
-                        relatedTable="retirement_records"
-                        relatedRecordId={account.id}
-                        category="correspondence"
-                        scope={scope}
-                      />
-                    </div>
+                    <RecordDocumentUpload
+                      packetId={packetId}
+                      relatedTable="retirement_records"
+                      relatedRecordId={account.id}
+                      category="statement"
+                      label="Most recent statement"
+                    />
+                    <RecordDocumentUpload
+                      packetId={packetId}
+                      relatedTable="retirement_records"
+                      relatedRecordId={account.id}
+                      category="plan_summary"
+                      label="Plan summary document"
+                    />
+                    <RecordDocumentUpload
+                      packetId={packetId}
+                      relatedTable="retirement_records"
+                      relatedRecordId={account.id}
+                      category="correspondence"
+                      label="Correspondence"
+                    />
                   </div>
                 </AccordionContent>
               </AccordionItem>
