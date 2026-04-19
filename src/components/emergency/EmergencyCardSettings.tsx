@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert, ChevronDown } from 'lucide-react';
+import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert, ChevronDown, Siren, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { emergencyService, EmergencyToken, EmergencyAccessLogEntry } from '../../services/emergencyService';
 import { generateEmergencyCardsPdf, generateQrPng } from '../../services/emergencyCardPdf';
@@ -19,6 +19,10 @@ const SECTION_LABELS: Record<string, string> = {
   custom_field: 'Custom Note',
 };
 
+// Default fields suggested for provider bypass — the truly time-critical ones
+const DEFAULT_BYPASS_FIELDS = ['blood_type', 'allergies', 'medications', 'dnr_status', 'organ_donor'];
+const BYPASS_CONSENT_VERSION = '1.0';
+
 export const EmergencyCardSettings: React.FC = () => {
   const { user, currentPacket, userDisplayName } = useAppContext();
   const [token, setToken] = useState<EmergencyToken | null>(null);
@@ -31,6 +35,8 @@ export const EmergencyCardSettings: React.FC = () => {
   const [accessLog, setAccessLog] = useState<EmergencyAccessLogEntry[]>([]);
   const [generating, setGenerating] = useState(false);
   const [visibilityOpen, setVisibilityOpen] = useState(false);
+  const [bypassOpen, setBypassOpen] = useState(false);
+  const [bypassSaving, setBypassSaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -94,7 +100,55 @@ export const EmergencyCardSettings: React.FC = () => {
     }
   };
 
-  const regenerate = async (compromised = false) => {
+  const setBypassEnabled = async (enabled: boolean) => {
+    if (!token) return;
+    if (enabled && (!token.bypass_fields || token.bypass_fields.length === 0)) {
+      // Seed with sensible defaults on first enable
+      const seed = DEFAULT_BYPASS_FIELDS.filter((f) => SECTION_LABELS[f]);
+      setBypassSaving(true);
+      try {
+        await emergencyService.updateBypass({ enabled: true, fields: seed, consentVersion: BYPASS_CONSENT_VERSION });
+        setToken({ ...token, bypass_enabled: true, bypass_fields: seed, bypass_consent_agreed_at: new Date().toISOString(), bypass_consent_version: BYPASS_CONSENT_VERSION });
+        toast.success('Provider bypass enabled', { duration: 3000, position: 'bottom-center' });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to enable bypass', { duration: 5000, position: 'bottom-center' });
+      } finally {
+        setBypassSaving(false);
+      }
+      return;
+    }
+    setBypassSaving(true);
+    try {
+      await emergencyService.updateBypass({ enabled, fields: token.bypass_fields || [], consentVersion: BYPASS_CONSENT_VERSION });
+      setToken({
+        ...token,
+        bypass_enabled: enabled,
+        bypass_consent_agreed_at: enabled ? new Date().toISOString() : token.bypass_consent_agreed_at,
+      });
+      toast.success(enabled ? 'Provider bypass enabled' : 'Provider bypass disabled', { duration: 3000, position: 'bottom-center' });
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to update', { duration: 5000, position: 'bottom-center' });
+    } finally {
+      setBypassSaving(false);
+    }
+  };
+
+  const toggleBypassField = async (field: string) => {
+    if (!token) return;
+    const current = new Set(token.bypass_fields || []);
+    if (current.has(field)) current.delete(field);
+    else current.add(field);
+    const next = Array.from(current);
+    const prev = token.bypass_fields;
+    setToken({ ...token, bypass_fields: next });
+    try {
+      await emergencyService.updateBypass({ enabled: token.bypass_enabled, fields: next, consentVersion: BYPASS_CONSENT_VERSION });
+    } catch (e: any) {
+      setToken({ ...token, bypass_fields: prev });
+      toast.error('Failed to save', { duration: 5000, position: 'bottom-center' });
+    }
+  };
+
     const msg = compromised
       ? 'RESET QR CODE: This will immediately invalidate the existing QR code and PIN access via that code. Anyone holding an old printed card will no longer be able to scan it. You must reprint and redistribute new cards. Continue?'
       : 'This will invalidate ALL existing printed cards. You will need to reprint and redistribute. Continue?';
@@ -288,6 +342,121 @@ export const EmergencyCardSettings: React.FC = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* 🚑 Emergency Provider Bypass */}
+          <div className="paper-sheet p-5 mb-4">
+            <button
+              onClick={() => setBypassOpen(o => !o)}
+              className="w-full flex items-center justify-between text-left"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Siren className={`w-4 h-4 shrink-0 ${token.bypass_enabled ? 'text-red-700' : 'text-stone-400'}`} />
+                <span className="text-sm font-bold text-navy-muted truncate">Emergency Provider Bypass</span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {token.bypass_enabled ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-800 border border-red-200">
+                    On · {(token.bypass_fields || []).length} {(token.bypass_fields || []).length === 1 ? 'field' : 'fields'}
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-stone-100 text-stone-500 border border-stone-200">
+                    Off · PIN required
+                  </span>
+                )}
+                <ChevronDown size={16} className={`text-stone-500 transition-transform ${bypassOpen ? 'rotate-180' : ''}`} />
+              </div>
+            </button>
+
+            {bypassOpen && (
+              <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                {/* Always-visible explanation banner */}
+                <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900 leading-relaxed">
+                  <p className="font-bold mb-1 flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    What is provider bypass?
+                  </p>
+                  <p>
+                    When enabled, anyone who scans your QR code can immediately see the fields you select below — without entering your PIN.
+                    This is intended for first responders (EMTs, ER staff) who need critical info in seconds.
+                  </p>
+                  <p className="mt-2">
+                    Anything <span className="font-semibold">not</span> selected stays locked behind your PIN. Choose only what you're comfortable exposing publicly.
+                  </p>
+                </div>
+
+                {/* Master toggle */}
+                <div className="flex items-center justify-between p-3 bg-stone-50 rounded-xl">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-navy-muted">Allow provider bypass</p>
+                    <p className="text-[11px] text-stone-500">Selected fields visible without PIN.</p>
+                  </div>
+                  <button
+                    onClick={() => setBypassEnabled(!token.bypass_enabled)}
+                    disabled={bypassSaving}
+                    role="switch"
+                    aria-checked={token.bypass_enabled}
+                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+                      token.bypass_enabled ? 'bg-red-700' : 'bg-stone-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${
+                        token.bypass_enabled ? 'translate-x-5' : 'translate-x-0.5'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Field selector — only when enabled */}
+                {token.bypass_enabled && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-stone-500">
+                      Visible without PIN
+                    </p>
+                    <div className="space-y-1.5">
+                      {Object.keys(SECTION_LABELS).map(key => {
+                        const checked = (token.bypass_fields || []).includes(key);
+                        return (
+                          <button
+                            key={key}
+                            onClick={() => toggleBypassField(key)}
+                            disabled={bypassSaving}
+                            className={`w-full flex items-center justify-between p-3 rounded-lg border transition-colors text-left ${
+                              checked
+                                ? 'bg-red-50 border-red-200 hover:bg-red-100'
+                                : 'bg-white border-stone-200 hover:bg-stone-50'
+                            } disabled:opacity-50`}
+                          >
+                            <span className={`text-sm ${checked ? 'font-semibold text-red-900' : 'text-stone-700'}`}>
+                              {SECTION_LABELS[key]}
+                            </span>
+                            <span
+                              className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
+                                checked ? 'bg-red-700 border-red-700 text-white' : 'bg-white border-stone-300'
+                              }`}
+                              aria-hidden
+                            >
+                              {checked && <Check className="w-3.5 h-3.5" />}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {(token.bypass_fields || []).length === 0 && (
+                      <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2">
+                        No fields selected — scans will see an empty bypass page. Pick at least one field, or turn bypass off.
+                      </p>
+                    )}
+                    {token.bypass_consent_agreed_at && (
+                      <p className="text-[10px] text-stone-400 italic">
+                        Consent agreed {new Date(token.bypass_consent_agreed_at).toLocaleDateString()} (v{token.bypass_consent_version || '1.0'})
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* PIN management */}

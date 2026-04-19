@@ -13,6 +13,10 @@ export interface EmergencyToken {
   locked_until: string | null;
   created_at: string;
   regenerated_at: string | null;
+  bypass_enabled: boolean;
+  bypass_fields: string[];
+  bypass_consent_agreed_at: string | null;
+  bypass_consent_version: string | null;
 }
 
 export interface EmergencyAccessLogEntry {
@@ -50,6 +54,28 @@ export const emergencyService = {
     const { error } = await supabase
       .from('emergency_tokens')
       .update({ visible_sections: visible, custom_field_text: customText ?? null })
+      .eq('user_id', userData.user.id);
+    if (error) throw error;
+  },
+
+  async updateBypass(opts: {
+    enabled: boolean;
+    fields: string[];
+    consentVersion?: string;
+  }): Promise<void> {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) throw new Error('Not authenticated');
+    const patch: any = {
+      bypass_enabled: opts.enabled,
+      bypass_fields: opts.fields,
+    };
+    if (opts.enabled) {
+      patch.bypass_consent_agreed_at = new Date().toISOString();
+      patch.bypass_consent_version = opts.consentVersion || '1.0';
+    }
+    const { error } = await supabase
+      .from('emergency_tokens')
+      .update(patch)
       .eq('user_id', userData.user.id);
     if (error) throw error;
   },

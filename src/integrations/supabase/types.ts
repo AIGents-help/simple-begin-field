@@ -1244,6 +1244,10 @@ export type Database = {
       }
       emergency_tokens: {
         Row: {
+          bypass_consent_agreed_at: string | null
+          bypass_consent_version: string | null
+          bypass_enabled: boolean
+          bypass_fields: Json
           created_at: string
           custom_field_text: string | null
           failed_attempts: number
@@ -1260,6 +1264,10 @@ export type Database = {
           visible_sections: Json
         }
         Insert: {
+          bypass_consent_agreed_at?: string | null
+          bypass_consent_version?: string | null
+          bypass_enabled?: boolean
+          bypass_fields?: Json
           created_at?: string
           custom_field_text?: string | null
           failed_attempts?: number
@@ -1276,6 +1284,10 @@ export type Database = {
           visible_sections?: Json
         }
         Update: {
+          bypass_consent_agreed_at?: string | null
+          bypass_consent_version?: string | null
+          bypass_enabled?: boolean
+          bypass_fields?: Json
           created_at?: string
           custom_field_text?: string | null
           failed_attempts?: number
