@@ -142,6 +142,35 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
   const [loading, setLoading] = useState(true);
   const [zoom, setZoom] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+
+  // Show one-time scroll hint on mobile when tree overflows
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobile) return;
+    const overflows = el.scrollWidth > el.clientWidth;
+    if (!overflows) return;
+    setShowScrollHint(true);
+    const t = setTimeout(() => setShowScrollHint(false), 3000);
+    return () => clearTimeout(t);
+  }, [members.length]);
+
+  // Desktop: convert vertical wheel to horizontal scroll when shift held
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (e.shiftKey && e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
 
   useEffect(() => {
     const fetchMembers = async () => {
