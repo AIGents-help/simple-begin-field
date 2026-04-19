@@ -108,32 +108,18 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     ]
   },
   banking: {
-    entries: [
-      { label: 'Checking Account', prefill: { account_type: 'Checking' } },
-      { label: 'Savings Account', prefill: { account_type: 'Savings' } },
-      { label: 'Joint Account', prefill: { account_type: 'Joint' } },
-      { label: 'Money Market Account', prefill: { account_type: 'Money Market' } },
-      { label: 'CD Account', prefill: { account_type: 'CD' } },
-      { label: 'Business Account', prefill: { account_type: 'Business' } },
-    ],
-    documents: [
-      { label: 'Bank Statements', prefill: { institution: 'Bank Statement' } },
-      { label: 'Check Image / Voided Check', prefill: { institution: 'Voided Check' } },
-      { label: 'Account Summary Printout', prefill: { institution: 'Account Summary' } },
-      { label: 'Safe Deposit Box Info', prefill: { institution: 'Safe Deposit Box Info' } },
-      { label: 'Beneficiary Paperwork', prefill: { institution: 'Beneficiary Paperwork' } },
-    ],
-    contacts: [
-      { label: 'Bank Branch Contact', prefill: { name: 'Bank Branch' } },
-      { label: 'Relationship Banker', prefill: { name: 'Relationship Banker' } },
-      { label: 'Fraud Department', prefill: { name: 'Fraud Department' } },
-    ],
-    considerations: [
-      'Which accounts are individual vs shared?',
-      'Which bills auto-draft from which account?',
-      'Where online banking recovery info is stored?',
-      'Who should handle accounts first?',
-    ]
+    aboutContent: {
+      paragraphs: [
+        "The Banking section keeps track of every account a trusted person would need to locate and access on your behalf. Accounts are grouped by institution so everything at one bank stays together.",
+        "Start by adding an institution — a bank, credit union, or financial platform. Then add each account within it: checking, savings, money market, CD, or any other account type. Each account gets its own entry with account number, type, and access details.",
+        "For each account, record what a trusted person needs to know: where to find statements, whether online banking is set up, and any relevant notes. Upload account documents directly to the entry they belong to.",
+        "If you have joint accounts, note the other account holder by name. If you have accounts at online-only banks or fintech platforms (like Venmo, PayPal, or CashApp), add them here too."
+      ]
+    },
+    entries: [],
+    documents: [],
+    contacts: [],
+    considerations: []
   },
   investments: {
     aboutContent: {
