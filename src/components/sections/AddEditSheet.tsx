@@ -741,7 +741,7 @@ export const AddEditSheet = ({
           Object.keys(record).forEach((k) => { if (!(k in sanitized)) delete record[k]; });
           Object.assign(record, sanitized);
         }
-        const { id, created_at, updated_at, entryOnly, ...rest } = record;
+        const { id, created_at, updated_at, entryOnly, _lockedFields, ...rest } = record;
         recordToSave = rest;
       }
 
