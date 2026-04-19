@@ -30,6 +30,20 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     contacts: [],
     considerations: []
   },
+  legal: {
+    aboutContent: {
+      paragraphs: [
+        "The Legal section stores your most important protective documents — the ones that give others the authority to act on your behalf, carry out your wishes, or care for your dependents.",
+        "Use the add buttons below to log each document type. For each entry you can record the document name, the attorney or notary involved, the date executed, where the original is stored, and upload a copy.",
+        "Powers of attorney and guardianship nominations often apply to a specific person. Consider also attaching those documents to the relevant person's entry in the Family section so they appear in both places.",
+        "If you haven't completed these documents yet, the \"Find a Professional\" link below can help you locate an estate planning attorney."
+      ]
+    },
+    entries: [],
+    documents: [],
+    contacts: [],
+    considerations: []
+  },
   family: {
     aboutContent: {
       paragraphs: [
