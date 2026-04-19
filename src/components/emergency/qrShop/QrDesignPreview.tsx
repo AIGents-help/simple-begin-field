@@ -76,7 +76,7 @@ export const QrDesignPreview: React.FC<Props> = ({ design, emergencyUrl, scale =
 
     case 'galaxy':
       return (
-        <div style={style} className="relative rounded-md overflow-hidden flex flex-col items-center justify-between p-2"
+        <div className="relative rounded-md overflow-hidden flex flex-col items-center justify-between p-2"
              style={{ ...style, background: 'radial-gradient(circle at 30% 20%, #4338ca 0%, #1e1b4b 70%)' }}>
           {/* stars */}
           {Array.from({ length: 18 }).map((_, i) => (
