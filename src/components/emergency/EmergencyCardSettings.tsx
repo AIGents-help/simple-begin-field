@@ -100,7 +100,55 @@ export const EmergencyCardSettings: React.FC = () => {
     }
   };
 
-  const regenerate = async (compromised = false) => {
+  const setBypassEnabled = async (enabled: boolean) => {
+    if (!token) return;
+    if (enabled && (!token.bypass_fields || token.bypass_fields.length === 0)) {
+      // Seed with sensible defaults on first enable
+      const seed = DEFAULT_BYPASS_FIELDS.filter((f) => SECTION_LABELS[f]);
+      setBypassSaving(true);
+      try {
+        await emergencyService.updateBypass({ enabled: true, fields: seed, consentVersion: BYPASS_CONSENT_VERSION });
+        setToken({ ...token, bypass_enabled: true, bypass_fields: seed, bypass_consent_agreed_at: new Date().toISOString(), bypass_consent_version: BYPASS_CONSENT_VERSION });
+        toast.success('Provider bypass enabled', { duration: 3000, position: 'bottom-center' });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to enable bypass', { duration: 5000, position: 'bottom-center' });
+      } finally {
+        setBypassSaving(false);
+      }
+      return;
+    }
+    setBypassSaving(true);
+    try {
+      await emergencyService.updateBypass({ enabled, fields: token.bypass_fields || [], consentVersion: BYPASS_CONSENT_VERSION });
+      setToken({
+        ...token,
+        bypass_enabled: enabled,
+        bypass_consent_agreed_at: enabled ? new Date().toISOString() : token.bypass_consent_agreed_at,
+      });
+      toast.success(enabled ? 'Provider bypass enabled' : 'Provider bypass disabled', { duration: 3000, position: 'bottom-center' });
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to update', { duration: 5000, position: 'bottom-center' });
+    } finally {
+      setBypassSaving(false);
+    }
+  };
+
+  const toggleBypassField = async (field: string) => {
+    if (!token) return;
+    const current = new Set(token.bypass_fields || []);
+    if (current.has(field)) current.delete(field);
+    else current.add(field);
+    const next = Array.from(current);
+    const prev = token.bypass_fields;
+    setToken({ ...token, bypass_fields: next });
+    try {
+      await emergencyService.updateBypass({ enabled: token.bypass_enabled, fields: next, consentVersion: BYPASS_CONSENT_VERSION });
+    } catch (e: any) {
+      setToken({ ...token, bypass_fields: prev });
+      toast.error('Failed to save', { duration: 5000, position: 'bottom-center' });
+    }
+  };
+
     const msg = compromised
       ? 'RESET QR CODE: This will immediately invalidate the existing QR code and PIN access via that code. Anyone holding an old printed card will no longer be able to scan it. You must reprint and redistribute new cards. Continue?'
       : 'This will invalidate ALL existing printed cards. You will need to reprint and redistribute. Continue?';
