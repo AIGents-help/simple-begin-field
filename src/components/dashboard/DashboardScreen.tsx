@@ -167,7 +167,7 @@ export const DashboardScreen = () => {
       {/* Beneficiary alignment + document gaps (couple-only, render conditionally) */}
       <BeneficiaryAlignmentCard />
       <DocumentGapsCard />
-      <CombinedFamilyTreeCard />
+      {/* CombinedFamilyTreeCard removed — redundant with Family section */}
       <CoupleActivityFeed />
 
       {/* Estate Value Summary Card */}
