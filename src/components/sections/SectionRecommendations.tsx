@@ -83,6 +83,10 @@ export const SectionRecommendations = ({
     return null;
   }
 
+  // Check if this section uses the new "About This Section" format
+  const aboutContent = recommendations.aboutContent;
+  const isAboutSection = !!aboutContent;
+
   return (
     <div className="mb-6">
       <button
@@ -94,11 +98,11 @@ export const SectionRecommendations = ({
             <Lightbulb size={18} />
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-bold">Recommended Information to Add</h3>
-            <p className="text-[10px] text-stone-500 font-medium uppercase tracking-wider">Guided Suggestions</p>
+            <h3 className="text-sm font-bold">{isAboutSection ? 'About This Section' : 'Recommended Information to Add'}</h3>
+            <p className="text-[10px] text-stone-500 font-medium uppercase tracking-wider">{isAboutSection ? 'HOW IT WORKS' : 'Guided Suggestions'}</p>
             {!isExpanded && (
               <p className="text-[11px] text-stone-500 italic mt-1 normal-case tracking-normal font-normal">
-                Expand for suggested entries to consider adding to this section.
+                {isAboutSection ? 'Expand to learn how this section works.' : 'Expand for suggested entries to consider adding to this section.'}
               </p>
             )}
           </div>
