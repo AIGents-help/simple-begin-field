@@ -21,7 +21,7 @@ export const SectionRecommendations = ({
   onRestoreNA,
   existingRecords = []
 }: SectionRecommendationsProps) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const recommendations = RECOMMENDATIONS_CONFIG[sectionId];
 
@@ -96,9 +96,14 @@ export const SectionRecommendations = ({
           <div className="text-left">
             <h3 className="text-sm font-bold">Recommended Information to Add</h3>
             <p className="text-[10px] text-stone-500 font-medium uppercase tracking-wider">Guided Suggestions</p>
+            {!isExpanded && (
+              <p className="text-[11px] text-stone-500 italic mt-1 normal-case tracking-normal font-normal">
+                Expand for suggested entries to consider adding to this section.
+              </p>
+            )}
           </div>
         </div>
-        {isExpanded ? <ChevronUp size={20} className="text-stone-400" /> : <ChevronDown size={20} className="text-stone-400" />}
+        {isExpanded ? <ChevronUp size={20} className="text-stone-400 shrink-0" /> : <ChevronDown size={20} className="text-stone-400 shrink-0" />}
       </button>
 
       <AnimatePresence>
