@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID } from '../demo/morganFamilyData';
 
 export type UpcomingExpiration = {
   id: string;
@@ -24,6 +26,10 @@ export const expirationAlertsService = {
    * Includes overdue (negative days) so users see them first.
    */
   async getUpcoming(packetId: string, limit = 3): Promise<UpcomingExpiration[]> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      // Demo packet has no live expirations — return empty list.
+      return [];
+    }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const horizon = new Date(today);

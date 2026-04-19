@@ -99,6 +99,24 @@ export const estateSummaryService = {
   },
 
   async listLiabilities(packetId: string): Promise<EstateLiability[]> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      // Map the summary's liability shape into the EstateLiability table shape.
+      const summary = DEMO_ESTATE_SUMMARY_FULL as any;
+      return (summary.liabilities || []).map((l: any) => ({
+        id: l.id,
+        packet_id: DEMO_PACKET_ID,
+        user_id: 'demo-morgan-user',
+        liability_type: l.liability_type,
+        lender_name: l.label || null,
+        balance: l.value || 0,
+        monthly_payment: null,
+        interest_rate: null,
+        payoff_date: l.payoff_date || null,
+        notes: null,
+        created_at: summary.calculated_at,
+        updated_at: summary.calculated_at,
+      })) as EstateLiability[];
+    }
     const { data, error } = await supabase
       .from('estate_liabilities')
       .select('*')
