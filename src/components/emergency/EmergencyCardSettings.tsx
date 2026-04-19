@@ -35,6 +35,8 @@ export const EmergencyCardSettings: React.FC = () => {
   const [accessLog, setAccessLog] = useState<EmergencyAccessLogEntry[]>([]);
   const [generating, setGenerating] = useState(false);
   const [visibilityOpen, setVisibilityOpen] = useState(false);
+  const [bypassOpen, setBypassOpen] = useState(false);
+  const [bypassSaving, setBypassSaving] = useState(false);
 
   const load = async () => {
     setLoading(true);
