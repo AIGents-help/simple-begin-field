@@ -47,34 +47,18 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     ]
   },
   family: {
-    entries: [
-      { label: 'Spouse / Partner', prefill: { relationship: 'Spouse' } },
-      { label: 'Child', prefill: { relationship: 'Child' } },
-      { label: 'Parent', prefill: { relationship: 'Parent' } },
-      { label: 'Sibling', prefill: { relationship: 'Sibling' } },
-      { label: 'Grandparent', prefill: { relationship: 'Grandparent' } },
-      { label: 'In-Law', prefill: { relationship: 'In-Law' } },
-      { label: 'Other Family Member', prefill: { relationship: 'Other' } },
-    ],
-    documents: [
-      { label: 'Guardianship Papers', prefill: { name: 'Guardianship Papers' } },
-      { label: 'Adoption Records', prefill: { name: 'Adoption Records' } },
-      { label: 'Custody Records', prefill: { name: 'Custody Records' } },
-      { label: 'Family Contact List', prefill: { name: 'Family Contact List' } },
-      { label: 'Family Legal Notes', prefill: { name: 'Family Legal Notes' } },
-    ],
-    contacts: [
-      { label: 'Immediate Family Contacts', prefill: { name: 'Immediate Family Contact' } },
-      { label: 'Guardian / Backup Guardian', prefill: { name: 'Guardian' } },
-      { label: 'Schools / Care Providers', prefill: { name: 'School/Care Provider' } },
-    ],
-    considerations: [
-      'Who should be contacted first?',
-      'Who depends on you financially?',
-      'Birthday reminders',
-      'Children or dependents with special needs',
-      'Family communication instructions',
-    ]
+    aboutContent: {
+      paragraphs: [
+        "The Family section is your household and relationship map. Each person gets their own entry — tap \"+ Add Family Member\" to get started.",
+        "For each person, you can record their contact details, relationship to you, important dates, and any relevant notes. Documents like guardianship papers or custody agreements can be attached directly to the person they apply to.",
+        "Think about everyone a trusted person would need to reach on your behalf: immediate family, extended relatives, dependents, and anyone who would need to be notified or involved if something happened to you.",
+        "You can also switch to Tree View to see your family visually organized by relationship."
+      ]
+    },
+    entries: [],
+    documents: [],
+    contacts: [],
+    considerations: []
   },
   medical: {
     entries: [
@@ -152,32 +136,18 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     ]
   },
   investments: {
-    entries: [
-      { label: 'Brokerage Account', prefill: { account_type: 'Individual Brokerage' } },
-      { label: 'Crypto Holdings', prefill: { account_type: 'Crypto Exchange' } },
-      { label: 'Stock Options / RSUs', prefill: { account_type: 'Other', account_nickname: 'Stock Options / RSUs' } },
-      { label: 'Private Investment', prefill: { account_type: 'Private Equity' } },
-      { label: 'Angel Investment', prefill: { account_type: 'Angel / Startup Investment' } },
-      { label: 'Managed Portfolio', prefill: { account_type: 'Managed Portfolio' } },
-    ],
-    documents: [
-      { label: 'Most Recent Statement', prefill: { institution: 'Investment Statement' } },
-      { label: 'Account Agreement', prefill: { institution: 'Account Agreement' } },
-      { label: 'Beneficiary Designation Form', prefill: { institution: 'Beneficiary Form' } },
-      { label: 'Shareholder Agreement', prefill: { institution: 'Shareholder Agreement' } },
-    ],
-    contacts: [
-      { label: 'Financial Advisor', prefill: { name: 'Financial Advisor' } },
-      { label: 'Brokerage Support', prefill: { name: 'Brokerage Support' } },
-      { label: 'Crypto Recovery Contact', prefill: { name: 'Crypto Recovery Contact' } },
-    ],
-    considerations: [
-      'Are TOD beneficiaries current?',
-      'Where are crypto seed phrases physically stored?',
-      'Which positions are concentrated risk?',
-      'Liquidate vs transfer-in-kind preferences',
-      'Vesting schedules for restricted stock',
-    ]
+    aboutContent: {
+      paragraphs: [
+        "The Investments section covers brokerage accounts, stocks, crypto, and any private holdings outside of your regular banking and retirement accounts.",
+        "For each account or holding, record the institution or platform, account number, approximate value, and how to access it. Upload statements or account documents directly to each entry.",
+        "Beneficiary designations on investment accounts often override your will — make sure they are current and reflect your actual wishes. Note who the designated beneficiaries are in each entry.",
+        "Your financial advisor's contact information belongs in the Advisors section, but you can reference them by name in each investment entry."
+      ]
+    },
+    entries: [],
+    documents: [],
+    contacts: [],
+    considerations: []
   },
   retirement: {
     entries: [
