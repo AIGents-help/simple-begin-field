@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_USER_ID } from '../demo/morganFamilyData';
 
 export type CouplePermissionLevel = 'hidden' | 'view' | 'collaborate';
 export type CoupleLinkStatus = 'pending' | 'active' | 'unlinked';
