@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID, DEMO_IDENTITY_RECORDS } from '../demo/morganFamilyData';
 
 export type IdentityCategory =
   | 'personal_info'
@@ -44,6 +46,9 @@ export interface IdentityRecord {
 
 export const identityService = {
   async list(packetId: string, scope?: string) {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return DEMO_IDENTITY_RECORDS as unknown as IdentityRecord[];
+    }
     // Pull modern category-tagged records.
     let modernQ = supabase
       .from('info_records')

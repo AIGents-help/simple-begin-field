@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID, DEMO_ESTATE_SUMMARY_FULL } from '../demo/morganFamilyData';
 
 export interface EstateRecordEntry {
   id: string;
@@ -72,6 +74,9 @@ export const LIABILITY_TYPES = [
 
 export const estateSummaryService = {
   async getSummary(packetId: string): Promise<EstateSummary | null> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return DEMO_ESTATE_SUMMARY_FULL as unknown as EstateSummary;
+    }
     const { data, error } = await supabase.rpc('calculate_estate_summary', { p_packet_id: packetId });
     if (error) {
       console.error('[estateSummaryService] getSummary error:', error);
@@ -82,6 +87,9 @@ export const estateSummaryService = {
 
   /** Section-aware summary for trusted contact viewers (also works for owners). */
   async getSummaryForViewer(packetId: string): Promise<EstateSummary | null> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return DEMO_ESTATE_SUMMARY_FULL as unknown as EstateSummary;
+    }
     const { data, error } = await supabase.rpc('calculate_estate_summary_for_viewer', { p_packet_id: packetId });
     if (error) {
       console.error('[estateSummaryService] getSummaryForViewer error:', error);

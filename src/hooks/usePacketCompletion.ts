@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { sectionService } from '../services/sectionService';
 import { SECTIONS_CONFIG } from '../config/sectionsConfig';
 import { useAppContext } from '../context/AppContext';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID, DEMO_SECTION_COMPLETION } from '../demo/morganFamilyData';
 
 /**
  * SINGLE SOURCE OF TRUTH for packet completion.
@@ -49,6 +51,15 @@ export function usePacketCompletion(packetId: string | undefined): PacketComplet
   const load = useCallback(async () => {
     if (!packetId) {
       setSectionStatus({});
+      setLoading(false);
+      return;
+    }
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      const next: Record<string, SectionCompletion> = {};
+      for (const section of SECTIONS_CONFIG) {
+        next[section.id] = DEMO_SECTION_COMPLETION[section.id] ?? { count: 0, hasContent: false, percent: 0 };
+      }
+      setSectionStatus(next);
       setLoading(false);
       return;
     }
