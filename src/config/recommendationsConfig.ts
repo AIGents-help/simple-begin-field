@@ -10,6 +10,10 @@ export interface SectionRecommendations {
   documents: RecommendationItem[];
   contacts: RecommendationItem[];
   considerations: string[];
+  /** Optional about content for sections using the new "About This Section" format */
+  aboutContent?: {
+    paragraphs: string[];
+  };
 }
 
 export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommendations>> = {
@@ -43,34 +47,18 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     ]
   },
   family: {
-    entries: [
-      { label: 'Spouse / Partner', prefill: { relationship: 'Spouse' } },
-      { label: 'Child', prefill: { relationship: 'Child' } },
-      { label: 'Parent', prefill: { relationship: 'Parent' } },
-      { label: 'Sibling', prefill: { relationship: 'Sibling' } },
-      { label: 'Grandparent', prefill: { relationship: 'Grandparent' } },
-      { label: 'In-Law', prefill: { relationship: 'In-Law' } },
-      { label: 'Other Family Member', prefill: { relationship: 'Other' } },
-    ],
-    documents: [
-      { label: 'Guardianship Papers', prefill: { name: 'Guardianship Papers' } },
-      { label: 'Adoption Records', prefill: { name: 'Adoption Records' } },
-      { label: 'Custody Records', prefill: { name: 'Custody Records' } },
-      { label: 'Family Contact List', prefill: { name: 'Family Contact List' } },
-      { label: 'Family Legal Notes', prefill: { name: 'Family Legal Notes' } },
-    ],
-    contacts: [
-      { label: 'Immediate Family Contacts', prefill: { name: 'Immediate Family Contact' } },
-      { label: 'Guardian / Backup Guardian', prefill: { name: 'Guardian' } },
-      { label: 'Schools / Care Providers', prefill: { name: 'School/Care Provider' } },
-    ],
-    considerations: [
-      'Who should be contacted first?',
-      'Who depends on you financially?',
-      'Birthday reminders',
-      'Children or dependents with special needs',
-      'Family communication instructions',
-    ]
+    aboutContent: {
+      paragraphs: [
+        "The Family section is your household and relationship map. Each person gets their own entry — tap \"+ Add Family Member\" to get started.",
+        "For each person, you can record their contact details, relationship to you, important dates, and any relevant notes. Documents like guardianship papers or custody agreements can be attached directly to the person they apply to.",
+        "Think about everyone a trusted person would need to reach on your behalf: immediate family, extended relatives, dependents, and anyone who would need to be notified or involved if something happened to you.",
+        "You can also switch to Tree View to see your family visually organized by relationship."
+      ]
+    },
+    entries: [],
+    documents: [],
+    contacts: [],
+    considerations: []
   },
   medical: {
     entries: [
@@ -148,32 +136,18 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     ]
   },
   investments: {
-    entries: [
-      { label: 'Brokerage Account', prefill: { account_type: 'Individual Brokerage' } },
-      { label: 'Crypto Holdings', prefill: { account_type: 'Crypto Exchange' } },
-      { label: 'Stock Options / RSUs', prefill: { account_type: 'Other', account_nickname: 'Stock Options / RSUs' } },
-      { label: 'Private Investment', prefill: { account_type: 'Private Equity' } },
-      { label: 'Angel Investment', prefill: { account_type: 'Angel / Startup Investment' } },
-      { label: 'Managed Portfolio', prefill: { account_type: 'Managed Portfolio' } },
-    ],
-    documents: [
-      { label: 'Most Recent Statement', prefill: { institution: 'Investment Statement' } },
-      { label: 'Account Agreement', prefill: { institution: 'Account Agreement' } },
-      { label: 'Beneficiary Designation Form', prefill: { institution: 'Beneficiary Form' } },
-      { label: 'Shareholder Agreement', prefill: { institution: 'Shareholder Agreement' } },
-    ],
-    contacts: [
-      { label: 'Financial Advisor', prefill: { name: 'Financial Advisor' } },
-      { label: 'Brokerage Support', prefill: { name: 'Brokerage Support' } },
-      { label: 'Crypto Recovery Contact', prefill: { name: 'Crypto Recovery Contact' } },
-    ],
-    considerations: [
-      'Are TOD beneficiaries current?',
-      'Where are crypto seed phrases physically stored?',
-      'Which positions are concentrated risk?',
-      'Liquidate vs transfer-in-kind preferences',
-      'Vesting schedules for restricted stock',
-    ]
+    aboutContent: {
+      paragraphs: [
+        "The Investments section covers brokerage accounts, stocks, crypto, and any private holdings outside of your regular banking and retirement accounts.",
+        "For each account or holding, record the institution or platform, account number, approximate value, and how to access it. Upload statements or account documents directly to each entry.",
+        "Beneficiary designations on investment accounts often override your will — make sure they are current and reflect your actual wishes. Note who the designated beneficiaries are in each entry.",
+        "Your financial advisor's contact information belongs in the Advisors section, but you can reference them by name in each investment entry."
+      ]
+    },
+    entries: [],
+    documents: [],
+    contacts: [],
+    considerations: []
   },
   retirement: {
     entries: [
@@ -373,31 +347,17 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     ]
   },
   legal: {
-    entries: [
-      { label: 'Will', prefill: { kind: 'will' } },
-      { label: 'Trust', prefill: { kind: 'trust' } },
-      { label: 'Financial Power of Attorney', prefill: { kind: 'fin_poa' } },
-      { label: 'Healthcare Power of Attorney', prefill: { kind: 'hcpoa' } },
-      { label: 'Living Will / Advance Directive', prefill: { kind: 'living_will' } },
-      { label: 'Guardianship Nomination', prefill: { kind: 'guardianship' } },
-      { label: 'Letter of Instruction', prefill: { kind: 'other', other_subtype: 'Letter of Instruction' } },
-      { label: 'Prenuptial Agreement', prefill: { kind: 'other', other_subtype: 'Prenuptial Agreement' } },
-    ],
-    documents: [
-      { label: 'Signed Will', prefill: { title: 'Signed Will', category: 'Will' } },
-      { label: 'Trust Documents', prefill: { title: 'Trust Documents', category: 'Trust' } },
-      { label: 'POA Documents', prefill: { title: 'POA Documents', category: 'Financial POA' } },
-      { label: 'Advance Directive', prefill: { title: 'Advance Directive', category: 'Medical Directive' } },
-      { label: 'Guardianship Papers', prefill: { title: 'Guardianship Papers', category: 'Other' } },
-      { label: 'Court Orders', prefill: { title: 'Court Orders', category: 'Other' } },
-      { label: 'Attorney Correspondence', prefill: { title: 'Attorney Correspondence', category: 'Other' } },
-    ],
+    aboutContent: {
+      paragraphs: [
+        "The Legal section stores your most important protective documents — the ones that give others the authority to act on your behalf, carry out your wishes, or care for your dependents.",
+        "Use the add buttons below to log each document type. For each entry you can record the document name, the attorney or notary involved, the date executed, where the original is stored, and upload a copy.",
+        "Powers of attorney and guardianship nominations often apply to a specific person. Consider also attaching those documents to the relevant person's entry in the Family section so they appear in both places.",
+        "If you haven't completed these documents yet, the \"Find a Professional\" link below can help you locate an estate planning attorney."
+      ]
+    },
+    entries: [],
+    documents: [],
     contacts: [],
-    considerations: [
-      'Powers of attorney and guardianship nominations should be entered on the specific person\u2019s record (e.g., the child or dependent they protect) \u2014 not only here.',
-      'Keep attorney contact info in the Advisors section.',
-      'Review and re-sign documents after major life events.',
-      'Store originals in a fireproof location and note that location here.',
-    ]
+    considerations: []
   }
 };
