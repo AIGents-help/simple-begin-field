@@ -158,8 +158,7 @@ export const DashboardScreen = () => {
       {/* Partner status (only renders when an active couple link exists) */}
       <PartnerStatusCard />
 
-      {/* Friendly competition badge */}
-      <FriendlyCompetitionBadge />
+      {/* Friendly competition badge merged into PartnerStatusCard above */}
 
       {/* Packet Health Score */}
       {currentPacket && <PacketHealthScore packetId={currentPacket.id} />}

@@ -2,14 +2,7 @@ import React from 'react';
 import { Heart, ArrowRight, Trophy } from 'lucide-react';
 import { useCouple } from '../../hooks/useCouple';
 import { useAppContext } from '../../context/AppContext';
-
-const initials = (name: string | null | undefined, email: string | null | undefined) => {
-  const src = (name || email || '').trim();
-  if (!src) return '??';
-  const parts = src.split(/\s+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  return src.substring(0, 2).toUpperCase();
-};
+import { PersonAvatar } from '../common/PersonAvatar';
 
 const formatRelative = (iso: string | null | undefined) => {
   if (!iso) return 'Not yet active';
@@ -24,38 +17,33 @@ const formatRelative = (iso: string | null | undefined) => {
   return `Active ${Math.floor(days / 30)}mo ago`;
 };
 
-interface PersonColumnProps {
+interface PersonRowProps {
   name: string;
-  email: string | null;
-  initialsText: string;
+  photoPath: string | null;
   lastActiveIso: string | null | undefined;
   score: number | null;
   isLeader: boolean;
 }
 
-const PersonColumn: React.FC<PersonColumnProps> = ({ name, email, initialsText, lastActiveIso, score, isLeader }) => (
-  <div className="flex-1 min-w-0 flex flex-col items-center text-center px-2">
-    <div className="relative">
-      <div className="w-16 h-16 rounded-2xl bg-navy-muted text-manila flex items-center justify-center font-bold text-lg shrink-0">
-        {initialsText}
-      </div>
+const PersonRow: React.FC<PersonRowProps> = ({ name, photoPath, lastActiveIso, score, isLeader }) => (
+  <div className="flex-1 min-w-0 flex items-center gap-2">
+    <div className="relative shrink-0">
+      <PersonAvatar photoPath={photoPath} name={name} size={40} ring />
       {isLeader && (
-        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-amber-400 text-amber-900 flex items-center justify-center shadow-sm">
-          <Trophy size={12} />
+        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-amber-900 flex items-center justify-center shadow-sm">
+          <Trophy size={9} />
         </div>
       )}
     </div>
-    <p className="mt-2 text-sm font-bold text-navy-muted truncate w-full">{name}</p>
-    {email && <p className="text-[11px] text-stone-500 truncate w-full">{email}</p>}
-    <p className="text-[11px] text-stone-400 mt-0.5">{formatRelative(lastActiveIso)}</p>
-    <div className="mt-2">
+    <div className="min-w-0 flex-1">
+      <p className="text-xs font-bold text-navy-muted truncate leading-tight">{name}</p>
+      <p className="text-[10px] text-stone-400 leading-tight">{formatRelative(lastActiveIso)}</p>
+    </div>
+    <div className="shrink-0 text-right">
       {score !== null ? (
-        <>
-          <p className="text-2xl font-serif font-bold text-navy-muted leading-none">{score}</p>
-          <p className="text-[10px] uppercase tracking-widest font-bold text-stone-400 mt-1">Health</p>
-        </>
+        <p className="text-base font-serif font-bold text-navy-muted leading-none">{score}</p>
       ) : (
-        <p className="text-[11px] text-stone-400 italic">No score yet</p>
+        <p className="text-[10px] text-stone-400 italic">—</p>
       )}
     </div>
   </div>
@@ -68,8 +56,8 @@ export const PartnerStatusCard: React.FC = () => {
   if (loading || !link || link.status !== 'active' || !partner || !user) return null;
 
   const myName = userDisplayName || profile?.full_name || user.email || 'You';
-  const myEmail = user.email || null;
   const myLastActive = profile?.last_login_at || profile?.updated_at || null;
+  const myPhoto = (profile as any)?.avatar_path ?? null;
 
   const myScore = myHealthScore;
   const partnerScore = partnerHealthScore;
@@ -92,57 +80,54 @@ export const PartnerStatusCard: React.FC = () => {
   }
 
   return (
-    <div className="rounded-3xl border border-stone-200 bg-gradient-to-br from-rose-50/40 via-white to-white p-6 shadow-sm">
-      <div className="flex items-center justify-between gap-3 mb-5">
+    <div className="rounded-2xl border border-stone-200 bg-gradient-to-br from-rose-50/40 via-white to-white px-4 py-3 shadow-sm">
+      {/* Header row */}
+      <div className="flex items-center justify-between gap-3 mb-2">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center">
-            <Heart size={16} />
+          <div className="w-6 h-6 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center">
+            <Heart size={12} />
           </div>
-          <h2 className="text-base font-serif font-bold text-navy-muted">Our Packet</h2>
+          <h2 className="text-sm font-serif font-bold text-navy-muted">Our Packet</h2>
+          {leadCopy && (
+            <span className="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[10px] font-bold text-amber-800">
+              <Trophy size={10} />
+              {leadCopy}
+            </span>
+          )}
         </div>
         <button
           onClick={() => setView('profile')}
-          className="text-[10px] uppercase font-bold tracking-widest text-stone-500 hover:text-navy-muted"
+          className="text-[10px] uppercase font-bold tracking-widest text-stone-500 hover:text-navy-muted shrink-0"
         >
           Manage
         </button>
       </div>
 
-      <div className="flex items-start gap-2">
-        <PersonColumn
+      {/* Compact single-row comparison */}
+      <div className="flex items-center gap-2">
+        <PersonRow
           name={myName}
-          email={myEmail}
-          initialsText={initials(myName, myEmail)}
+          photoPath={myPhoto}
           lastActiveIso={myLastActive}
           score={typeof myScore === 'number' ? myScore : null}
           isLeader={myLead}
         />
-        <div className="self-center text-stone-300 text-xs font-bold">VS</div>
-        <PersonColumn
+        <div className="text-stone-300 text-[10px] font-bold shrink-0">VS</div>
+        <PersonRow
           name={partner.full_name || partner.email || 'Partner'}
-          email={partner.email}
-          initialsText={initials(partner.full_name, partner.email)}
+          photoPath={partner.avatar_path}
           lastActiveIso={partner.last_login_at}
           score={typeof partnerScore === 'number' ? partnerScore : null}
           isLeader={partnerLead}
         />
       </div>
 
-      {leadCopy && (
-        <div className="mt-4 flex justify-center">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-800">
-            <Trophy size={12} />
-            {leadCopy}
-          </span>
-        </div>
-      )}
-
       <button
         onClick={() => setView('profile')}
-        className="mt-5 w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-stone-200 rounded-xl text-xs font-bold text-navy-muted hover:border-navy-muted/40 transition-colors"
+        className="mt-2 w-full flex items-center justify-center gap-1.5 py-1 text-[11px] font-bold text-stone-500 hover:text-navy-muted transition-colors"
       >
         Sharing settings
-        <ArrowRight size={14} />
+        <ArrowRight size={12} />
       </button>
     </div>
   );
