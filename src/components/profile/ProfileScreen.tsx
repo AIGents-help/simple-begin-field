@@ -208,8 +208,7 @@ export const ProfileScreen = () => {
           </button>
         </Card>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Household Setup</h3>
+        <CollapsibleSection title="Household Setup" defaultOpen>
           <Card>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -225,10 +224,9 @@ export const ProfileScreen = () => {
             </div>
             {userMode === 'couple' && <PartnerCard />}
           </Card>
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Security & Trust</h3>
+        <CollapsibleSection title="Security & Trust">
           <div className="grid grid-cols-2 gap-4">
             <button 
               onClick={() => setView('security')}
@@ -249,10 +247,9 @@ export const ProfileScreen = () => {
               <span className="text-xs font-bold text-navy-muted">Trust Info</span>
             </button>
           </div>
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Subscription</h3>
+        <CollapsibleSection title="Subscription">
           <Card>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -281,10 +278,9 @@ export const ProfileScreen = () => {
               </button>
             )}
           </Card>
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Estate Overview</h3>
+        <CollapsibleSection title="Estate Overview">
           <button
             onClick={() => setView('estate')}
             className="w-full flex items-center justify-between p-4 bg-white border border-stone-200 rounded-2xl hover:border-navy-muted/30 transition-colors group"
@@ -330,7 +326,7 @@ export const ProfileScreen = () => {
             </div>
             <ArrowRight size={16} className="text-stone-400 group-hover:translate-x-0.5 transition-transform" />
           </button>
-        </div>
+        </CollapsibleSection>
 
         <AlertPreferences />
 
@@ -344,8 +340,7 @@ export const ProfileScreen = () => {
 
         <InactivityCheckInCard />
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Data Export</h3>
+        <CollapsibleSection title="Data Export">
           <Card>
             <div className="space-y-3 mb-4">
               <div className="flex items-center gap-3">
@@ -362,15 +357,13 @@ export const ProfileScreen = () => {
             </div>
             <DownloadPacketButton variant="settings" />
           </Card>
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Download History</h3>
+        <CollapsibleSection title="Download History">
           <DownloadHistoryList />
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Packet Info</h3>
+        <CollapsibleSection title="Packet Info">
           <Card>
             <div className="space-y-3">
               <div>
@@ -387,7 +380,7 @@ export const ProfileScreen = () => {
               </div>
             </div>
           </Card>
-        </div>
+        </CollapsibleSection>
 
         <button 
           onClick={handleSignOut}
