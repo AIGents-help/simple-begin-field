@@ -19,6 +19,7 @@ import {
 import { useAppContext } from '../../context/AppContext';
 import { inviteService } from '../../services/inviteService';
 import { packetService } from '../../services/packetService';
+import { coupleService } from '../../services/coupleService';
 import { PlanGate } from '../billing/PlanGate';
 import { useConfirm } from '../../context/ConfirmDialogContext';
 
@@ -27,10 +28,11 @@ interface HouseholdSettingsProps {
 }
 
 export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) => {
-  const { packet, user, refreshPacketData } = useAppContext();
+  const { packet, user, refreshPacketData, refreshBilling } = useAppContext();
   const confirm = useConfirm();
   const [members, setMembers] = useState<any[]>([]);
   const [invites, setInvites] = useState<any[]>([]);
+  const [coupleLink, setCoupleLink] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -39,15 +41,41 @@ export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) 
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
-    if (!packet) return;
+    if (!packet || !user) return;
     setLoading(true);
     try {
-      const [membersRes, invitesRes] = await Promise.all([
+      const [membersRes, invitesRes, link] = await Promise.all([
         inviteService.getPacketMembers(packet.id),
-        inviteService.getPacketInvites(packet.id)
+        inviteService.getPacketInvites(packet.id),
+        coupleService.getActiveLink(user.id),
       ]);
-      setMembers(membersRes.data || []);
+
+      const baseMembers = membersRes.data || [];
+      const merged: any[] = [...baseMembers];
+
+      // Merge active couple_links partner as a household member.
+      // The linked partner record lives in couple_links, not packet_members,
+      // so we synthesize a row here and de-dupe by user_id.
+      if (link && link.status === 'active') {
+        const partnerId = link.user_id_1 === user.id ? link.user_id_2 : link.user_id_1;
+        if (partnerId && !merged.some((m) => m.user_id === partnerId)) {
+          const partnerProfile = await coupleService.getPartnerProfile(partnerId);
+          merged.push({
+            id: `couple-link-${link.id}`,
+            user_id: partnerId,
+            role: 'partner',
+            isCoupleLink: true,
+            coupleLinkId: link.id,
+            profiles: partnerProfile
+              ? { full_name: partnerProfile.full_name, email: partnerProfile.email }
+              : { full_name: link.invite_email || 'Linked Partner', email: link.invite_email || '' },
+          });
+        }
+      }
+
+      setMembers(merged);
       setInvites(invitesRes.data || []);
+      setCoupleLink(link);
     } catch (err) {
       console.error('Error fetching household data:', err);
     } finally {
@@ -57,7 +85,10 @@ export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) 
 
   useEffect(() => {
     fetchData();
-  }, [packet?.id]);
+    // Force a fresh plan check so any recent plan upgrade is reflected
+    // immediately without waiting for a session refresh.
+    void refreshBilling?.();
+  }, [packet?.id, user?.id]);
 
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
