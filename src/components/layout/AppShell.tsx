@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { MobileTopBar } from './MobileTopBar';
 import { BottomNav } from './BottomNav';
@@ -31,6 +31,7 @@ import { isDemoMode } from '../../demo/demoMode';
 
 export const AppShell = () => {
   const { onboarded, view, setView, loading, user, profile, setTab } = useAppContext();
+  const mainRef = useRef<HTMLElement>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isQuickAdding, setIsQuickAdding] = useState(false);
   const [initialFile, setInitialFile] = useState<File | null>(null);
@@ -38,6 +39,12 @@ export const AppShell = () => {
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [refreshFn, setRefreshFn] = useState<((newRecord?: any) => void) | null>(null);
+  const location = useLocation();
+
+  // Reset main scroll position on every route or in-app view change
+  useEffect(() => {
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [location.pathname, view]);
 
   const handleAddClick = (file?: File, data?: any, options?: CategoryOption[], isEntryOnly?: boolean) => {
     if (file) setInitialFile(file);
@@ -61,7 +68,6 @@ export const AppShell = () => {
     setCategoryOptions([]);
   };
   const [inviteToken, setInviteToken] = useState<string | null>(null);
-  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -164,7 +170,7 @@ export const AppShell = () => {
         {demoMode && <DemoBanner />}
         {view !== 'household' && <MobileTopBar onMenuClick={() => setIsMenuOpen(true)} />}
         
-        <main className="flex-1 overflow-y-auto no-scrollbar pb-24 md:pb-0">
+        <main ref={mainRef} className="flex-1 overflow-y-auto no-scrollbar pb-24 md:pb-0">
           <div className="max-w-[1280px] mx-auto w-full">
             {profile?.role && profile.role !== 'user' && (
               <div className="px-4 py-2 bg-stone-900 text-white flex items-center justify-between">
