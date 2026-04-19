@@ -142,27 +142,37 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
   const [loading, setLoading] = useState(true);
   const [zoom, setZoom] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasCenteredRef = useRef(false);
+  const pinchRef = useRef<{ startDist: number; startZoom: number } | null>(null);
   const [showScrollHint, setShowScrollHint] = useState(false);
 
-  // Show one-time scroll hint on mobile when tree overflows
+  const clampZoom = (z: number) => Math.min(2, Math.max(0.3, z));
+
+  // Show one-time scroll hint when tree overflows (session-scoped)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const el = scrollRef.current;
     if (!el) return;
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (!isMobile) return;
-    const overflows = el.scrollWidth > el.clientWidth;
+    const seen = sessionStorage.getItem('familyTreeHintSeen');
+    if (seen) return;
+    const overflows = el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight;
     if (!overflows) return;
     setShowScrollHint(true);
+    sessionStorage.setItem('familyTreeHintSeen', '1');
     const t = setTimeout(() => setShowScrollHint(false), 3000);
     return () => clearTimeout(t);
   }, [members.length]);
 
-  // Desktop: convert vertical wheel to horizontal scroll when shift held
+  // Wheel zoom (ctrl/meta + wheel) and shift-wheel horizontal scroll
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        setZoom((z) => clampZoom(z - e.deltaY * 0.002));
+        return;
+      }
       if (e.shiftKey && e.deltaY !== 0) {
         e.preventDefault();
         el.scrollLeft += e.deltaY;
@@ -171,6 +181,41 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
   }, []);
+
+  // Pinch-to-zoom on touch
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const dist = (t: TouchList) => {
+      const dx = t[0].clientX - t[1].clientX;
+      const dy = t[0].clientY - t[1].clientY;
+      return Math.hypot(dx, dy);
+    };
+    const onStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        pinchRef.current = { startDist: dist(e.touches), startZoom: zoom };
+      }
+    };
+    const onMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchRef.current) {
+        e.preventDefault();
+        const d = dist(e.touches);
+        const ratio = d / pinchRef.current.startDist;
+        setZoom(clampZoom(pinchRef.current.startZoom * ratio));
+      }
+    };
+    const onEnd = () => { pinchRef.current = null; };
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchmove', onMove, { passive: false });
+    el.addEventListener('touchend', onEnd);
+    el.addEventListener('touchcancel', onEnd);
+    return () => {
+      el.removeEventListener('touchstart', onStart);
+      el.removeEventListener('touchmove', onMove);
+      el.removeEventListener('touchend', onEnd);
+      el.removeEventListener('touchcancel', onEnd);
+    };
+  }, [zoom]);
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -182,6 +227,19 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
     };
     void fetchMembers();
   }, [currentPacket?.id, refreshKey]);
+
+  // Initial mobile zoom-out + auto-center on user once members load
+  useEffect(() => {
+    if (loading || members.length === 0 || hasCenteredRef.current) return;
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) setZoom(0.7);
+    hasCenteredRef.current = true;
+    requestAnimationFrame(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+    });
+  }, [loading, members.length]);
 
   const rootName = currentPacket?.person_a_name || 'You';
 
