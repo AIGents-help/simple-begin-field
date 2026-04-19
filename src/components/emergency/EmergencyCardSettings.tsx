@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert, ChevronDown } from 'lucide-react';
+import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert, ChevronDown, Siren, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { emergencyService, EmergencyToken, EmergencyAccessLogEntry } from '../../services/emergencyService';
 import { generateEmergencyCardsPdf, generateQrPng } from '../../services/emergencyCardPdf';
@@ -18,6 +18,10 @@ const SECTION_LABELS: Record<string, string> = {
   insurance: 'Insurance Info',
   custom_field: 'Custom Note',
 };
+
+// Default fields suggested for provider bypass — the truly time-critical ones
+const DEFAULT_BYPASS_FIELDS = ['blood_type', 'allergies', 'medications', 'dnr_status', 'organ_donor'];
+const BYPASS_CONSENT_VERSION = '1.0';
 
 export const EmergencyCardSettings: React.FC = () => {
   const { user, currentPacket, userDisplayName } = useAppContext();
