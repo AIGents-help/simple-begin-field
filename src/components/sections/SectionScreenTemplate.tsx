@@ -80,6 +80,7 @@ export const SectionScreenTemplate = ({
 
   if (!config) return null;
 
+  const demoMode = isDemoMode();
   const hasData = records.length > 0 || docs.length > 0;
 
   return (
