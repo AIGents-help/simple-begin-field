@@ -2347,57 +2347,138 @@ export type Database = {
       }
       legal_documents: {
         Row: {
+          agent_email: string | null
+          agent_name: string | null
+          agent_phone: string | null
+          alternate_agent_name: string | null
+          alternate_executor_name: string | null
+          alternate_guardian_name: string | null
+          artificial_nutrition_preference: string | null
+          assets_in_trust: string | null
+          attorney_email: string | null
           attorney_firm: string | null
           attorney_name: string | null
           attorney_phone: string | null
           category: string | null
           created_at: string
+          details: Json | null
           document_date: string | null
+          document_name: string | null
           document_type: string
+          effective_when: string | null
+          executor_name: string | null
+          guardian_email: string | null
+          guardian_name: string | null
+          guardian_phone: string | null
+          guardian_reasoning: string | null
           id: string
+          is_durable: boolean | null
           is_na: boolean | null
           last_reviewed_date: string | null
+          legacy_notes: string | null
+          life_sustaining_preference: string | null
           notes: string | null
+          organ_donation_preference: string | null
           original_location: string | null
+          other_subtype: string | null
           packet_id: string
+          pain_management_preference: string | null
+          parties_involved: string | null
           scope: string | null
           status: string | null
+          successor_trustee_name: string | null
+          trust_type: string | null
+          trustee_name: string | null
           updated_at: string
         }
         Insert: {
+          agent_email?: string | null
+          agent_name?: string | null
+          agent_phone?: string | null
+          alternate_agent_name?: string | null
+          alternate_executor_name?: string | null
+          alternate_guardian_name?: string | null
+          artificial_nutrition_preference?: string | null
+          assets_in_trust?: string | null
+          attorney_email?: string | null
           attorney_firm?: string | null
           attorney_name?: string | null
           attorney_phone?: string | null
           category?: string | null
           created_at?: string
+          details?: Json | null
           document_date?: string | null
+          document_name?: string | null
           document_type: string
+          effective_when?: string | null
+          executor_name?: string | null
+          guardian_email?: string | null
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          guardian_reasoning?: string | null
           id?: string
+          is_durable?: boolean | null
           is_na?: boolean | null
           last_reviewed_date?: string | null
+          legacy_notes?: string | null
+          life_sustaining_preference?: string | null
           notes?: string | null
+          organ_donation_preference?: string | null
           original_location?: string | null
+          other_subtype?: string | null
           packet_id: string
+          pain_management_preference?: string | null
+          parties_involved?: string | null
           scope?: string | null
           status?: string | null
+          successor_trustee_name?: string | null
+          trust_type?: string | null
+          trustee_name?: string | null
           updated_at?: string
         }
         Update: {
+          agent_email?: string | null
+          agent_name?: string | null
+          agent_phone?: string | null
+          alternate_agent_name?: string | null
+          alternate_executor_name?: string | null
+          alternate_guardian_name?: string | null
+          artificial_nutrition_preference?: string | null
+          assets_in_trust?: string | null
+          attorney_email?: string | null
           attorney_firm?: string | null
           attorney_name?: string | null
           attorney_phone?: string | null
           category?: string | null
           created_at?: string
+          details?: Json | null
           document_date?: string | null
+          document_name?: string | null
           document_type?: string
+          effective_when?: string | null
+          executor_name?: string | null
+          guardian_email?: string | null
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          guardian_reasoning?: string | null
           id?: string
+          is_durable?: boolean | null
           is_na?: boolean | null
           last_reviewed_date?: string | null
+          legacy_notes?: string | null
+          life_sustaining_preference?: string | null
           notes?: string | null
+          organ_donation_preference?: string | null
           original_location?: string | null
+          other_subtype?: string | null
           packet_id?: string
+          pain_management_preference?: string | null
+          parties_involved?: string | null
           scope?: string | null
           status?: string | null
+          successor_trustee_name?: string | null
+          trust_type?: string | null
+          trustee_name?: string | null
           updated_at?: string
         }
         Relationships: [
