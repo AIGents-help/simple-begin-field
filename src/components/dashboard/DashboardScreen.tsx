@@ -29,6 +29,8 @@ import { CoupleActivityFeed } from '../couple/CoupleActivityFeed';
 import { FriendlyCompetitionBadge } from '../couple/FriendlyCompetitionBadge';
 import { getCustomSectionIcon } from '../../config/customSectionIcons';
 import { CustomSectionModal } from '../sections/CustomSectionModal';
+import { isDemoMode } from '../../demo/demoMode';
+import { DemoProfileCard } from '../demo/DemoProfileCard';
 
 export const DashboardScreen = () => {
   const {
@@ -146,6 +148,9 @@ export const DashboardScreen = () => {
           />
         </div>
       </div>
+
+      {/* Demo Mode: James Morgan profile card */}
+      {isDemoMode() && <DemoProfileCard />}
 
       {/* Annual review nudge (only when due) */}
       <AnnualReviewBanner />
