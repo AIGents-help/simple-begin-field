@@ -4336,9 +4336,14 @@ export type Database = {
           category: string | null
           contact_info: string | null
           created_at: string | null
+          details: Json
+          employer_name: string | null
           id: string
           institution: string | null
           is_na: boolean | null
+          legacy_notes: string | null
+          loan_balance: number | null
+          nickname: string | null
           notes: string | null
           packet_id: string | null
           scope: string | null
@@ -4355,9 +4360,14 @@ export type Database = {
           category?: string | null
           contact_info?: string | null
           created_at?: string | null
+          details?: Json
+          employer_name?: string | null
           id?: string
           institution?: string | null
           is_na?: boolean | null
+          legacy_notes?: string | null
+          loan_balance?: number | null
+          nickname?: string | null
           notes?: string | null
           packet_id?: string | null
           scope?: string | null
@@ -4374,9 +4384,14 @@ export type Database = {
           category?: string | null
           contact_info?: string | null
           created_at?: string | null
+          details?: Json
+          employer_name?: string | null
           id?: string
           institution?: string | null
           is_na?: boolean | null
+          legacy_notes?: string | null
+          loan_balance?: number | null
+          nickname?: string | null
           notes?: string | null
           packet_id?: string | null
           scope?: string | null
