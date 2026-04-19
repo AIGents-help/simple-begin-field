@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID, DEMO_MEDICAL_RECORDS } from '../demo/morganFamilyData';
 
 export type MedicalRecordType = 'emergency' | 'doctor' | 'insurance' | 'allergy' | 'surgery';
 
@@ -78,6 +80,9 @@ export interface MedicationRecord {
 export const medicalService = {
   // ---------- medical_records (everything except medications) ----------
   async list(packetId: string, scope?: string): Promise<MedicalRecord[]> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return DEMO_MEDICAL_RECORDS as unknown as MedicalRecord[];
+    }
     let q = supabase
       .from('medical_records')
       .select('*')

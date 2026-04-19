@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { sectionService } from '@/services/sectionService';
 import { healthScoreService, HealthScore } from '@/services/healthScoreService';
 import { HavenOwlSvg } from './HavenOwlSvg';
+import { isDemoMode } from '@/demo/demoMode';
+import { DEMO_HAVEN_GREETING } from '@/demo/morganFamilyData';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -92,6 +94,11 @@ export const HavenAssistant = () => {
 
   const sendInitialMessage = async () => {
     setInitialSent(true);
+    // Demo mode: skip the live edge function call and show the canned greeting
+    if (isDemoMode()) {
+      setMessages([{ role: 'assistant', content: DEMO_HAVEN_GREETING }]);
+      return;
+    }
     setLoading(true);
     try {
       const [sectionData, healthScore] = await Promise.all([fetchSectionData(), fetchHealthScore()]);

@@ -20,6 +20,15 @@ export const DEMO_PROFILE = {
   email: 'demo@survivorpacket.com',
   role: 'user',
   avatar_url: dicebear('JamesMorgan'),
+  // Extended profile data for the dashboard profile card
+  date_of_birth: '1966-03-14',
+  age: 58,
+  city: 'Media',
+  state: 'PA',
+  occupation: 'Retired civil engineer',
+  marital_status: 'Widower',
+  bio: 'Father of three. Grandfather of two. Lives in Media, PA. Husband to the late Catherine Morgan (1992–2021).',
+  joined_at: '2024-01-15',
 };
 
 export const DEMO_PACKET = {
@@ -842,3 +851,268 @@ export const DEMO_ESTATE_SUMMARY = {
 };
 
 export const DEMO_HEALTH_SCORE = 87;
+
+// ---------------------------------------------------------------------------
+// IDENTITY RECORDS (shape matches identityService — info_records with
+// category + details + expiry_date). Drives the Info/Identity section cards.
+// ---------------------------------------------------------------------------
+export const DEMO_IDENTITY_RECORDS = [
+  {
+    id: 'demo-id-dl',
+    packet_id: DEMO_PACKET_ID,
+    scope: 'personA',
+    category: 'drivers_license',
+    title: "Pennsylvania Driver's License",
+    notes: 'Organ donor. Stored in wallet.',
+    expiry_date: '2027-03-14',
+    status: 'completed',
+    details: {
+      number_masked: '****4471',
+      state: 'PA',
+      issued_date: '2023-03-14',
+      class: 'C',
+      organ_donor: true,
+      restrictions: 'Corrective lenses',
+    },
+    created_at: today,
+  },
+  {
+    id: 'demo-id-passport',
+    packet_id: DEMO_PACKET_ID,
+    scope: 'personA',
+    category: 'passport',
+    title: 'US Passport',
+    notes: 'Primary travel document. Stored in fireproof safe, master bedroom.',
+    expiry_date: '2029-08-22',
+    status: 'completed',
+    details: {
+      number_masked: '****8821',
+      country: 'United States',
+      issued_date: '2019-08-22',
+      issuing_authority: 'US Department of State',
+    },
+    created_at: today,
+  },
+  {
+    id: 'demo-id-ssn',
+    packet_id: DEMO_PACKET_ID,
+    scope: 'personA',
+    category: 'social_security',
+    title: 'Social Security Card',
+    notes: 'Original card stored in fireproof safe, master bedroom.',
+    expiry_date: null,
+    status: 'completed',
+    details: { number_masked: '***-**-7823' },
+    created_at: today,
+  },
+  {
+    id: 'demo-id-birth',
+    packet_id: DEMO_PACKET_ID,
+    scope: 'personA',
+    category: 'birth_certificate',
+    title: 'Birth Certificate',
+    notes: 'Certified original. Chester County, PA.',
+    expiry_date: null,
+    status: 'completed',
+    details: {
+      birth_date: '1966-03-14',
+      place_of_birth: 'Chester County, PA',
+      certificate_number: '****0314',
+    },
+    created_at: today,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// CUSTOM SECTIONS — Travel Documents demo example
+// ---------------------------------------------------------------------------
+export const DEMO_CUSTOM_SECTIONS = [
+  {
+    id: 'demo-cs-travel',
+    user_id: DEMO_USER_ID,
+    packet_id: DEMO_PACKET_ID,
+    name: 'Travel Documents',
+    icon: 'plane',
+    description: 'Frequent traveler programs, lounge access, and trusted-traveler IDs.',
+    sort_order: 0,
+    created_at: today,
+    updated_at: today,
+  },
+];
+
+export const DEMO_CUSTOM_SECTION_RECORDS: Record<string, any[]> = {
+  'demo-cs-travel': [
+    {
+      id: 'demo-csr-globalentry',
+      custom_section_id: 'demo-cs-travel',
+      packet_id: DEMO_PACKET_ID,
+      scope: 'personA',
+      title: 'Global Entry / TSA PreCheck',
+      entry_date: '2024-02-10',
+      notes: 'Member ID ending 2284. Renewed 02/2024. Expires 02/2029. PASS ID linked to passport.',
+      status: 'completed',
+      created_at: today,
+      updated_at: today,
+    },
+    {
+      id: 'demo-csr-united',
+      custom_section_id: 'demo-cs-travel',
+      packet_id: DEMO_PACKET_ID,
+      scope: 'personA',
+      title: 'United Airlines MileagePlus',
+      entry_date: '2009-06-01',
+      notes: 'Premier Gold. Account ending 7741. ~287,000 miles available.',
+      status: 'completed',
+      created_at: today,
+      updated_at: today,
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// HEALTH SCORE — full shape matching healthScoreService.HealthScore
+// ---------------------------------------------------------------------------
+export const DEMO_HEALTH_SCORE_FULL = {
+  packet_id: DEMO_PACKET_ID,
+  total_score: 87,
+  previous_score: 84,
+  score_change: 3,
+  section_scores: {
+    info: { score: 9, max: 10 },
+    family: { score: 10, max: 10 },
+    legal: { score: 10, max: 10 },
+    medical: { score: 9, max: 10 },
+    'real-estate': { score: 8, max: 10 },
+    banking: { score: 8, max: 10 },
+    investments: { score: 7, max: 10 },
+    retirement: { score: 9, max: 10 },
+    advisors: { score: 8, max: 10 },
+    vehicles: { score: 7, max: 10 },
+    passwords: { score: 6, max: 10 },
+    property: { score: 7, max: 10 },
+    pets: { score: 6, max: 10 },
+    funeral: { score: 9, max: 10 },
+    memories: { score: 8, max: 10 },
+  },
+  critical_gaps: [
+    {
+      section: 'passwords',
+      label: 'Password manager master password not stored offline',
+      impact: 4,
+      cta: 'Add backup location',
+    },
+  ],
+  calculated_at: today,
+};
+
+// ---------------------------------------------------------------------------
+// SCORE HISTORY — 6-month journey from 23 → 87
+// ---------------------------------------------------------------------------
+export const DEMO_SCORE_HISTORY = (() => {
+  const trajectory = [23, 31, 38, 47, 54, 61, 67, 72, 76, 80, 84, 87];
+  const now = Date.now();
+  return trajectory.map((score, i) => ({
+    total_score: score,
+    recorded_at: new Date(now - (trajectory.length - 1 - i) * 15 * 24 * 60 * 60 * 1000).toISOString(),
+  }));
+})();
+
+// ---------------------------------------------------------------------------
+// FULL ESTATE SUMMARY — shape matches estateSummaryService.EstateSummary
+// ---------------------------------------------------------------------------
+export const DEMO_ESTATE_SUMMARY_FULL = {
+  packet_id: DEMO_PACKET_ID,
+  gross_assets: 1559500,
+  total_liabilities: 195400,
+  net_estate: 1364100,
+  liquid_assets: 350800,
+  illiquid_assets: 1208700,
+  death_benefits: 0,
+  categories: {
+    real_estate: {
+      total: 805000,
+      records: [
+        { id: 'demo-re-primary', label: '847 Willow Creek Drive, Media, PA', value: 485000 },
+        { id: 'demo-re-vacation', label: '22 Beach Haven Court, Stone Harbor, NJ', value: 320000 },
+      ],
+    },
+    vehicles: {
+      total: 47000,
+      records: [
+        { id: 'demo-veh-camry', label: '2021 Toyota Camry XSE', value: 28000 },
+        { id: 'demo-veh-f150', label: '2018 Ford F-150 XLT', value: 19000 },
+      ],
+    },
+    banking: {
+      total: 60600,
+      records: [
+        { id: 'demo-bank-chase', label: 'Chase Checking ****4892', value: 12400 },
+        { id: 'demo-bank-fidelity', label: 'Fidelity Savings ****7731', value: 48200 },
+      ],
+    },
+    investments: {
+      total: 287000,
+      records: [
+        { id: 'demo-inv-fidelity', label: 'Fidelity Brokerage ****2291', value: 287000 },
+      ],
+    },
+    retirement: {
+      total: 612000,
+      records: [
+        { id: 'demo-ret-401k', label: 'Vanguard 401k ****8821', value: 485000 },
+        { id: 'demo-ret-ira', label: 'Vanguard Traditional IRA ****4421', value: 127000 },
+      ],
+    },
+    property: {
+      total: 33000,
+      records: [
+        { id: 'demo-prop-ring', label: "Catherine's Engagement Ring", value: 18500 },
+        { id: 'demo-prop-painting', label: 'Oil Painting "Autumn Valley"', value: 8200 },
+        { id: 'demo-prop-coins', label: 'Coin Collection', value: 6300 },
+      ],
+    },
+    life_insurance: { records: [] },
+  },
+  liabilities: [
+    {
+      id: 'demo-liab-mortgage',
+      liability_type: 'Mortgage',
+      label: 'Chase mortgage — 847 Willow Creek Drive',
+      value: 187000,
+      payoff_date: '2032-06-01',
+    },
+    {
+      id: 'demo-liab-truck',
+      liability_type: 'Vehicle Loan',
+      label: 'Ford F-150 loan',
+      value: 8400,
+      payoff_date: '2025-12-01',
+    },
+  ],
+  missing_values: [
+    { section: 'investments', id: 'demo-inv-coinbase', label: 'Coinbase cryptocurrency wallet' },
+  ],
+  calculated_at: today,
+};
+
+// ---------------------------------------------------------------------------
+// SECTION COMPLETION — per-section count + percent for the dashboard grid
+// ---------------------------------------------------------------------------
+export const DEMO_SECTION_COMPLETION: Record<
+  string,
+  { count: number; hasContent: boolean; percent: number }
+> = (() => {
+  const out: Record<string, { count: number; hasContent: boolean; percent: number }> = {};
+  for (const [key, records] of Object.entries(DEMO_RECORDS_BY_SECTION)) {
+    out[key] = { count: records.length, hasContent: records.length > 0, percent: records.length > 0 ? 100 : 0 };
+  }
+  out['private'] = { count: 0, hasContent: false, percent: 0 };
+  return out;
+})();
+
+// ---------------------------------------------------------------------------
+// HAVEN GREETING — used by HavenAssistant when isDemoMode()
+// ---------------------------------------------------------------------------
+export const DEMO_HAVEN_GREETING =
+  "Welcome! You're exploring James Morgan's Survivor Packet. I'm Haven, your guide. Ask me anything about what you see here or how The Survivor Packet can help your family.";
+

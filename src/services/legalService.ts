@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID, DEMO_LEGAL_DOCUMENTS } from '../demo/morganFamilyData';
 
 /**
  * Whitelist of REAL columns on legal_documents.
@@ -146,6 +148,9 @@ export const yearsSince = (dateStr?: string | null): number | null => {
 
 export const legalService = {
   async list(packetId: string) {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return { data: DEMO_LEGAL_DOCUMENTS as any[], error: null };
+    }
     const { data, error } = await supabase
       .from('legal_documents')
       .select('*')

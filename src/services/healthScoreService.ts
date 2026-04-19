@@ -1,4 +1,10 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import {
+  DEMO_PACKET_ID,
+  DEMO_HEALTH_SCORE_FULL,
+  DEMO_SCORE_HISTORY,
+} from '../demo/morganFamilyData';
 
 export type SectionScore = { score: number; max: number };
 export type CriticalGap = { section: string; label: string; impact: number; cta: string };
@@ -32,6 +38,9 @@ export function tierForScore(score: number): ScoreTier {
 
 export const healthScoreService = {
   async getCurrent(packetId: string): Promise<HealthScore | null> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return DEMO_HEALTH_SCORE_FULL as unknown as HealthScore;
+    }
     const { data, error } = await supabase
       .from('health_scores' as any)
       .select('*')
@@ -43,12 +52,18 @@ export const healthScoreService = {
   },
 
   async recompute(packetId: string): Promise<HealthScore | null> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return DEMO_HEALTH_SCORE_FULL as unknown as HealthScore;
+    }
     const { error } = await supabase.rpc('calculate_health_score' as any, { p_packet_id: packetId });
     if (error) throw error;
     return this.getCurrent(packetId);
   },
 
   async getHistory(packetId: string, limit = 30): Promise<Array<{ total_score: number; recorded_at: string }>> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return DEMO_SCORE_HISTORY.slice(-limit);
+    }
     const { data, error } = await supabase
       .from('health_score_history' as any)
       .select('total_score, recorded_at')

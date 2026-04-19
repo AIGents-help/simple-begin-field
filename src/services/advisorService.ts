@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID, DEMO_ADVISORS } from '../demo/morganFamilyData';
 
 /**
  * Whitelist of REAL columns on advisor_records. Anything outside this set
@@ -168,6 +170,9 @@ export const sanitizeAdvisorPayload = (form: Record<string, any>) => {
 
 export const advisorService = {
   async list(packetId: string) {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return { data: DEMO_ADVISORS as any[], error: null };
+    }
     const { data, error } = await supabase
       .from('advisor_records')
       .select('*')
