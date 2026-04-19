@@ -6,6 +6,7 @@ import { SECTIONS_CONFIG } from '../../config/sectionsConfig';
 import { ScopeToggle } from '../layout/ScopeToggle';
 import { sectionService } from '../../services/sectionService';
 import { documentService } from '../../services/documentService';
+import { isDemoMode } from '../../demo/demoMode';
 
 import { SectionRecommendations } from './SectionRecommendations';
 import { FindProfessionalPrompt } from '../directory/FindProfessionalPrompt';
