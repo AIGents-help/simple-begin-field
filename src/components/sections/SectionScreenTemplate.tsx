@@ -277,6 +277,7 @@ export const RecordCard = ({
   subtitlePlaceholder?: string;
 }) => {
   const { activeTab } = useAppContext();
+  const demoMode = isDemoMode();
   const isNA = data?.is_na || data?.status === 'not_applicable';
   // Person/animal lifecycle dimming — applies to family/pets/trusted contacts (is_deceased)
   // and advisors (advisor_status !== 'active').
