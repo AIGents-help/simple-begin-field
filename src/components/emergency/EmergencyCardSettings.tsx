@@ -552,6 +552,13 @@ export const EmergencyCardSettings: React.FC = () => {
           </div>
         </>
       )}
+
+      <SendQrCardModal
+        open={sendOpen}
+        onClose={() => setSendOpen(false)}
+        qrPngDataUrl={qrPreview}
+        emergencyUrl={emergencyUrl}
+      />
     </div>
   );
 };
