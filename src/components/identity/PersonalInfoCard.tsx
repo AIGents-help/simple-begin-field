@@ -58,7 +58,19 @@ export const PersonalInfoCard: React.FC = () => {
           console.error('Failed to load profile', error);
           toast.error('Could not load your personal info', { position: 'bottom-center' });
         }
-        setProfile((data as ProfileLike) || ({ id: user.id } as ProfileLike));
+        const loaded = (data as ProfileLike) || ({ id: user.id } as ProfileLike);
+        // Backfill first/last name from full_name when individual fields are empty,
+        // so the edit form shows the user's actual saved name (not placeholder hints).
+        if (!loaded.first_name && !loaded.last_name && typeof loaded.full_name === 'string' && loaded.full_name.trim()) {
+          const parts = loaded.full_name.trim().split(/\s+/);
+          if (parts.length === 1) {
+            loaded.first_name = parts[0];
+          } else {
+            loaded.first_name = parts[0];
+            loaded.last_name = parts.slice(1).join(' ');
+          }
+        }
+        setProfile(loaded);
         setLoading(false);
       });
     return () => { cancelled = true; };
