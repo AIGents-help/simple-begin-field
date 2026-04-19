@@ -14,7 +14,8 @@ import {
   Activity,
   Share2,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  Scale
 } from 'lucide-react';
 import { Section, SectionId } from './types';
 
@@ -34,6 +35,14 @@ export const SECTIONS_CONFIG: Section[] = [
     description: 'Spouse, children, parents & family contacts',
     emptyStateText: 'No family members listed yet.',
     addButtonLabel: 'Add Family Member'
+  },
+  {
+    id: 'legal',
+    label: 'Legal',
+    icon: Scale,
+    description: 'Will, trusts, powers of attorney & directives',
+    emptyStateText: 'No legal documents added yet.',
+    addButtonLabel: 'Add Legal Document'
   },
   {
     id: 'medical',

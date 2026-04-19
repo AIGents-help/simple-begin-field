@@ -21,7 +21,8 @@ export const sectionService = {
     'funeral': 'funeral_records',
     'memories': 'memories',
     'private': 'private_items',
-    'medical': 'medical_records'
+    'medical': 'medical_records',
+    'legal': 'legal_documents'
   } as Record<string, any>,
 
   async getRecords(packetId: string, sectionKey: string, scope?: 'personA' | 'personB' | 'shared') {

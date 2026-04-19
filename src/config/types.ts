@@ -3,6 +3,7 @@ import React from 'react';
 export type SectionId = 
   | 'info' 
   | 'family' 
+  | 'legal'
   | 'medical'
   | 'real-estate' 
   | 'banking' 
