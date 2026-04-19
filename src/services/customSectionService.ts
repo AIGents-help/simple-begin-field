@@ -1,4 +1,10 @@
 import { supabase } from '@/lib/supabase';
+import { isDemoMode } from '../demo/demoMode';
+import {
+  DEMO_PACKET_ID,
+  DEMO_CUSTOM_SECTIONS,
+  DEMO_CUSTOM_SECTION_RECORDS,
+} from '../demo/morganFamilyData';
 
 export interface CustomSection {
   id: string;
