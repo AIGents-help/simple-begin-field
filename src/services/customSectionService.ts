@@ -27,6 +27,9 @@ export interface CustomSectionRecord {
 
 export const customSectionService = {
   async list(packetId: string): Promise<CustomSection[]> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      return DEMO_CUSTOM_SECTIONS as unknown as CustomSection[];
+    }
     const { data, error } = await supabase
       .from('custom_sections' as any)
       .select('*')
@@ -91,6 +94,9 @@ export const customSectionService = {
   },
 
   async listRecords(customSectionId: string): Promise<CustomSectionRecord[]> {
+    if (isDemoMode() && DEMO_CUSTOM_SECTION_RECORDS[customSectionId]) {
+      return DEMO_CUSTOM_SECTION_RECORDS[customSectionId] as unknown as CustomSectionRecord[];
+    }
     const { data, error } = await supabase
       .from('custom_section_records' as any)
       .select('*')

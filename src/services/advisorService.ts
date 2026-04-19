@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID, DEMO_ADVISORS } from '../demo/morganFamilyData';
 
 /**
  * Whitelist of REAL columns on advisor_records. Anything outside this set

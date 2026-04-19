@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET_ID, DEMO_PASSWORDS } from '../demo/morganFamilyData';
 
 /**
  * Whitelist of REAL columns on password_records.
