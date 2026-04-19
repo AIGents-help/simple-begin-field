@@ -275,3 +275,9 @@ export const SectionRecommendations = ({
                 </>
               )}
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
