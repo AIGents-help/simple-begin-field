@@ -429,7 +429,15 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
             scrollbarWidth: 'thin',
           }}
         >
-        <div style={{ width: svgW * zoom, height: svgH * zoom, transform: `scale(${zoom})`, transformOrigin: 'top left' }}>
+        <div
+          style={{
+            width: svgW * zoom,
+            height: svgH * zoom,
+            transform: `scale(${zoom})`,
+            transformOrigin: 'top left',
+            touchAction: 'none',
+          }}
+        >
           <svg width={svgW} height={svgH} className="block">
             {/* Connectors */}
             {connections.map((c, idx) => {
