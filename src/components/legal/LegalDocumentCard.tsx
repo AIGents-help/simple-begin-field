@@ -743,14 +743,13 @@ export const LegalDocumentCard: React.FC<Props> = ({
           />
 
           {/* Use our template — only when no content yet */}
-          {!hasContent && !isDraft === false && (
+          {!hasContent && (
             <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
               Need a starting point?{' '}
               <button
                 type="button"
                 className="underline font-medium"
                 onClick={() => {
-                  // Navigate to templates view; user can pick the relevant template
                   window.dispatchEvent(new CustomEvent('navigate-templates', { detail: { kind } }));
                 }}
               >
