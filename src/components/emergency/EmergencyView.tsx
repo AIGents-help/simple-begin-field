@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, ShieldAlert, Phone, AlertTriangle, Heart } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Loader2, ShieldAlert, Phone, AlertTriangle, Heart, Siren, Lock } from 'lucide-react';
 
 interface HintResponse {
   valid: boolean;
@@ -8,6 +8,7 @@ interface HintResponse {
   hint?: string | null;
   locked?: boolean;
   locked_until?: string | null;
+  bypass_enabled?: boolean;
 }
 
 interface VerifyResponse {
@@ -21,13 +22,16 @@ interface VerifyResponse {
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const ANON = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+type Mode = 'bypass' | 'pin';
+
 export const EmergencyView = () => {
   const { token } = useParams<{ token: string }>();
-  const navigate = useNavigate();
   const [hint, setHint] = useState<HintResponse | null>(null);
   const [pin, setPin] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [data, setData] = useState<any>(null);
+  const [bypassData, setBypassData] = useState<any>(null);
+  const [mode, setMode] = useState<Mode>('bypass');
   const [error, setError] = useState<string>('');
   const [showHint, setShowHint] = useState(false);
 
@@ -39,7 +43,30 @@ export const EmergencyView = () => {
       body: JSON.stringify({ token, action: 'hint' }),
     })
       .then(r => r.json())
-      .then(setHint)
+      .then(async (h: HintResponse) => {
+        setHint(h);
+        if (h?.valid && h.bypass_enabled) {
+          // Auto-fetch bypass data
+          try {
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/get-emergency-info`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', apikey: ANON, Authorization: `Bearer ${ANON}` },
+              body: JSON.stringify({ token, action: 'bypass' }),
+            });
+            const json = await res.json();
+            if (json?.success) {
+              setBypassData(json.data);
+              setMode('bypass');
+            } else {
+              setMode('pin');
+            }
+          } catch (_) {
+            setMode('pin');
+          }
+        } else {
+          setMode('pin');
+        }
+      })
       .catch(() => setHint({ valid: false }));
   }, [token]);
 
@@ -95,7 +122,191 @@ export const EmergencyView = () => {
     );
   }
 
-  // After successful verification — Emergency view
+  // PATH A — Bypass view (provider mode, no PIN required)
+  if (mode === 'bypass' && bypassData) {
+    const med = (bypassData.medical_records || [])[0] || {};
+    const v = bypassData.visible_sections || {};
+    return (
+      <div className="min-h-screen bg-white">
+        {/* Urgent red banner — visually distinct from PIN-unlocked view */}
+        <div className="bg-red-700 text-white">
+          <div className="px-6 py-5 text-center border-b-4 border-red-900">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Siren className="w-6 h-6 animate-pulse" />
+              <p className="text-xs uppercase tracking-[0.2em] font-extrabold">Medical Emergency</p>
+              <Siren className="w-6 h-6 animate-pulse" />
+            </div>
+            <h1 className="text-2xl font-extrabold">Provider Access</h1>
+            <p className="text-xs opacity-90 mt-1">Information authorized for emergency provider access</p>
+          </div>
+          <div className="px-6 py-4 text-center bg-red-800">
+            <p className="text-xs uppercase tracking-widest opacity-80 font-bold">Patient</p>
+            <p className="text-3xl font-extrabold">{bypassData.first_name}</p>
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto p-6 space-y-5">
+          {/* Critical Medical — only fields the user authorized */}
+          <section>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-red-700 mb-3">Critical Medical</h2>
+            <div className="bg-white border-2 border-red-200 rounded-2xl divide-y divide-red-100">
+              {v.blood_type && med.blood_type && (
+                <div className="p-5 flex items-baseline justify-between">
+                  <span className="text-base font-bold text-stone-700">Blood Type</span>
+                  <span className="text-4xl font-extrabold text-red-700">{med.blood_type}</span>
+                </div>
+              )}
+              {v.allergies && med.allergies && (
+                <div className="p-5 bg-red-50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-5 h-5 text-red-700" />
+                    <span className="text-sm font-bold uppercase tracking-wide text-red-700">Allergies</span>
+                  </div>
+                  <p className="text-xl font-semibold text-red-900 leading-snug">{med.allergies}</p>
+                </div>
+              )}
+              {v.medications && (bypassData.medications || []).length > 0 && (
+                <div className="p-5">
+                  <p className="text-sm font-bold uppercase tracking-wide text-stone-500 mb-3">Current Medications</p>
+                  <ul className="space-y-2">
+                    {bypassData.medications.map((m: any, i: number) => (
+                      <li key={i} className="text-lg text-stone-900">
+                        <span className="font-semibold">{m.name}</span>
+                        {m.dose && <span className="text-stone-600"> · {m.dose}</span>}
+                        {m.frequency && <span className="text-stone-600"> · {m.frequency}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {v.medical_conditions && med.conditions && (
+                <div className="p-5">
+                  <p className="text-sm font-bold uppercase tracking-wide text-stone-500 mb-1">Medical Conditions</p>
+                  <p className="text-lg text-stone-900">{med.conditions}</p>
+                </div>
+              )}
+              {(v.dnr_status || v.organ_donor) && (
+                <div className="p-5 grid grid-cols-2 gap-4">
+                  {v.dnr_status && med.dnr_status && (
+                    <div>
+                      <p className="text-xs font-bold uppercase text-red-700">DNR Status</p>
+                      <p className="text-lg font-bold text-stone-900">{med.dnr_status}</p>
+                    </div>
+                  )}
+                  {v.organ_donor && med.organ_donor !== null && med.organ_donor !== undefined && (
+                    <div>
+                      <p className="text-xs font-bold uppercase text-stone-500">Organ Donor</p>
+                      <p className="text-lg font-bold text-stone-900">{med.organ_donor ? 'Yes' : 'No'}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              {!v.blood_type && !v.allergies && !v.medications && !v.medical_conditions && !v.dnr_status && !v.organ_donor && (
+                <div className="p-5 text-sm text-stone-500 italic">No critical medical fields authorized for provider bypass.</div>
+              )}
+            </div>
+          </section>
+
+          {/* Emergency Contacts */}
+          {v.emergency_contacts && (bypassData.emergency_contacts || []).length > 0 && (
+            <section>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-red-700 mb-3">Emergency Contacts</h2>
+              <div className="space-y-2">
+                {bypassData.emergency_contacts.map((c: any, i: number) => (
+                  <a
+                    key={i}
+                    href={`tel:${c.phone}`}
+                    className="flex items-center justify-between p-4 bg-white border-2 border-red-200 rounded-2xl active:bg-red-50"
+                  >
+                    <div>
+                      <p className="text-lg font-bold text-stone-900">{c.name}</p>
+                      {c.relationship && <p className="text-sm text-stone-500">{c.relationship}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-3 bg-red-700 text-white rounded-xl font-bold">
+                      <Phone className="w-5 h-5" />
+                      <span>{c.phone}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Doctor */}
+          {v.doctor && med.provider_name && (
+            <section>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-red-700 mb-3">Primary Doctor</h2>
+              <a
+                href={med.phone ? `tel:${med.phone}` : '#'}
+                className="flex items-center justify-between p-4 bg-white border-2 border-red-200 rounded-2xl"
+              >
+                <div>
+                  <p className="text-lg font-bold text-stone-900">{med.provider_name}</p>
+                </div>
+                {med.phone && (
+                  <div className="flex items-center gap-2 px-4 py-3 bg-red-700 text-white rounded-xl font-bold">
+                    <Phone className="w-5 h-5" />
+                    <span>{med.phone}</span>
+                  </div>
+                )}
+              </a>
+            </section>
+          )}
+
+          {/* Insurance */}
+          {v.insurance && med.insurance_provider && (
+            <section>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-red-700 mb-3">Insurance</h2>
+              <div className="bg-white border-2 border-red-200 rounded-2xl p-5 space-y-2">
+                <p className="text-lg font-bold text-stone-900">{med.insurance_provider}</p>
+                {med.insurance_member_id && <p className="text-base text-stone-700">Member ID: {med.insurance_member_id}</p>}
+                {med.insurance_group_number && <p className="text-base text-stone-700">Group: {med.insurance_group_number}</p>}
+                {med.insurance_phone && (
+                  <a href={`tel:${med.insurance_phone}`} className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-red-700 text-white rounded-xl font-bold">
+                    <Phone className="w-4 h-4" /> {med.insurance_phone}
+                  </a>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Custom */}
+          {v.custom_field && bypassData.custom_field && (
+            <section>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-red-700 mb-3">Additional Info</h2>
+              <div className="bg-white border-2 border-red-200 rounded-2xl p-5">
+                <p className="text-base text-stone-900 whitespace-pre-wrap">{bypassData.custom_field}</p>
+              </div>
+            </section>
+          )}
+
+          {/* Separator + escalate to PIN-locked full view */}
+          <div className="pt-6 border-t-2 border-stone-200">
+            <button
+              onClick={() => { setMode('pin'); setBypassData(null); }}
+              className="w-full py-4 bg-stone-900 text-white font-bold rounded-xl text-base hover:bg-stone-800 transition-colors flex items-center justify-center gap-2"
+            >
+              <Lock className="w-5 h-5" />
+              View Full Emergency Card →
+            </button>
+            <p className="text-center text-xs text-stone-500 mt-2">
+              Requires PIN. For trusted contacts and family members.
+            </p>
+          </div>
+
+          <footer className="text-center text-xs text-stone-400 pt-6 pb-8">
+            <p className="flex items-center justify-center gap-1">
+              <Heart className="w-3 h-3" />
+              The Survivor Packet · survivorpacket.com
+            </p>
+            <p className="mt-1">Provider bypass access · {new Date().toLocaleString()}</p>
+          </footer>
+        </div>
+      </div>
+    );
+  }
+
+  // After successful verification — Full Emergency view
   if (data) {
     const med = (data.medical_records || [])[0] || {};
     const v = data.visible_sections || {};
@@ -302,6 +513,15 @@ export const EmergencyView = () => {
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-900 text-center">
               <span className="font-bold">Hint:</span> {hint.hint}
             </div>
+          )}
+
+          {hint.bypass_enabled && (
+            <button
+              onClick={() => { setMode('bypass'); }}
+              className="w-full text-xs text-red-700 font-semibold hover:underline pt-2"
+            >
+              ← Back to provider emergency view
+            </button>
           )}
         </div>
 
