@@ -27,6 +27,10 @@ export const SectionRecommendations = ({
 
   if (!recommendations) return null;
 
+  // Check if this section uses the new "About This Section" format
+  const aboutContent = recommendations.aboutContent;
+  const isAboutSection = !!aboutContent;
+
   const getExistingRecord = (item: any) => {
     if (!existingRecords || existingRecords.length === 0) return null;
     
@@ -79,13 +83,12 @@ export const SectionRecommendations = ({
   const totalHidden = entries.hidden.length + documents.hidden.length + contacts.hidden.length;
   const hasActive = entries.active.length > 0 || documents.active.length > 0 || contacts.active.length > 0;
 
-  if (!hasActive && totalHidden === 0) {
+  // For about sections, always show the block
+  if (isAboutSection) {
+    // Continue to render
+  } else if (!hasActive && totalHidden === 0) {
     return null;
   }
-
-  // Check if this section uses the new "About This Section" format
-  const aboutContent = recommendations.aboutContent;
-  const isAboutSection = !!aboutContent;
 
   return (
     <div className="mb-6">
@@ -120,147 +123,155 @@ export const SectionRecommendations = ({
             className="overflow-hidden"
           >
             <div className="mt-3 p-5 bg-white border border-stone-100 rounded-3xl shadow-sm space-y-6">
-              {(entries.active.length > 0 || (showHidden && entries.hidden.length > 0)) && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-stone-400">
-                    <Plus size={14} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Recommended Entries</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {entries.active.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-1">
-                        <button
-                          onClick={() => onEntryClick ? onEntryClick(item.label) : onSuggestionClick({ ...item.prefill, entryOnly: true })}
-                          className="px-3 py-2 bg-stone-50 hover:bg-manila/20 border border-stone-200 hover:border-manila rounded-xl text-xs font-bold text-navy-muted transition-all active:scale-95"
-                        >
-                          {item.label}
-                        </button>
-                      </div>
-                    ))}
-                    {showHidden && entries.hidden.map((item, idx) => (
-                      <div key={`hidden-${idx}`} className="flex items-center gap-1">
-                        <span className="px-3 py-2 bg-stone-50/50 border border-stone-100 rounded-xl text-xs font-medium text-stone-400 italic">
-                          {item.label}
-                        </span>
-                        {onRestoreNA && (
-                          <button
-                            onClick={() => onRestoreNA(item.prefill)}
-                            className="p-2 text-[10px] font-bold text-navy-muted hover:underline transition-colors"
-                          >
-                            Restore
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+              {isAboutSection && aboutContent && (
+                <div className="space-y-4">
+                  {aboutContent.paragraphs.map((paragraph, idx) => (
+                    <p key={idx} className="text-sm text-stone-600 leading-relaxed">
+                      {paragraph}
+                    </p>
+                  ))}
                 </div>
               )}
-
-              {(documents.active.length > 0 || (showHidden && documents.hidden.length > 0)) && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-stone-400">
-                    <FileText size={14} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Recommended Documents</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {documents.active.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-1">
-                        <button
-                          onClick={() => onSuggestionClick({ ...item.prefill, entryOnly: false })}
-                          className="px-3 py-2 bg-stone-50 hover:bg-manila/20 border border-stone-200 hover:border-manila rounded-xl text-xs font-bold text-navy-muted transition-all active:scale-95"
-                        >
-                          {item.label}
-                        </button>
+              
+              {!isAboutSection && (
+                <>
+                  {(entries.active.length > 0 || (showHidden && entries.hidden.length > 0)) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-stone-400">
+                        <Plus size={14} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Recommended Entries</span>
                       </div>
-                    ))}
-                    {showHidden && documents.hidden.map((item, idx) => (
-                      <div key={`hidden-${idx}`} className="flex items-center gap-1">
-                        <span className="px-3 py-2 bg-stone-50/50 border border-stone-100 rounded-xl text-xs font-medium text-stone-400 italic">
-                          {item.label}
-                        </span>
-                        {onRestoreNA && (
-                          <button
-                            onClick={() => onRestoreNA(item.prefill)}
-                            className="p-2 text-[10px] font-bold text-navy-muted hover:underline transition-colors"
-                          >
-                            Restore
-                          </button>
-                        )}
+                      <div className="flex flex-wrap gap-2">
+                        {entries.active.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-1">
+                            <button
+                              onClick={() => onEntryClick ? onEntryClick(item.label) : onSuggestionClick({ ...item.prefill, entryOnly: true })}
+                              className="px-3 py-2 bg-stone-50 hover:bg-manila/20 border border-stone-200 hover:border-manila rounded-xl text-xs font-bold text-navy-muted transition-all active:scale-95"
+                            >
+                              {item.label}
+                            </button>
+                          </div>
+                        ))}
+                        {showHidden && entries.hidden.map((item, idx) => (
+                          <div key={`hidden-${idx}`} className="flex items-center gap-1">
+                            <span className="px-3 py-2 bg-stone-50/50 border border-stone-100 rounded-xl text-xs font-medium text-stone-400 italic">
+                              {item.label}
+                            </span>
+                            {onRestoreNA && (
+                              <button
+                                onClick={() => onRestoreNA(item.prefill)}
+                                className="p-2 text-[10px] font-bold text-navy-muted hover:underline transition-colors"
+                              >
+                                Restore
+                              </button>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </div>
+                  )}
 
-              {(contacts.active.length > 0 || (showHidden && contacts.hidden.length > 0)) && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-stone-400">
-                    <Users size={14} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Recommended Contacts</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {contacts.active.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-1">
-                        <button
-                          onClick={() => onSuggestionClick({ ...item.prefill, entryOnly: true })}
-                          className="px-3 py-2 bg-stone-50 hover:bg-manila/20 border border-stone-200 hover:border-manila rounded-xl text-xs font-bold text-navy-muted transition-all active:scale-95"
-                        >
-                          {item.label}
-                        </button>
+                  {(documents.active.length > 0 || (showHidden && documents.hidden.length > 0)) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-stone-400">
+                        <FileText size={14} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Recommended Documents</span>
                       </div>
-                    ))}
-                    {showHidden && contacts.hidden.map((item, idx) => (
-                      <div key={`hidden-${idx}`} className="flex items-center gap-1">
-                        <span className="px-3 py-2 bg-stone-50/50 border border-stone-100 rounded-xl text-xs font-medium text-stone-400 italic">
-                          {item.label}
-                        </span>
-                        {onRestoreNA && (
-                          <button
-                            onClick={() => onRestoreNA(item.prefill)}
-                            className="p-2 text-[10px] font-bold text-navy-muted hover:underline transition-colors"
-                          >
-                            Restore
-                          </button>
-                        )}
+                      <div className="flex flex-wrap gap-2">
+                        {documents.active.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-1">
+                            <button
+                              onClick={() => onSuggestionClick({ ...item.prefill, entryOnly: false })}
+                              className="px-3 py-2 bg-stone-50 hover:bg-manila/20 border border-stone-200 hover:border-manila rounded-xl text-xs font-bold text-navy-muted transition-all active:scale-95"
+                            >
+                              {item.label}
+                            </button>
+                          </div>
+                        ))}
+                        {showHidden && documents.hidden.map((item, idx) => (
+                          <div key={`hidden-${idx}`} className="flex items-center gap-1">
+                            <span className="px-3 py-2 bg-stone-50/50 border border-stone-100 rounded-xl text-xs font-medium text-stone-400 italic">
+                              {item.label}
+                            </span>
+                            {onRestoreNA && (
+                              <button
+                                onClick={() => onRestoreNA(item.prefill)}
+                                className="p-2 text-[10px] font-bold text-navy-muted hover:underline transition-colors"
+                              >
+                                Restore
+                              </button>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </div>
+                  )}
 
-              {totalHidden > 0 && (
-                <div className="pt-2 border-t border-stone-50 flex justify-center">
-                  <button
-                    onClick={() => setShowHidden(!showHidden)}
-                    className="text-[10px] font-bold text-stone-400 hover:text-navy-muted transition-colors uppercase tracking-widest"
-                  >
-                    {showHidden ? 'Hide' : `Show ${totalHidden} hidden items`}
-                  </button>
-                </div>
-              )}
+                  {(contacts.active.length > 0 || (showHidden && contacts.hidden.length > 0)) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-stone-400">
+                        <Users size={14} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Recommended Contacts</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {contacts.active.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-1">
+                            <button
+                              onClick={() => onSuggestionClick({ ...item.prefill, entryOnly: true })}
+                              className="px-3 py-2 bg-stone-50 hover:bg-manila/20 border border-stone-200 hover:border-manila rounded-xl text-xs font-bold text-navy-muted transition-all active:scale-95"
+                            >
+                              {item.label}
+                            </button>
+                          </div>
+                        ))}
+                        {showHidden && contacts.hidden.map((item, idx) => (
+                          <div key={`hidden-${idx}`} className="flex items-center gap-1">
+                            <span className="px-3 py-2 bg-stone-50/50 border border-stone-100 rounded-xl text-xs font-medium text-stone-400 italic">
+                              {item.label}
+                            </span>
+                            {onRestoreNA && (
+                              <button
+                                onClick={() => onRestoreNA(item.prefill)}
+                                className="p-2 text-[10px] font-bold text-navy-muted hover:underline transition-colors"
+                              >
+                                Restore
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              {recommendations.considerations.length > 0 && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-stone-400">
-                    <HelpCircle size={14} />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Important Considerations</span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-2">
-                    {recommendations.considerations.map((text, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 bg-manila/10 border border-manila/20 rounded-xl text-xs text-stone-600 leading-relaxed italic"
+                  {totalHidden > 0 && (
+                    <div className="pt-2 border-t border-stone-50 flex justify-center">
+                      <button
+                        onClick={() => setShowHidden(!showHidden)}
+                        className="text-[10px] font-bold text-stone-400 hover:text-navy-muted transition-colors uppercase tracking-widest"
                       >
-                        "{text}"
+                        {showHidden ? 'Hide' : `Show ${totalHidden} hidden items`}
+                      </button>
+                    </div>
+                  )}
+
+                  {recommendations.considerations.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-stone-400">
+                        <HelpCircle size={14} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Important Considerations</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="grid grid-cols-1 gap-2">
+                        {recommendations.considerations.map((text, idx) => (
+                          <div
+                            key={idx}
+                            className="p-3 bg-manila/10 border border-manila/20 rounded-xl text-xs text-stone-600 leading-relaxed italic"
+                          >
+                            "{text}"
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
