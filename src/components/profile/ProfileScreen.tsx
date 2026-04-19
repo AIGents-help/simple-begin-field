@@ -359,7 +359,9 @@ export const ProfileScreen = () => {
           </button>
         </CollapsibleSection>
 
-        <AlertPreferences />
+        <CollapsibleSection title="Alerts & Notifications">
+          <AlertPreferences />
+        </CollapsibleSection>
 
         <EmergencyCardSettings />
 
