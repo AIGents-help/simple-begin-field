@@ -347,31 +347,17 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     ]
   },
   legal: {
-    entries: [
-      { label: 'Will', prefill: { kind: 'will' } },
-      { label: 'Trust', prefill: { kind: 'trust' } },
-      { label: 'Financial Power of Attorney', prefill: { kind: 'fin_poa' } },
-      { label: 'Healthcare Power of Attorney', prefill: { kind: 'hcpoa' } },
-      { label: 'Living Will / Advance Directive', prefill: { kind: 'living_will' } },
-      { label: 'Guardianship Nomination', prefill: { kind: 'guardianship' } },
-      { label: 'Letter of Instruction', prefill: { kind: 'other', other_subtype: 'Letter of Instruction' } },
-      { label: 'Prenuptial Agreement', prefill: { kind: 'other', other_subtype: 'Prenuptial Agreement' } },
-    ],
-    documents: [
-      { label: 'Signed Will', prefill: { title: 'Signed Will', category: 'Will' } },
-      { label: 'Trust Documents', prefill: { title: 'Trust Documents', category: 'Trust' } },
-      { label: 'POA Documents', prefill: { title: 'POA Documents', category: 'Financial POA' } },
-      { label: 'Advance Directive', prefill: { title: 'Advance Directive', category: 'Medical Directive' } },
-      { label: 'Guardianship Papers', prefill: { title: 'Guardianship Papers', category: 'Other' } },
-      { label: 'Court Orders', prefill: { title: 'Court Orders', category: 'Other' } },
-      { label: 'Attorney Correspondence', prefill: { title: 'Attorney Correspondence', category: 'Other' } },
-    ],
+    aboutContent: {
+      paragraphs: [
+        "The Legal section stores your most important protective documents — the ones that give others the authority to act on your behalf, carry out your wishes, or care for your dependents.",
+        "Use the add buttons below to log each document type. For each entry you can record the document name, the attorney or notary involved, the date executed, where the original is stored, and upload a copy.",
+        "Powers of attorney and guardianship nominations often apply to a specific person. Consider also attaching those documents to the relevant person's entry in the Family section so they appear in both places.",
+        "If you haven't completed these documents yet, the \"Find a Professional\" link below can help you locate an estate planning attorney."
+      ]
+    },
+    entries: [],
+    documents: [],
     contacts: [],
-    considerations: [
-      'Powers of attorney and guardianship nominations should be entered on the specific person\u2019s record (e.g., the child or dependent they protect) \u2014 not only here.',
-      'Keep attorney contact info in the Advisors section.',
-      'Review and re-sign documents after major life events.',
-      'Store originals in a fireproof location and note that location here.',
-    ]
+    considerations: []
   }
 };
