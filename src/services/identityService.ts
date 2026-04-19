@@ -46,7 +46,7 @@ export interface IdentityRecord {
 
 export const identityService = {
   async list(packetId: string, scope?: string) {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return DEMO_IDENTITY_RECORDS as unknown as IdentityRecord[];
     }
     // Pull modern category-tagged records.

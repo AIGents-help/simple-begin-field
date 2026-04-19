@@ -54,7 +54,7 @@ export function usePacketCompletion(packetId: string | undefined): PacketComplet
       setLoading(false);
       return;
     }
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       const next: Record<string, SectionCompletion> = {};
       for (const section of SECTIONS_CONFIG) {
         next[section.id] = DEMO_SECTION_COMPLETION[section.id] ?? { count: 0, hasContent: false, percent: 0 };
