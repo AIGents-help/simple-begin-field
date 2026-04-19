@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { PRICING_PLANS, PlanId, FeatureTier, PlanCategory } from '../config/pricingConfig';
 import { User } from '@supabase/supabase-js';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_USER_ID } from '../demo/morganFamilyData';
 
 export const useBilling = (user: User | null) => {
   const [loading, setLoading] = useState(true);
@@ -14,6 +16,18 @@ export const useBilling = (user: User | null) => {
 
   const fetchBillingStatus = useCallback(async () => {
     if (!user) return;
+
+    // Demo mode: pretend the demo user has the top lifetime plan, no DB calls.
+    if (isDemoMode() && user.id === DEMO_USER_ID) {
+      setPlanId('full_single_lifetime');
+      setIsPaid(true);
+      setIsCouple(true);
+      setIsLifetime(true);
+      setFeatureTier('full');
+      setPlanCategory('individual');
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     try {

@@ -1,4 +1,6 @@
 import { supabase } from '@/lib/supabase';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PROFILE, DEMO_USER_ID } from '../demo/morganFamilyData';
 
 export const authService = {
   async signUp(email: string, password?: string) {
@@ -27,6 +29,9 @@ export const authService = {
   },
 
   async getProfile(userId: string) {
+    if (isDemoMode() && userId === DEMO_USER_ID) {
+      return { data: DEMO_PROFILE as any, error: null };
+    }
     const { data, error } = await supabase
       .from('profiles')
       .select('*')

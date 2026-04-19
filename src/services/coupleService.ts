@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_USER_ID } from '../demo/morganFamilyData';
 
 export type CouplePermissionLevel = 'hidden' | 'view' | 'collaborate';
 export type CoupleLinkStatus = 'pending' | 'active' | 'unlinked';
@@ -106,6 +108,10 @@ export const SHARABLE_SECTIONS: { id: string; label: string }[] = [
 
 export const coupleService = {
   async getActiveLink(userId: string): Promise<CoupleLink | null> {
+    if (isDemoMode() && userId === DEMO_USER_ID) {
+      // Demo packet is single-mode — no active couple link.
+      return null;
+    }
     const { data, error } = await (supabase as any)
       .from('couple_links')
       .select('*')
