@@ -3,8 +3,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')!;
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
+const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')!;
+const AI_GATEWAY_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -16,6 +16,14 @@ Deno.serve(async (req) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY is not configured');
+      return new Response(JSON.stringify({ error: 'AI service not configured' }), {
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -74,29 +82,40 @@ ${templateGuidance}
 
 The user is currently in the ${section || 'dashboard'} section. Their current data is: ${JSON.stringify(sectionData || {})}. Identify what is missing and guide them to complete it step by step.`;
 
-    // Anthropic requires system prompt as a top-level field, not as a message role
-    const anthropicMessages = (messages as Array<{ role: string; content: string }>)
-      .filter((m) => m.role === 'user' || m.role === 'assistant')
-      .map((m) => ({ role: m.role, content: m.content }));
+    const chatMessages = [
+      { role: 'system', content: systemPrompt },
+      ...(messages as Array<{ role: string; content: string }>)
+        .filter((m) => m.role === 'user' || m.role === 'assistant')
+        .map((m) => ({ role: m.role, content: m.content })),
+    ];
 
-    const response = await fetch(ANTHROPIC_API_URL, {
+    const response = await fetch(AI_GATEWAY_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'claude-3-5-haiku-20241022',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: anthropicMessages,
+        model: 'google/gemini-2.5-flash',
+        messages: chatMessages,
       }),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('Anthropic API error:', response.status, errText);
+      console.error('AI gateway error:', response.status, errText);
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'AI credits required. Please add credits in workspace settings.' }), {
+          status: 402,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -104,7 +123,7 @@ The user is currently in the ${section || 'dashboard'} section. Their current da
     }
 
     const data = await response.json();
-    const reply = data.content?.[0]?.text || "I'm here to help. What would you like to work on?";
+    const reply = data.choices?.[0]?.message?.content || "I'm here to help. What would you like to work on?";
 
     return new Response(JSON.stringify({ reply }), {
       status: 200,
