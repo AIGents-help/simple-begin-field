@@ -38,6 +38,8 @@ export const EmergencyCardSettings: React.FC = () => {
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [bypassOpen, setBypassOpen] = useState(false);
   const [bypassSaving, setBypassSaving] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
+  const [emergencyUrl, setEmergencyUrl] = useState<string>('');
 
   const load = async () => {
     setLoading(true);
