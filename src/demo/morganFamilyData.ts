@@ -20,6 +20,15 @@ export const DEMO_PROFILE = {
   email: 'demo@survivorpacket.com',
   role: 'user',
   avatar_url: dicebear('JamesMorgan'),
+  // Extended profile data for the dashboard profile card
+  date_of_birth: '1966-03-14',
+  age: 58,
+  city: 'Media',
+  state: 'PA',
+  occupation: 'Retired civil engineer',
+  marital_status: 'Widower',
+  bio: 'Father of three. Grandfather of two. Lives in Media, PA. Husband to the late Catherine Morgan (1992–2021).',
+  joined_at: '2024-01-15',
 };
 
 export const DEMO_PACKET = {
