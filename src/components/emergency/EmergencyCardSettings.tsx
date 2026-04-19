@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert, ChevronDown, Siren, Check } from 'lucide-react';
+import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert, ChevronDown, Siren, Check, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { emergencyService, EmergencyToken, EmergencyAccessLogEntry } from '../../services/emergencyService';
 import { generateEmergencyCardsPdf, generateQrPng } from '../../services/emergencyCardPdf';
 import { useAppContext } from '../../context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
+import { SendQrCardModal } from './SendQrCardModal';
 
 const SECTION_LABELS: Record<string, string> = {
   blood_type: 'Blood Type',
