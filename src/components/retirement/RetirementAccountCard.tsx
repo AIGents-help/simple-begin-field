@@ -168,7 +168,7 @@ export const RetirementAccountCard: React.FC<Props> = ({
       title: 'Delete this retirement account?',
       description: `Delete "${form.institution || form.account_type || 'this account'}"? This cannot be undone.`,
       confirmLabel: 'Delete',
-      destructive: true,
+      variant: 'danger',
     });
     if (!ok) return;
     setDeleting(true);
