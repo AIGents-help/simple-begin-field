@@ -38,7 +38,7 @@ export function tierForScore(score: number): ScoreTier {
 
 export const healthScoreService = {
   async getCurrent(packetId: string): Promise<HealthScore | null> {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return DEMO_HEALTH_SCORE_FULL as unknown as HealthScore;
     }
     const { data, error } = await supabase
@@ -52,7 +52,7 @@ export const healthScoreService = {
   },
 
   async recompute(packetId: string): Promise<HealthScore | null> {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return DEMO_HEALTH_SCORE_FULL as unknown as HealthScore;
     }
     const { error } = await supabase.rpc('calculate_health_score' as any, { p_packet_id: packetId });
@@ -61,7 +61,7 @@ export const healthScoreService = {
   },
 
   async getHistory(packetId: string, limit = 30): Promise<Array<{ total_score: number; recorded_at: string }>> {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return DEMO_SCORE_HISTORY.slice(-limit);
     }
     const { data, error } = await supabase
