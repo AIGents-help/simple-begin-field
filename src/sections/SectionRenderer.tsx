@@ -17,6 +17,7 @@ import { MedicalSection } from '../sections/MedicalSection';
 import { PrivateSection } from '../sections/PrivateSection';
 import { AffiliateSection } from '../sections/AffiliateSection';
 import { MemoriesSection } from '../sections/MemoriesSection';
+import { LegalSection } from '../sections/LegalSection';
 import { CustomSection } from '../sections/CustomSection';
 import { PrivateLockGate } from '../components/private/PrivateLockGate';
 import { PlanGate } from '../components/billing/PlanGate';
@@ -79,6 +80,8 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
         return <MemoriesSection />;
       case 'medical':
         return <MedicalSection onAddClick={onAddClick} onRefresh={onRefresh} />;
+      case 'legal':
+        return <LegalSection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'private':
         return (
           <PrivateLockGate>
