@@ -134,13 +134,21 @@ export const HouseholdSettings: React.FC<HouseholdSettingsProps> = ({ onBack }) 
   };
 
   const handleRemoveMember = async (id: string) => {
+    const member = members.find((m) => m.id === id);
+    const isCoupleLink = !!member?.isCoupleLink;
     const ok = await confirm({
-      title: 'Remove this household member?',
-      description: 'They will immediately lose access. This action cannot be undone.',
-      confirmLabel: 'Remove',
+      title: isCoupleLink ? 'Unlink this partner?' : 'Remove this household member?',
+      description: isCoupleLink
+        ? 'Your partner will be unlinked and lose collaborative access.'
+        : 'They will immediately lose access. This action cannot be undone.',
+      confirmLabel: isCoupleLink ? 'Unlink' : 'Remove',
     });
     if (!ok) return;
-    await inviteService.removeMember(id);
+    if (isCoupleLink && member?.coupleLinkId && user) {
+      await coupleService.unlink(member.coupleLinkId, user.id);
+    } else {
+      await inviteService.removeMember(id);
+    }
     fetchData();
   };
 
