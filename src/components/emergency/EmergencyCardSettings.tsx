@@ -49,6 +49,7 @@ export const EmergencyCardSettings: React.FC = () => {
       if (t) {
         setHint(t.pin_hint || '');
         const url = await emergencyService.getEmergencyUrl(t.token);
+        setEmergencyUrl(url);
         setQrPreview(await generateQrPng(url));
         setAccessLog(await emergencyService.getAccessLog());
       }
