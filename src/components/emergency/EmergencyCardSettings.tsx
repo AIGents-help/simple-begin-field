@@ -149,6 +149,7 @@ export const EmergencyCardSettings: React.FC = () => {
     }
   };
 
+  const regenerate = async (compromised: boolean) => {
     const msg = compromised
       ? 'RESET QR CODE: This will immediately invalidate the existing QR code and PIN access via that code. Anyone holding an old printed card will no longer be able to scan it. You must reprint and redistribute new cards. Continue?'
       : 'This will invalidate ALL existing printed cards. You will need to reprint and redistribute. Continue?';
