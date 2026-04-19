@@ -25,6 +25,7 @@ import {
   Shield,
   Users,
   Briefcase,
+  X,
 } from 'lucide-react';
 import {
   legalService,
@@ -130,7 +131,9 @@ export const LegalDocumentCard: React.FC<Props> = ({
   }));
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [hintDismissed, setHintDismissed] = useState(false);
   const isDraft = isDraftId(doc.id);
+  const showPersonHint = !hintDismissed && (kind === 'fin_poa' || kind === 'hcpoa' || kind === 'guardianship');
 
   const setField = (name: string, value: any) =>
     setForm((prev) => ({ ...prev, [name]: value }));
