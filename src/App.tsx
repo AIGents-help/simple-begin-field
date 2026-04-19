@@ -39,8 +39,14 @@ import FamilyAccept from './pages/FamilyAccept';
 import CorporateAccept from './pages/CorporateAccept';
 import NotFound from "./pages/NotFound.tsx";
 import { InstallPromptBanner } from './components/pwa/InstallPromptBanner';
+import { useDynamicFavicon } from './hooks/useDynamicFavicon';
 
 const queryClient = new QueryClient();
+
+const FaviconManager = () => {
+  useDynamicFavicon();
+  return null;
+};
 
 const DashboardRoutes = () => {
   const { profile } = useAppContext();
@@ -90,6 +96,7 @@ export default function App() {
         <Sonner />
         <InstallPromptBanner />
         <AppProvider>
+          <FaviconManager />
           <ConfirmDialogProvider>
           <Router>
             <Routes>
