@@ -13,6 +13,8 @@ import {
 } from '../services/legalService';
 import { LegalDocumentCard } from '../components/legal/LegalDocumentCard';
 import { FindProfessionalPrompt } from '../components/directory/FindProfessionalPrompt';
+import { SectionRecommendations } from '../components/sections/SectionRecommendations';
+import { CrossPacketLegalDocs } from '../components/legal/CrossPacketLegalDocs';
 import { supabase } from '@/integrations/supabase/client';
 
 const ALL_KINDS: LegalKind[] = [

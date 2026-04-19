@@ -129,7 +129,7 @@ export const CrossPacketLegalDocs: React.FC<{ packetId: string }> = ({ packetId 
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-navy-muted truncate">{d.file_name || d.category || 'Document'}</p>
-                  <p className="text-[11px] text-stone-500 truncate">{sectionLabel} \u203A {recordName}</p>
+                  <p className="text-[11px] text-stone-500 truncate">{sectionLabel} › {recordName}</p>
                 </div>
                 <ChevronRight size={16} className="text-stone-300 shrink-0" />
               </button>
