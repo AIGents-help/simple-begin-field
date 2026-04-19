@@ -6,6 +6,8 @@ import { generateEmergencyCardsPdf, generateQrPng } from '../../services/emergen
 import { useAppContext } from '../../context/AppContext';
 import { supabase } from '@/integrations/supabase/client';
 import { SendQrCardModal } from './SendQrCardModal';
+import { QrShopSheet } from './qrShop/QrShopSheet';
+import { ShoppingBag } from 'lucide-react';
 
 const SECTION_LABELS: Record<string, string> = {
   blood_type: 'Blood Type',
@@ -40,6 +42,7 @@ export const EmergencyCardSettings: React.FC = () => {
   const [bypassSaving, setBypassSaving] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [emergencyUrl, setEmergencyUrl] = useState<string>('');
+  const [shopOpen, setShopOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -312,6 +315,22 @@ export const EmergencyCardSettings: React.FC = () => {
               </div>
             </div>
 
+            {/* Get It on a Product CTA */}
+            <button
+              onClick={() => setShopOpen(true)}
+              disabled={!emergencyUrl}
+              className="mt-4 w-full text-left p-4 rounded-xl border border-stone-200 bg-gradient-to-br from-amber-50 to-white hover:border-amber-300 transition-colors disabled:opacity-50 flex items-center gap-3"
+            >
+              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                <ShoppingBag className="w-5 h-5 text-amber-700" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-navy-muted">🛍️ Get It on a Product</p>
+                <p className="text-[11px] text-stone-500 leading-snug">Put your emergency card on something people will actually keep.</p>
+              </div>
+              <span className="text-xs font-bold text-amber-700 shrink-0">Browse Designs →</span>
+            </button>
+
             {/* Collapsible: What appears on scan */}
             <div className="mt-4 pt-4 border-t border-stone-200">
               <button
@@ -559,6 +578,10 @@ export const EmergencyCardSettings: React.FC = () => {
         qrPngDataUrl={qrPreview}
         emergencyUrl={emergencyUrl}
       />
+
+      {shopOpen && emergencyUrl && (
+        <QrShopSheet emergencyUrl={emergencyUrl} onClose={() => setShopOpen(false)} />
+      )}
     </div>
   );
 };
