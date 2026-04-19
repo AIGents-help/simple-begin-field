@@ -355,7 +355,7 @@ export const RecordCard = ({
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0 ml-2">
-          {onEdit && (
+          {!demoMode && onEdit && (
             <span
               role="button"
               tabIndex={0}
@@ -367,7 +367,7 @@ export const RecordCard = ({
               <Edit2 size={14} />
             </span>
           )}
-          {onDelete && (
+          {!demoMode && onDelete && (
             <span
               role="button"
               tabIndex={0}
