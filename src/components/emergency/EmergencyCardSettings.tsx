@@ -93,11 +93,19 @@ export const EmergencyCardSettings: React.FC = () => {
     }
   };
 
-  const regenerate = async () => {
-    if (!confirm('This will invalidate ALL existing printed cards. You will need to reprint and redistribute. Continue?')) return;
+  const regenerate = async (compromised = false) => {
+    const msg = compromised
+      ? 'RESET QR CODE: This will immediately invalidate the existing QR code and PIN access via that code. Anyone holding an old printed card will no longer be able to scan it. You must reprint and redistribute new cards. Continue?'
+      : 'This will invalidate ALL existing printed cards. You will need to reprint and redistribute. Continue?';
+    if (!confirm(msg)) return;
     try {
       await emergencyService.regenerateToken();
-      toast.success('New QR code generated. Reprint your cards.', { duration: 5000, position: 'bottom-center' });
+      toast.success(
+        compromised
+          ? 'QR code reset. Old cards are now inactive — reprint immediately.'
+          : 'New QR code generated. Reprint your cards.',
+        { duration: 5000, position: 'bottom-center' }
+      );
       await load();
     } catch (e: any) {
       toast.error(e.message || 'Failed', { duration: 5000 });
