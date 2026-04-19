@@ -7,8 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')!;
-const LOVABLE_API_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
+const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')!;
+const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
@@ -157,21 +157,18 @@ Deno.serve(async (req) => {
 
     const { user } = buildPrompt(body);
 
-    const aiResp = await fetch(LOVABLE_API_URL, {
+    const aiResp = await fetch(ANTHROPIC_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens: 600,
-        response_format: { type: 'json_object' },
+        system: 'You are a market valuation assistant. You produce best-effort estimates based on typical market data. You always respond with valid JSON only — no markdown, no prose.',
         messages: [
-          {
-            role: 'system',
-            content: 'You are a market valuation assistant. You produce best-effort estimates based on typical market data. You always respond with valid JSON only — no markdown, no prose.',
-          },
           { role: 'user', content: user },
         ],
       }),
@@ -179,7 +176,7 @@ Deno.serve(async (req) => {
 
     if (!aiResp.ok) {
       const errText = await aiResp.text();
-      console.error('AI gateway error:', aiResp.status, errText);
+      console.error('Anthropic API error:', aiResp.status, errText);
       const status = aiResp.status === 429 ? 429 : aiResp.status === 402 ? 402 : 502;
       const message = status === 429
         ? 'Too many requests right now. Please try again in a moment.'
@@ -192,7 +189,7 @@ Deno.serve(async (req) => {
     }
 
     const aiData = await aiResp.json();
-    const raw = aiData.choices?.[0]?.message?.content || '';
+    const raw = aiData.content?.[0]?.text || '';
     const parsed = safeParseJson(raw);
 
     if (!parsed) {

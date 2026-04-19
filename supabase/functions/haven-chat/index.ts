@@ -3,8 +3,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')!;
-const LOVABLE_API_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
+const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')!;
+const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -74,25 +74,29 @@ ${templateGuidance}
 
 The user is currently in the ${section || 'dashboard'} section. Their current data is: ${JSON.stringify(sectionData || {})}. Identify what is missing and guide them to complete it step by step.`;
 
-    const response = await fetch(LOVABLE_API_URL, {
+    // Anthropic requires system prompt as a top-level field, not as a message role
+    const anthropicMessages = (messages as Array<{ role: string; content: string }>)
+      .filter((m) => m.role === 'user' || m.role === 'assistant')
+      .map((m) => ({ role: m.role, content: m.content }));
+
+    const response = await fetch(ANTHROPIC_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'claude-3-5-haiku-20241022',
         max_tokens: 1000,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages,
-        ],
+        system: systemPrompt,
+        messages: anthropicMessages,
       }),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('AI API error:', errText);
+      console.error('Anthropic API error:', response.status, errText);
       return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -100,7 +104,7 @@ The user is currently in the ${section || 'dashboard'} section. Their current da
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "I'm here to help. What would you like to work on?";
+    const reply = data.content?.[0]?.text || "I'm here to help. What would you like to work on?";
 
     return new Response(JSON.stringify({ reply }), {
       status: 200,
