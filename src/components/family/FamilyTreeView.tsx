@@ -543,6 +543,7 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
             })}
           </svg>
         </div>
+        </div>
       </div>
 
       {/* Floating add button */}
