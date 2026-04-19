@@ -27,6 +27,8 @@ import { HavenAssistant } from '../haven/HavenAssistant';
 import { EstateSummaryPage } from '../estate/EstateSummaryPage';
 import { TemplatesScreen } from '../templates/TemplatesScreen';
 import { PartnerSettings } from '../couple/PartnerSettings';
+import { DemoBanner } from '../demo/DemoBanner';
+import { isDemoMode } from '../../demo/demoMode';
 
 export const AppShell = () => {
   const { onboarded, view, setView, loading, user, profile, setTab } = useAppContext();
@@ -155,12 +157,15 @@ export const AppShell = () => {
     }
   };
 
+  const demoMode = isDemoMode();
+
   return (
     <div className="min-h-screen bg-[#fdfaf3] flex font-sans relative overflow-hidden">
       {/* Sidebar for Desktop/Tablet */}
       <Sidebar isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
+        {demoMode && <DemoBanner />}
         {view !== 'household' && <MobileTopBar onMenuClick={() => setIsMenuOpen(true)} />}
         
         <main className="flex-1 overflow-y-auto no-scrollbar pb-24 md:pb-0">
@@ -188,23 +193,26 @@ export const AppShell = () => {
         {view !== 'household' && <BottomNav onAddClick={() => setIsQuickAdding(true)} />}
       </div>
 
-      <QuickAddSheet 
-        isOpen={isQuickAdding} 
-        onClose={() => setIsQuickAdding(false)} 
-        onSelect={handleQuickAddSelect}
-      />
+      {!demoMode && (
+        <QuickAddSheet 
+          isOpen={isQuickAdding} 
+          onClose={() => setIsQuickAdding(false)} 
+          onSelect={handleQuickAddSelect}
+        />
+      )}
 
-      <AddEditSheet 
-        isOpen={isAdding} 
-        onClose={handleCloseAdd} 
-        initialFile={initialFile}
-        initialData={initialData}
-        categoryOptions={categoryOptions}
-        onSuccess={(newRecord) => {
-          if (refreshFn) refreshFn(newRecord);
-        }}
-      />
-
+      {!demoMode && (
+        <AddEditSheet 
+          isOpen={isAdding} 
+          onClose={handleCloseAdd} 
+          initialFile={initialFile}
+          initialData={initialData}
+          categoryOptions={categoryOptions}
+          onSuccess={(newRecord) => {
+            if (refreshFn) refreshFn(newRecord);
+          }}
+        />
+      )}
       <HavenAssistant />
     </div>
   );
