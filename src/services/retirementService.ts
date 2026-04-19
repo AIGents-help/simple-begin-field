@@ -94,7 +94,7 @@ export const retirementService = {
       const { id, ...rest } = payload;
       const { data, error } = await supabase
         .from('retirement_records')
-        .update(rest)
+        .update(rest as any)
         .eq('id', id)
         .select()
         .single();
@@ -104,7 +104,7 @@ export const retirementService = {
     const { id: _drop, ...insertPayload } = payload;
     const { data, error } = await supabase
       .from('retirement_records')
-      .insert(insertPayload)
+      .insert(insertPayload as any)
       .select()
       .single();
     return { data, error };
