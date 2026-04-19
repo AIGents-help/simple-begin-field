@@ -355,11 +355,22 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
         </button>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="overflow-auto pb-4 -mx-6 px-6 touch-pan-x touch-pan-y"
-        style={{ maxHeight: '70vh' }}
-      >
+      <div className="relative">
+        {showScrollHint && (
+          <div className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 rounded-full bg-navy-muted/90 text-white text-xs font-semibold shadow-lg animate-fade-in md:hidden">
+            ← Scroll to explore →
+          </div>
+        )}
+        <div
+          ref={scrollRef}
+          className="overflow-x-auto overflow-y-auto pb-4 -mx-6 px-6 overscroll-contain"
+          style={{
+            maxHeight: '70vh',
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-x pan-y pinch-zoom',
+            scrollbarWidth: 'thin',
+          }}
+        >
         <div style={{ width: svgW * zoom, height: svgH * zoom, transform: `scale(${zoom})`, transformOrigin: 'top left' }}>
           <svg width={svgW} height={svgH} className="block">
             {/* Connectors */}
