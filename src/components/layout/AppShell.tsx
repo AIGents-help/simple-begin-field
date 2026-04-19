@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { MobileTopBar } from './MobileTopBar';
 import { BottomNav } from './BottomNav';
-import { FolderTabNav } from './FolderTabNav';
 import { Sidebar } from './Sidebar';
 import { DashboardScreen } from '../dashboard/DashboardScreen';
 import { SectionRenderer } from '../../sections/SectionRenderer';
@@ -113,13 +112,10 @@ export const AppShell = () => {
         return <DashboardScreen />;
       case 'sections':
         return (
-          <>
-            <FolderTabNav />
-            <SectionRenderer 
-              onAddClick={handleAddClick} 
-              onRefresh={handleRefreshRegister}
-            />
-          </>
+          <SectionRenderer 
+            onAddClick={handleAddClick} 
+            onRefresh={handleRefreshRegister}
+          />
         );
       case 'profile':
         return <ProfileScreen />;
