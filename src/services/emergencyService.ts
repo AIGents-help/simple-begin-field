@@ -74,6 +74,6 @@ export const emergencyService = {
   },
 
   async getEmergencyUrl(token: string): Promise<string> {
-    return `${window.location.origin}/emergency/${token}`;
+    return `https://app.survivorpacket.com/emergency/${token}`;
   },
 };
