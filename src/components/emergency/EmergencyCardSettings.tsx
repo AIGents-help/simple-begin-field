@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert } from 'lucide-react';
+import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { emergencyService, EmergencyToken, EmergencyAccessLogEntry } from '../../services/emergencyService';
 import { generateEmergencyCardsPdf, generateQrPng } from '../../services/emergencyCardPdf';
@@ -30,6 +30,7 @@ export const EmergencyCardSettings: React.FC = () => {
   const [qrPreview, setQrPreview] = useState<string>('');
   const [accessLog, setAccessLog] = useState<EmergencyAccessLogEntry[]>([]);
   const [generating, setGenerating] = useState(false);
+  const [visibilityOpen, setVisibilityOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -223,7 +224,7 @@ export const EmergencyCardSettings: React.FC = () => {
         </div>
       ) : (
         <>
-          {/* QR Preview & Download */}
+          {/* QR Preview & Download + collapsible visibility toggles */}
           <div className="paper-sheet p-5 mb-4">
             <div className="flex gap-4 items-start">
               {qrPreview && (
@@ -243,40 +244,50 @@ export const EmergencyCardSettings: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* Visibility toggles */}
-          <div className="paper-sheet p-5 mb-4">
-            <p className="text-sm font-bold text-navy-muted mb-3">What appears on scan</p>
-            <div className="space-y-2">
-              {Object.keys(SECTION_LABELS).map(key => (
-                <button
-                  key={key}
-                  onClick={() => toggleSection(key)}
-                  className="w-full flex items-center justify-between p-3 bg-stone-50 rounded-lg hover:bg-stone-100 transition-colors"
-                >
-                  <span className="text-sm text-stone-700">{SECTION_LABELS[key]}</span>
-                  {token.visible_sections[key] ? (
-                    <Eye className="w-4 h-4 text-emerald-600" />
-                  ) : (
-                    <EyeOff className="w-4 h-4 text-stone-400" />
+            {/* Collapsible: What appears on scan */}
+            <div className="mt-4 pt-4 border-t border-stone-200">
+              <button
+                onClick={() => setVisibilityOpen(o => !o)}
+                className="w-full flex items-center justify-between"
+              >
+                <span className="text-sm font-bold text-navy-muted">What appears on scan</span>
+                <ChevronDown size={16} className={`text-stone-500 transition-transform ${visibilityOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {visibilityOpen && (
+                <div className="mt-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <div className="space-y-2">
+                    {Object.keys(SECTION_LABELS).map(key => (
+                      <button
+                        key={key}
+                        onClick={() => toggleSection(key)}
+                        className="w-full flex items-center justify-between p-3 bg-stone-50 rounded-lg hover:bg-stone-100 transition-colors"
+                      >
+                        <span className="text-sm text-stone-700">{SECTION_LABELS[key]}</span>
+                        {token.visible_sections[key] ? (
+                          <Eye className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                          <EyeOff className="w-4 h-4 text-stone-400" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {token.visible_sections.custom_field && (
+                    <div className="mt-3">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Custom note text</label>
+                      <textarea
+                        value={token.custom_field_text || ''}
+                        onChange={e => updateCustomText(e.target.value)}
+                        onBlur={saveCustomText}
+                        rows={2}
+                        className="w-full mt-1 p-2 bg-white rounded-lg border border-stone-200 text-xs"
+                        placeholder="Anything else first responders should see…"
+                      />
+                    </div>
                   )}
-                </button>
-              ))}
+                </div>
+              )}
             </div>
-            {token.visible_sections.custom_field && (
-              <div className="mt-3">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Custom note text</label>
-                <textarea
-                  value={token.custom_field_text || ''}
-                  onChange={e => updateCustomText(e.target.value)}
-                  onBlur={saveCustomText}
-                  rows={2}
-                  className="w-full mt-1 p-2 bg-white rounded-lg border border-stone-200 text-xs"
-                  placeholder="Anything else first responders should see…"
-                />
-              </div>
-            )}
           </div>
 
           {/* PIN management */}
