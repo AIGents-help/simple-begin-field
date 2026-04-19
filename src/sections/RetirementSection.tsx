@@ -195,13 +195,15 @@ export const RetirementSection: React.FC<Props> = ({ onRefresh }) => {
       {/* Find a Professional CTAs */}
       {isEmpty ? (
         <FindProfessionalPrompt
+          variant="block"
           message="Need retirement planning help?"
-          professionalType="Financial Advisor"
+          query="Financial Advisor"
         />
       ) : overdueReviewCount > 0 ? (
         <FindProfessionalPrompt
+          variant="block"
           message="Review beneficiary designations with an attorney?"
-          professionalType="Estate Planning Attorney"
+          query="Estate Planning Attorney"
         />
       ) : null}
     </div>
