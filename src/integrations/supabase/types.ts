@@ -3165,63 +3165,150 @@ export type Database = {
       password_records: {
         Row: {
           access_instructions: string | null
+          account_created_date: string | null
+          account_phone: string | null
+          after_death_action: string | null
+          authenticator_app: string | null
+          backup_codes_location: string | null
           category: string | null
           created_at: string | null
+          crypto_exchange: string | null
+          details: Json | null
+          download_archive_instructions: string | null
+          emergency_instructions: string | null
+          handler_contact_id: string | null
+          hardware_wallet_location: string | null
+          hr_contact_name: string | null
+          hr_contact_phone: string | null
           id: string
           is_na: boolean | null
+          legacy_notes: Json | null
+          manager_name: string | null
+          master_password_location: string | null
+          memorial_contact_name: string | null
           notes: string | null
           packet_id: string | null
           password_encrypted: string | null
           password_masked: string | null
           recovery_email: string | null
+          recovery_key_location: string | null
+          renewal_date: string | null
           requires_reauth: boolean | null
           scope: string | null
+          security_question_hint: string | null
+          seed_phrase_location: string | null
           service_name: string
+          special_instructions: string | null
           status: string | null
+          subscription_cost: number | null
+          trusted_person_name: string | null
+          two_fa_enabled: boolean | null
+          two_fa_method: string | null
           two_fa_notes: string | null
           updated_at: string | null
           username: string | null
+          wallet_type: string | null
+          website_url: string | null
           who_should_access: string | null
+          work_company_name: string | null
         }
         Insert: {
           access_instructions?: string | null
+          account_created_date?: string | null
+          account_phone?: string | null
+          after_death_action?: string | null
+          authenticator_app?: string | null
+          backup_codes_location?: string | null
           category?: string | null
           created_at?: string | null
+          crypto_exchange?: string | null
+          details?: Json | null
+          download_archive_instructions?: string | null
+          emergency_instructions?: string | null
+          handler_contact_id?: string | null
+          hardware_wallet_location?: string | null
+          hr_contact_name?: string | null
+          hr_contact_phone?: string | null
           id?: string
           is_na?: boolean | null
+          legacy_notes?: Json | null
+          manager_name?: string | null
+          master_password_location?: string | null
+          memorial_contact_name?: string | null
           notes?: string | null
           packet_id?: string | null
           password_encrypted?: string | null
           password_masked?: string | null
           recovery_email?: string | null
+          recovery_key_location?: string | null
+          renewal_date?: string | null
           requires_reauth?: boolean | null
           scope?: string | null
+          security_question_hint?: string | null
+          seed_phrase_location?: string | null
           service_name: string
+          special_instructions?: string | null
           status?: string | null
+          subscription_cost?: number | null
+          trusted_person_name?: string | null
+          two_fa_enabled?: boolean | null
+          two_fa_method?: string | null
           two_fa_notes?: string | null
           updated_at?: string | null
           username?: string | null
+          wallet_type?: string | null
+          website_url?: string | null
           who_should_access?: string | null
+          work_company_name?: string | null
         }
         Update: {
           access_instructions?: string | null
+          account_created_date?: string | null
+          account_phone?: string | null
+          after_death_action?: string | null
+          authenticator_app?: string | null
+          backup_codes_location?: string | null
           category?: string | null
           created_at?: string | null
+          crypto_exchange?: string | null
+          details?: Json | null
+          download_archive_instructions?: string | null
+          emergency_instructions?: string | null
+          handler_contact_id?: string | null
+          hardware_wallet_location?: string | null
+          hr_contact_name?: string | null
+          hr_contact_phone?: string | null
           id?: string
           is_na?: boolean | null
+          legacy_notes?: Json | null
+          manager_name?: string | null
+          master_password_location?: string | null
+          memorial_contact_name?: string | null
           notes?: string | null
           packet_id?: string | null
           password_encrypted?: string | null
           password_masked?: string | null
           recovery_email?: string | null
+          recovery_key_location?: string | null
+          renewal_date?: string | null
           requires_reauth?: boolean | null
           scope?: string | null
+          security_question_hint?: string | null
+          seed_phrase_location?: string | null
           service_name?: string
+          special_instructions?: string | null
           status?: string | null
+          subscription_cost?: number | null
+          trusted_person_name?: string | null
+          two_fa_enabled?: boolean | null
+          two_fa_method?: string | null
           two_fa_notes?: string | null
           updated_at?: string | null
           username?: string | null
+          wallet_type?: string | null
+          website_url?: string | null
           who_should_access?: string | null
+          work_company_name?: string | null
         }
         Relationships: [
           {
