@@ -148,7 +148,7 @@ export const yearsSince = (dateStr?: string | null): number | null => {
 
 export const legalService = {
   async list(packetId: string) {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return { data: DEMO_LEGAL_DOCUMENTS as any[], error: null };
     }
     const { data, error } = await supabase

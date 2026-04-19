@@ -13,6 +13,8 @@
  * Pure read layer — destination forms / hooks decide which values to apply.
  */
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_FAMILY_MEMBERS, DEMO_ADVISORS, DEMO_MEDICAL_RECORDS, DEMO_FUNERAL, DEMO_REAL_ESTATE } from '../demo/morganFamilyData';
 
 export type FederationSources = {
   homeAddress: string | null;
@@ -66,6 +68,47 @@ export const EMPTY_FEDERATION_SOURCES: FederationSources = {
  */
 export async function loadFederationSources(packetId: string): Promise<FederationSources> {
   if (!packetId) return EMPTY_FEDERATION_SOURCES;
+  if (isDemoMode()) {
+    const properties = DEMO_REAL_ESTATE as any[];
+    const family = DEMO_FAMILY_MEMBERS as any[];
+    const advisors = DEMO_ADVISORS as any[];
+    const medical = DEMO_MEDICAL_RECORDS as any[];
+    const funeral = DEMO_FUNERAL as any[];
+
+    const primary = properties.find((p) => p.property_type === 'primary_residence' && p.address?.trim()) || properties.find((p) => p.address?.trim());
+    const homeAddress = primary?.address?.trim() || null;
+    const spouseRow = family.find((f) => String(f.relationship || '').toLowerCase() === 'spouse' && !f.is_deceased) || null;
+    const spouse = spouseRow ? {
+      id: spouseRow.id,
+      name: spouseRow.name || `${spouseRow.first_name || ''} ${spouseRow.last_name || ''}`.trim(),
+      first_name: spouseRow.first_name,
+      last_name: spouseRow.last_name,
+      address: spouseRow.address || null,
+    } : null;
+    const children = family
+      .filter((f) => {
+        const rel = String(f.relationship || '').toLowerCase();
+        return (rel === 'child' || rel === 'grandchild') && !f.is_deceased;
+      })
+      .map((f) => ({ id: f.id, name: f.name || `${f.first_name || ''} ${f.last_name || ''}`.trim() }))
+      .filter((c) => !!c.name);
+    const attorneyRow = advisors.find((a) => String(a.advisor_type || '').toLowerCase().includes('attorney')) || null;
+    const financialAdvisorRow = advisors.find((a) => String(a.advisor_type || '').toLowerCase().includes('financial')) || null;
+    const doctorRow = medical.find((m) => String(m.record_type || '').toLowerCase() === 'doctor' && String(m.specialty || '').toLowerCase().includes('primary'))
+      || medical.find((m) => String(m.record_type || '').toLowerCase() === 'doctor')
+      || null;
+    const funeralRow = funeral.find((f) => String(f.category || '').toLowerCase() === 'funeral_home') || null;
+
+    return {
+      homeAddress,
+      spouse,
+      children,
+      attorney: attorneyRow ? { id: attorneyRow.id, name: attorneyRow.name || '', firm: attorneyRow.firm, phone: attorneyRow.phone, email: attorneyRow.email } : null,
+      financialAdvisor: financialAdvisorRow ? { id: financialAdvisorRow.id, name: financialAdvisorRow.name || '', firm: financialAdvisorRow.firm, phone: financialAdvisorRow.phone, email: financialAdvisorRow.email } : null,
+      primaryDoctor: doctorRow ? { id: doctorRow.id, name: doctorRow.name || doctorRow.provider_name || '', phone: doctorRow.phone } : null,
+      funeralHome: funeralRow ? { name: funeralRow.title || funeralRow.funeral_home || null, phone: funeralRow.funeral_home_phone || null, email: funeralRow.funeral_home_email || null } : null,
+    };
+  }
 
   const [
     realEstateRes,

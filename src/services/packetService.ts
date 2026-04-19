@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { Database } from '../types/database';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET, DEMO_SECTION_COMPLETION } from '../demo/morganFamilyData';
 
 type Packet = Database['public']['Tables']['packets']['Row'];
 type PacketInsert = Database['public']['Tables']['packets']['Insert'];
@@ -7,6 +9,12 @@ type PacketMember = Database['public']['Tables']['packet_members']['Row'];
 
 export const packetService = {
   async getPacketsForUser(userId: string) {
+    if (isDemoMode()) {
+      return {
+        data: [{ packet_id: DEMO_PACKET.id, role: 'owner', household_scope: 'full', packets: DEMO_PACKET }],
+        error: null,
+      };
+    }
     const { data, error } = await supabase
       .from('packet_members')
       .select(`
@@ -86,6 +94,9 @@ export const packetService = {
   },
 
   async getPacketMembers(packetId: string) {
+    if (isDemoMode()) {
+      return { data: [], error: null };
+    }
     const { data, error } = await supabase
       .from('packet_members')
       .select(`
@@ -98,6 +109,16 @@ export const packetService = {
   },
 
   async getSectionCompletion(packetId: string) {
+    if (isDemoMode()) {
+      const data = Object.entries(DEMO_SECTION_COMPLETION).map(([section_key, value]) => ({
+        packet_id: DEMO_PACKET.id,
+        section_key,
+        scope: 'personA',
+        status: value.hasContent ? 'complete' : 'empty',
+        percent_complete: value.percent,
+      }));
+      return { data, error: null };
+    }
     const { data, error } = await supabase
       .from('section_completion')
       .select('*')

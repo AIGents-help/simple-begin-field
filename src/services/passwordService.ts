@@ -78,7 +78,7 @@ export const passwordService = {
   PASSWORD_MANAGER_CATEGORY,
 
   async listAll(packetId: string) {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return { data: DEMO_PASSWORDS as any[], error: null };
     }
     const { data, error } = await (supabase as any)
@@ -90,7 +90,7 @@ export const passwordService = {
   },
 
   async getManager(packetId: string) {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       const mgr = (DEMO_PASSWORDS as any[]).find((p) => p.category === PASSWORD_MANAGER_CATEGORY) || null;
       return { data: mgr, error: null };
     }

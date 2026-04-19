@@ -139,6 +139,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   })();
 
   const fetchPackets = React.useCallback(async (userId: string) => {
+    if (isDemoMode()) {
+      setPackets([DEMO_PACKET]);
+      setCurrentPacket(DEMO_PACKET);
+      setState(prev => ({
+        ...prev,
+        onboarded: true,
+        userMode: DEMO_PACKET.household_mode as UserMode,
+        personA: DEMO_PACKET.person_a_name || 'Person A',
+        personB: DEMO_PACKET.person_b_name || 'Person B',
+      }));
+      return;
+    }
+
     const { data, error } = await packetService.getPacketsForUser(userId);
 
     if (error) {
@@ -196,6 +209,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setPackets([]);
       setCurrentPacket(null);
       setState(prev => ({ ...prev, onboarded: false }));
+      setLoading(false);
+      return;
+    }
+
+    if (isDemoMode()) {
+      setProfile(DEMO_PROFILE);
+      await fetchPackets(DEMO_USER_ID);
       setLoading(false);
       return;
     }

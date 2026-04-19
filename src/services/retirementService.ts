@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_RETIREMENT } from '../demo/morganFamilyData';
 
 /**
  * Whitelist of real columns on retirement_records.
@@ -80,6 +82,9 @@ export const yearsSince = (dateStr?: string | null): number | null => {
 
 export const retirementService = {
   async list(packetId: string) {
+    if (isDemoMode()) {
+      return { data: DEMO_RETIREMENT as any[], error: null };
+    }
     const { data, error } = await supabase
       .from('retirement_records')
       .select('*')

@@ -11,8 +11,8 @@
 const dicebear = (seed: string) =>
   `https://api.dicebear.com/7.x/personas/svg?seed=${encodeURIComponent(seed)}`;
 
-export const DEMO_PACKET_ID = 'demo-morgan-packet';
-export const DEMO_USER_ID = 'demo-morgan-user';
+export const DEMO_PACKET_ID = '11111111-1111-1111-1111-111111111111';
+export const DEMO_USER_ID = '22222222-2222-2222-2222-222222222222';
 
 export const DEMO_PROFILE = {
   id: DEMO_USER_ID,

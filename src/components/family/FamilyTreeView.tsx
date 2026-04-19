@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Loader2, Pencil, Plus, Heart, Minus, Maximize2 } from 'lucide-react';
 import { HavenOwlSvg } from '@/components/haven/HavenOwlSvg';
 import { useAppContext } from '@/context/AppContext';
-import { supabase } from '@/integrations/supabase/client';
+import { familyService } from '@/services/familyService';
 import { uploadService } from '@/services/uploadService';
 import { PersonAvatar } from '@/components/common/PersonAvatar';
 
@@ -145,20 +145,14 @@ export const FamilyTreeView = ({ onEditMember, onAddMember, refreshKey = 0 }: Fa
 
   useEffect(() => {
     const fetchMembers = async () => {
-      if (!currentPacket) return;
+      if (!currentPacket?.id) return;
       setLoading(true);
-      // Select all columns so the edit handler can pre-fill the form with
-      // the complete record (phone, email, address, marital_status, etc.)
-      const { data } = await supabase
-        .from('family_members')
-        .select('*')
-        .eq('packet_id', currentPacket.id)
-        .order('created_at', { ascending: true });
+      const { data } = await familyService.list(currentPacket.id);
       setMembers((data as any[]) || []);
       setLoading(false);
     };
-    fetchMembers();
-  }, [currentPacket, refreshKey]);
+    void fetchMembers();
+  }, [currentPacket?.id, refreshKey]);
 
   const rootName = currentPacket?.person_a_name || 'You';
 

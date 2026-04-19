@@ -33,7 +33,7 @@ export interface CustomSectionRecord {
 
 export const customSectionService = {
   async list(packetId: string): Promise<CustomSection[]> {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return DEMO_CUSTOM_SECTIONS as unknown as CustomSection[];
     }
     const { data, error } = await supabase

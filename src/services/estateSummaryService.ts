@@ -74,7 +74,7 @@ export const LIABILITY_TYPES = [
 
 export const estateSummaryService = {
   async getSummary(packetId: string): Promise<EstateSummary | null> {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return DEMO_ESTATE_SUMMARY_FULL as unknown as EstateSummary;
     }
     const { data, error } = await supabase.rpc('calculate_estate_summary', { p_packet_id: packetId });
@@ -87,7 +87,7 @@ export const estateSummaryService = {
 
   /** Section-aware summary for trusted contact viewers (also works for owners). */
   async getSummaryForViewer(packetId: string): Promise<EstateSummary | null> {
-    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+    if (isDemoMode()) {
       return DEMO_ESTATE_SUMMARY_FULL as unknown as EstateSummary;
     }
     const { data, error } = await supabase.rpc('calculate_estate_summary_for_viewer', { p_packet_id: packetId });
