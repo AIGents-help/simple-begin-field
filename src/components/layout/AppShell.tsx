@@ -68,7 +68,6 @@ export const AppShell = () => {
     setCategoryOptions([]);
   };
   const [inviteToken, setInviteToken] = useState<string | null>(null);
-  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
