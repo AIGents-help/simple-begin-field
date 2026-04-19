@@ -58,61 +58,127 @@ export type Database = {
           address: string | null
           advisor_status: string
           advisor_type: string | null
+          agency_name: string | null
+          areas_handled: string[] | null
+          aum_estimate: number | null
           category: string | null
+          client_reference: string | null
           created_at: string | null
+          date_of_death: string | null
+          death_certificate_path: string | null
+          details: Json
           email: string | null
+          fee_structure: string | null
           firm: string | null
+          firm_regulatory_status: string | null
+          first_name: string | null
           id: string
+          insurance_lines: string[] | null
+          is_deceased: boolean
           is_na: boolean | null
+          last_name: string | null
+          legacy_notes: string | null
           license_expiry_date: string | null
+          license_number: string | null
+          license_states: string[] | null
+          license_type: string | null
           name: string | null
           notes: string | null
           packet_id: string | null
           phone: string | null
           photo_path: string | null
+          realtor_specialties: string[] | null
           scope: string | null
+          software_used: string[] | null
+          specialty: string | null
           status: string | null
+          tax_reminders: boolean
           updated_at: string | null
+          website: string | null
         }
         Insert: {
           address?: string | null
           advisor_status?: string
           advisor_type?: string | null
+          agency_name?: string | null
+          areas_handled?: string[] | null
+          aum_estimate?: number | null
           category?: string | null
+          client_reference?: string | null
           created_at?: string | null
+          date_of_death?: string | null
+          death_certificate_path?: string | null
+          details?: Json
           email?: string | null
+          fee_structure?: string | null
           firm?: string | null
+          firm_regulatory_status?: string | null
+          first_name?: string | null
           id?: string
+          insurance_lines?: string[] | null
+          is_deceased?: boolean
           is_na?: boolean | null
+          last_name?: string | null
+          legacy_notes?: string | null
           license_expiry_date?: string | null
+          license_number?: string | null
+          license_states?: string[] | null
+          license_type?: string | null
           name?: string | null
           notes?: string | null
           packet_id?: string | null
           phone?: string | null
           photo_path?: string | null
+          realtor_specialties?: string[] | null
           scope?: string | null
+          software_used?: string[] | null
+          specialty?: string | null
           status?: string | null
+          tax_reminders?: boolean
           updated_at?: string | null
+          website?: string | null
         }
         Update: {
           address?: string | null
           advisor_status?: string
           advisor_type?: string | null
+          agency_name?: string | null
+          areas_handled?: string[] | null
+          aum_estimate?: number | null
           category?: string | null
+          client_reference?: string | null
           created_at?: string | null
+          date_of_death?: string | null
+          death_certificate_path?: string | null
+          details?: Json
           email?: string | null
+          fee_structure?: string | null
           firm?: string | null
+          firm_regulatory_status?: string | null
+          first_name?: string | null
           id?: string
+          insurance_lines?: string[] | null
+          is_deceased?: boolean
           is_na?: boolean | null
+          last_name?: string | null
+          legacy_notes?: string | null
           license_expiry_date?: string | null
+          license_number?: string | null
+          license_states?: string[] | null
+          license_type?: string | null
           name?: string | null
           notes?: string | null
           packet_id?: string | null
           phone?: string | null
           photo_path?: string | null
+          realtor_specialties?: string[] | null
           scope?: string | null
+          software_used?: string[] | null
+          specialty?: string | null
           status?: string | null
+          tax_reminders?: boolean
           updated_at?: string | null
+          website?: string | null
         }
         Relationships: [
           {
