@@ -39,6 +39,12 @@ export const AppShell = () => {
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [refreshFn, setRefreshFn] = useState<((newRecord?: any) => void) | null>(null);
+  const location = useLocation();
+
+  // Reset main scroll position on every route or in-app view change
+  useEffect(() => {
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [location.pathname, view]);
 
   const handleAddClick = (file?: File, data?: any, options?: CategoryOption[], isEntryOnly?: boolean) => {
     if (file) setInitialFile(file);
