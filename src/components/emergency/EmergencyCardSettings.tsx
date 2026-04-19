@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock } from 'lucide-react';
+import { Loader2, QrCode, Download, RefreshCw, Eye, EyeOff, Phone, AlertTriangle, MapPin, Clock, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { emergencyService, EmergencyToken, EmergencyAccessLogEntry } from '../../services/emergencyService';
 import { generateEmergencyCardsPdf, generateQrPng } from '../../services/emergencyCardPdf';
@@ -93,11 +93,19 @@ export const EmergencyCardSettings: React.FC = () => {
     }
   };
 
-  const regenerate = async () => {
-    if (!confirm('This will invalidate ALL existing printed cards. You will need to reprint and redistribute. Continue?')) return;
+  const regenerate = async (compromised = false) => {
+    const msg = compromised
+      ? 'RESET QR CODE: This will immediately invalidate the existing QR code and PIN access via that code. Anyone holding an old printed card will no longer be able to scan it. You must reprint and redistribute new cards. Continue?'
+      : 'This will invalidate ALL existing printed cards. You will need to reprint and redistribute. Continue?';
+    if (!confirm(msg)) return;
     try {
       await emergencyService.regenerateToken();
-      toast.success('New QR code generated. Reprint your cards.', { duration: 5000, position: 'bottom-center' });
+      toast.success(
+        compromised
+          ? 'QR code reset. Old cards are now inactive — reprint immediately.'
+          : 'New QR code generated. Reprint your cards.',
+        { duration: 5000, position: 'bottom-center' }
+      );
       await load();
     } catch (e: any) {
       toast.error(e.message || 'Failed', { duration: 5000 });
@@ -296,13 +304,29 @@ export const EmergencyCardSettings: React.FC = () => {
             </button>
           </div>
 
-          {/* Regenerate */}
-          <div className="paper-sheet p-5 mb-4">
+          {/* Reset / Regenerate */}
+          <div className="paper-sheet p-5 mb-4 space-y-3">
+            <div className="flex items-start gap-2">
+              <ShieldAlert className="w-4 h-4 text-red-700 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-bold text-navy-muted">Compromised card?</p>
+                <p className="text-[11px] text-stone-500 leading-relaxed mt-0.5">
+                  If you've lost a card or suspect someone unauthorized has it, reset the QR code immediately.
+                  All existing printed cards will stop working.
+                </p>
+              </div>
+            </div>
             <button
-              onClick={regenerate}
-              className="w-full py-2.5 border border-red-200 text-red-700 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-red-50"
+              onClick={() => regenerate(true)}
+              className="w-full py-2.5 bg-red-700 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-red-800"
             >
-              <RefreshCw className="w-3.5 h-3.5" /> Regenerate QR Code (invalidates old cards)
+              <ShieldAlert className="w-3.5 h-3.5" /> Reset QR Code Now
+            </button>
+            <button
+              onClick={() => regenerate(false)}
+              className="w-full py-2.5 border border-stone-200 text-stone-600 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-stone-50"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Regenerate QR (routine refresh)
             </button>
           </div>
 
