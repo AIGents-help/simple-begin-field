@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import { Database } from '../types/database';
 import { documentService } from './documentService';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_RECORDS_BY_SECTION, DEMO_PACKET_ID } from '../demo/morganFamilyData';
 
 type Tables = Database['public']['Tables'];
 
@@ -26,6 +28,12 @@ export const sectionService = {
   } as Record<string, any>,
 
   async getRecords(packetId: string, sectionKey: string, scope?: 'personA' | 'personB' | 'shared') {
+    // Demo mode: serve static Morgan family data, no DB calls.
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      const records = DEMO_RECORDS_BY_SECTION[sectionKey] || [];
+      return { data: records, error: null };
+    }
+
     const tableName = this.tableMap[sectionKey];
     if (!tableName) return { data: [], error: new Error(`No table mapped for section: ${sectionKey}`) };
 
@@ -47,6 +55,9 @@ export const sectionService = {
   },
 
   async createRecord(sectionKey: string, record: any) {
+    if (isDemoMode()) {
+      return { data: null, error: new Error('Demo mode is read-only.') };
+    }
     const tableName = this.tableMap[sectionKey];
     console.log(`Creating record in ${tableName}:`, record);
     if (!tableName) return { data: null, error: new Error(`No table mapped for section: ${sectionKey}`) };
@@ -67,6 +78,9 @@ export const sectionService = {
   },
 
   async updateRecord(sectionKey: string, recordId: string, updates: any) {
+    if (isDemoMode()) {
+      return { data: null, error: new Error('Demo mode is read-only.') };
+    }
     const tableName = this.tableMap[sectionKey];
     console.log(`Updating record ${recordId} in ${tableName}:`, updates);
     if (!tableName) return { data: null, error: new Error(`No table mapped for section: ${sectionKey}`) };
@@ -88,6 +102,9 @@ export const sectionService = {
   },
 
   async deleteRecord(sectionKey: string, recordId: string) {
+    if (isDemoMode()) {
+      return { error: new Error('Demo mode is read-only.') };
+    }
     const tableName = this.tableMap[sectionKey];
     if (!tableName) return { data: null, error: new Error(`No table mapped for section: ${sectionKey}`) };
 
@@ -149,6 +166,14 @@ export const sectionService = {
    * lacked a record_count column and always returned 0.
    */
   async getSectionCounts(packetId: string): Promise<Record<string, number>> {
+    if (isDemoMode() && packetId === DEMO_PACKET_ID) {
+      const result: Record<string, number> = {};
+      for (const [key, records] of Object.entries(DEMO_RECORDS_BY_SECTION)) {
+        result[key] = records.length;
+      }
+      return result;
+    }
+
     const sectionKeys = Object.keys(this.tableMap);
 
     // Count records per section table (one head request per table)
