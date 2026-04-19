@@ -158,6 +158,37 @@ export const ProfileScreen = () => {
     </div>
   );
 
+  const CollapsibleSection = ({
+    title,
+    children,
+    defaultOpen = false,
+  }: {
+    title: string;
+    children: React.ReactNode;
+    defaultOpen?: boolean;
+  }) => {
+    const [open, setOpen] = useState(defaultOpen);
+    return (
+      <div>
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          className="w-full flex items-center justify-between mb-4 group"
+        >
+          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 group-hover:text-stone-700 transition-colors">
+            {title}
+          </h3>
+          <ChevronDown
+            size={16}
+            className={`text-stone-400 group-hover:text-stone-600 transition-transform ${open ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {open && <div className="animate-in fade-in slide-in-from-top-1 duration-200">{children}</div>}
+      </div>
+    );
+  };
+
   return (
     <div className="p-6 pb-32">
       <div className="mb-8">
