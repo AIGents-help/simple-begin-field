@@ -189,7 +189,6 @@ export const SectionScreenTemplate = ({
         </div>
       ) : hasData ? (
         <div className="space-y-4">
-          {children && children(records, docs, fetchData)}
           {!demoMode && (
             <button 
               onClick={() => onAddClick?.()}
@@ -199,6 +198,7 @@ export const SectionScreenTemplate = ({
               <span className="font-bold text-sm">{config.addButtonLabel}</span>
             </button>
           )}
+          {children && children(records, docs, fetchData)}
         </div>
       ) : (
         emptyState || (

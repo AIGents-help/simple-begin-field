@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { SectionScreenTemplate } from '../components/sections/SectionScreenTemplate';
-import { List, GitBranch, Plus, Heart } from 'lucide-react';
+import { List, GitBranch } from 'lucide-react';
 import { CategoryOption } from '../components/upload/types';
 import { FamilyTreeView } from '../components/family/FamilyTreeView';
 import { SpouseProfileSheet } from '../components/family/SpouseProfileSheet';
@@ -214,15 +214,6 @@ export const FamilySection = ({
                   );
                 })}
 
-                {/* Primary Add Family Member CTA */}
-                <button
-                  type="button"
-                  onClick={() => setPickerOpen(true)}
-                  className="w-full py-4 border-2 border-dashed border-stone-200 rounded-2xl flex items-center justify-center gap-2 text-stone-400 hover:border-navy-muted hover:text-navy-muted transition-colors"
-                >
-                  <Plus size={18} />
-                  <span className="font-bold text-sm">Add Family Member</span>
-                </button>
               </div>
             );
           }}
