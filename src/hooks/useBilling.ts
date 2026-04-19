@@ -31,23 +31,15 @@ export const useBilling = (user: User | null) => {
 
     setLoading(true);
     try {
-      // Admins always get full lifetime
+      // Admins always get full lifetime — but if they ALSO have a real purchase
+      // (e.g. couple/family plan), prefer that so partner collaboration works correctly.
       const profileRes = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .maybeSingle();
 
-      if (profileRes.data?.role === 'admin') {
-        setPlanId('full_single_lifetime');
-        setIsPaid(true);
-        setIsCouple(true);
-        setIsLifetime(true);
-        setFeatureTier('full');
-        setPlanCategory('individual');
-        setLoading(false);
-        return;
-      }
+      const isAdmin = profileRes.data?.role === 'admin';
 
       const purchaseRes = await supabase
         .from('purchases')
@@ -84,6 +76,14 @@ export const useBilling = (user: User | null) => {
         }
         setFeatureTier(resolvedTier);
         setPlanCategory(resolvedCat);
+      } else if (isAdmin) {
+        // Admin without a purchase — fall back to full lifetime individual
+        setPlanId('full_single_lifetime');
+        setIsPaid(true);
+        setIsCouple(true);
+        setIsLifetime(true);
+        setFeatureTier('full');
+        setPlanCategory('individual');
       } else {
         setPlanId('free');
         setIsPaid(false);

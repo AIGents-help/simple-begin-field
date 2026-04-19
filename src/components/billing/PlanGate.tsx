@@ -31,11 +31,22 @@ const FULL_FEATURE_KEYS: FullFeatureKey[] = [
 ];
 
 export const PlanGate = ({ children, feature, requireFullFeature, fallback, benefitText }: PlanGateProps) => {
-  const { currentPlan, user, currentPacket, featureTier, planCategory } = useAppContext() as any;
+  const { currentPlan, user, currentPacket, featureTier, planCategory, isCouple } = useAppContext() as any;
   const navigate = useNavigate();
 
   const isFullFeatureFlag = feature && FULL_FEATURE_KEYS.includes(feature as FullFeatureKey);
   const needsFull = requireFullFeature || isFullFeatureFlag;
+
+  // Partner collaboration is allowed for any couple/family/corporate/comp/enterprise plan,
+  // any plan flagged canInvitePartner, or admins. We rely on the resolved planCategory/isCouple
+  // from useBilling rather than the static currentPlan flag (which can be stale when an admin
+  // override or fallback PlanId is in effect).
+  const canCollaborateWithPartner = () => {
+    if (planCategory === 'couple' || planCategory === 'family' || planCategory === 'corporate') return true;
+    if (isCouple) return true;
+    if (currentPlan?.canInvitePartner) return true;
+    return false;
+  };
 
   const hasAccess = () => {
     // Owner of the packet always has access (legacy behavior)
@@ -50,7 +61,7 @@ export const PlanGate = ({ children, feature, requireFullFeature, fallback, bene
     if (!feature) return true;
     if (feature === 'upload') return true; // upload available on all paid tiers
     if (feature === 'pdf') return currentPlan.canExportPDF;
-    if (feature === 'partner') return currentPlan.canInvitePartner;
+    if (feature === 'partner') return canCollaborateWithPartner();
 
     if (currentPlan.allowedSections === 'all') return true;
     return currentPlan.allowedSections.includes(feature as SectionId);
