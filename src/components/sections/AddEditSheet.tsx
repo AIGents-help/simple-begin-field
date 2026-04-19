@@ -1082,6 +1082,8 @@ export const AddEditSheet = ({
                         }
 
                         const origin = autoFilledOrigins[field.name];
+                        const lockedFields: string[] = Array.isArray(initialData?._lockedFields) ? initialData._lockedFields : [];
+                        const isLocked = lockedFields.includes(field.name);
                         const clearOrigin = () => {
                           if (!origin) return;
                           setAutoFilledOrigins((prev) => {
@@ -1091,6 +1093,7 @@ export const AddEditSheet = ({
                           });
                         };
                         const handleChange = (val: any) => {
+                          if (isLocked) return;
                           setFormData({ ...formData, [field.name]: val });
                           if (origin) clearOrigin();
                         };
@@ -1099,6 +1102,7 @@ export const AddEditSheet = ({
                         <div className="flex items-center justify-between gap-2 flex-wrap">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 block">
                             {field.label} {field.required && <span className="text-red-500">*</span>}
+                            {isLocked && <span className="ml-2 text-[9px] font-bold uppercase tracking-widest text-stone-400 normal-case">(locked)</span>}
                           </label>
                           {origin ? <AutoFilledIndicator sourceLabel={origin} onClear={() => { clearOrigin(); setFormData({ ...formData, [field.name]: '' }); }} /> : null}
                         </div>
@@ -1106,17 +1110,17 @@ export const AddEditSheet = ({
                           <textarea
                             rows={field.rows || 3}
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
-                            className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm resize-none font-medium"
+                            className={`w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm resize-none font-medium ${isLocked ? 'bg-stone-50 text-stone-500 cursor-not-allowed' : ''}`}
                             value={formData[field.name] || ''}
                             onChange={(e) => handleChange(e.target.value)}
-                            disabled={loading}
+                            disabled={loading || isLocked}
                           />
                         ) : field.type === 'select' && field.options ? (
                           <select
-                            className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium appearance-none"
+                            className={`w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium appearance-none ${isLocked ? 'bg-stone-50 text-stone-500 cursor-not-allowed' : ''}`}
                             value={formData[field.name] || ''}
                             onChange={(e) => handleChange(e.target.value)}
-                            disabled={loading}
+                            disabled={loading || isLocked}
                           >
                             <option value="">Select {field.label.toLowerCase()}...</option>
                             {field.options.map((opt) => (
@@ -1133,17 +1137,18 @@ export const AddEditSheet = ({
                             value={formData[field.name] || ''}
                             onChange={handleChange}
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
-                            disabled={loading}
+                            disabled={loading || isLocked}
                           />
                         ) : (
                           <input
                             type={field.type || 'text'}
                             list={field.list}
                             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
-                            className="w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium"
+                            className={`w-full p-4 bg-white rounded-2xl border border-stone-200 focus:border-navy-muted outline-none shadow-sm font-medium ${isLocked ? 'bg-stone-50 text-stone-500 cursor-not-allowed' : ''}`}
                             value={formData[field.name] || ''}
                             onChange={(e) => handleChange(e.target.value)}
-                            disabled={loading}
+                            disabled={loading || isLocked}
+                            readOnly={isLocked}
                           />
                         )}
                         {errors[field.name] && (
