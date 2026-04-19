@@ -106,6 +106,10 @@ export const SHARABLE_SECTIONS: { id: string; label: string }[] = [
 
 export const coupleService = {
   async getActiveLink(userId: string): Promise<CoupleLink | null> {
+    if (isDemoMode() && userId === DEMO_USER_ID) {
+      // Demo packet is single-mode — no active couple link.
+      return null;
+    }
     const { data, error } = await (supabase as any)
       .from('couple_links')
       .select('*')
