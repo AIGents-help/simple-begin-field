@@ -17,7 +17,7 @@ const formatRelative = (iso: string | null | undefined) => {
   return `Active ${Math.floor(days / 30)}mo ago`;
 };
 
-interface PersonRowProps {
+interface PersonCardProps {
   name: string;
   photoPath: string | null;
   lastActiveIso: string | null | undefined;
@@ -25,26 +25,30 @@ interface PersonRowProps {
   isLeader: boolean;
 }
 
-const PersonRow: React.FC<PersonRowProps> = ({ name, photoPath, lastActiveIso, score, isLeader }) => (
-  <div className="flex-1 min-w-0 flex items-center gap-2">
-    <div className="relative shrink-0">
-      <PersonAvatar photoPath={photoPath} name={name} size={40} ring />
-      {isLeader && (
-        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-amber-900 flex items-center justify-center shadow-sm">
-          <Trophy size={9} />
-        </div>
-      )}
+const PersonCard: React.FC<PersonCardProps> = ({ name, photoPath, lastActiveIso, score, isLeader }) => (
+  <div className="rounded-xl border border-stone-200 bg-white px-3 py-2.5 shadow-sm min-w-0">
+    <div className="flex items-center gap-2 min-w-0">
+      <div className="relative shrink-0">
+        <PersonAvatar photoPath={photoPath} name={name} size={40} ring />
+        {isLeader && (
+          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-amber-900 flex items-center justify-center shadow-sm">
+            <Trophy size={9} />
+          </div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-bold text-navy-muted truncate leading-tight">{name}</p>
+        <p className="text-[10px] text-stone-400 leading-tight truncate">{formatRelative(lastActiveIso)}</p>
+      </div>
     </div>
-    <div className="min-w-0 flex-1">
-      <p className="text-xs font-bold text-navy-muted truncate leading-tight">{name}</p>
-      <p className="text-[10px] text-stone-400 leading-tight">{formatRelative(lastActiveIso)}</p>
-    </div>
-    <div className="shrink-0 text-right">
+    <div className="my-2 border-t border-stone-100" />
+    <div className="flex items-baseline gap-1.5">
       {score !== null ? (
-        <p className="text-base font-serif font-bold text-navy-muted leading-none">{score}</p>
+        <span className="text-[22px] font-serif font-bold text-navy-muted leading-none">{score}</span>
       ) : (
-        <p className="text-[10px] text-stone-400 italic">—</p>
+        <span className="text-base text-stone-400 italic leading-none">—</span>
       )}
+      <span className="text-[9px] font-bold uppercase tracking-widest text-stone-400">Health</span>
     </div>
   </div>
 );
@@ -103,17 +107,25 @@ export const PartnerStatusCard: React.FC = () => {
         </button>
       </div>
 
-      {/* Compact single-row comparison */}
-      <div className="flex items-center gap-2">
-        <PersonRow
+      {/* 3-column grid: person | VS | person */}
+      <div
+        className="grid items-center"
+        style={{ gridTemplateColumns: '1fr auto 1fr', gap: '8px' }}
+      >
+        <PersonCard
           name={myName}
           photoPath={myPhoto}
           lastActiveIso={myLastActive}
           score={typeof myScore === 'number' ? myScore : null}
           isLeader={myLead}
         />
-        <div className="text-stone-300 text-[10px] font-bold shrink-0">VS</div>
-        <PersonRow
+        <span
+          className="text-stone-400"
+          style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em' }}
+        >
+          VS
+        </span>
+        <PersonCard
           name={partner.full_name || partner.email || 'Partner'}
           photoPath={partner.avatar_path}
           lastActiveIso={partner.last_login_at}
