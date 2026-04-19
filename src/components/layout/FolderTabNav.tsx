@@ -24,7 +24,7 @@ export const FolderTabNav = () => {
 
   return (
     <>
-      <div className="lg:hidden sticky top-[61px] z-20 bg-[#fdfaf3] pt-4 pb-0 border-b border-folder-edge overflow-hidden">
+      <div className="lg:hidden sticky top-[69px] z-20 bg-[#fdfaf3] pt-4 pb-0 border-b border-folder-edge overflow-hidden">
         <div className="flex items-center justify-between px-6 mb-2">
           <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Packet Sections</span>
         </div>
