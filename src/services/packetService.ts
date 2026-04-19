@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { Database } from '../types/database';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_PACKET, DEMO_SECTION_COMPLETION } from '../demo/morganFamilyData';
 
 type Packet = Database['public']['Tables']['packets']['Row'];
 type PacketInsert = Database['public']['Tables']['packets']['Insert'];
@@ -7,6 +9,12 @@ type PacketMember = Database['public']['Tables']['packet_members']['Row'];
 
 export const packetService = {
   async getPacketsForUser(userId: string) {
+    if (isDemoMode()) {
+      return {
+        data: [{ packet_id: DEMO_PACKET.id, role: 'owner', household_scope: 'full', packets: DEMO_PACKET }],
+        error: null,
+      };
+    }
     const { data, error } = await supabase
       .from('packet_members')
       .select(`

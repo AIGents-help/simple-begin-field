@@ -1,6 +1,8 @@
 // src/services/infoService.ts
 
 import { supabase } from '../lib/supabase'
+import { isDemoMode } from '../demo/demoMode'
+import { DEMO_INFO_RECORDS } from '../demo/morganFamilyData'
 
 export interface InfoRecord {
   id: string
@@ -43,6 +45,10 @@ export type SaveInfoResponse = SaveInfoResult | SaveInfoError
  * Returns records newest-first.
  */
 export async function fetchInfoRecords(packetId: string): Promise<InfoRecord[]> {
+  if (isDemoMode()) {
+    return DEMO_INFO_RECORDS as unknown as InfoRecord[]
+  }
+
   const { data, error } = await supabase
     .from('info_records')
     .select('*')

@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { isDemoMode } from '../demo/demoMode';
+import { DEMO_FAMILY_MEMBERS } from '../demo/morganFamilyData';
 
 /**
  * Whitelist of columns that exist on family_members. Anything outside this set
@@ -129,6 +131,9 @@ export const sanitizeFamilyPayload = (form: any, opts?: { extraLegacy?: string[]
 
 export const familyService = {
   async list(packetId: string) {
+    if (isDemoMode()) {
+      return { data: DEMO_FAMILY_MEMBERS as any[], error: null };
+    }
     return supabase
       .from('family_members')
       .select('*')
