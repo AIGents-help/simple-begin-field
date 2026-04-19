@@ -13,6 +13,8 @@ import {
 } from '../services/legalService';
 import { LegalDocumentCard } from '../components/legal/LegalDocumentCard';
 import { FindProfessionalPrompt } from '../components/directory/FindProfessionalPrompt';
+import { SectionRecommendations } from '../components/sections/SectionRecommendations';
+import { CrossPacketLegalDocs } from '../components/legal/CrossPacketLegalDocs';
 import { supabase } from '@/integrations/supabase/client';
 
 const ALL_KINDS: LegalKind[] = [
@@ -195,7 +197,31 @@ export const LegalSection: React.FC<Props> = ({ onRefresh }) => {
         </div>
       )}
 
-      {/* Recommended chips — always visible */}
+      {/* Recommended block (collapsed by default) — matches other sections */}
+      <SectionRecommendations
+        sectionId="legal"
+        existingRecords={docs}
+        onSuggestionClick={(prefill: any) => {
+          const k = (prefill?.kind || 'other') as LegalKind;
+          handleAddDraft(k);
+        }}
+        onEntryClick={(label: string) => {
+          // Map entry label back to a kind
+          const map: Record<string, LegalKind> = {
+            'Will': 'will',
+            'Trust': 'trust',
+            'Financial Power of Attorney': 'fin_poa',
+            'Healthcare Power of Attorney': 'hcpoa',
+            'Living Will / Advance Directive': 'living_will',
+            'Guardianship Nomination': 'guardianship',
+            'Letter of Instruction': 'other',
+            'Prenuptial Agreement': 'other',
+          };
+          handleAddDraft(map[label] || 'other');
+        }}
+      />
+
+      {/* Add chips — kept below recommended block */}
       <div className="space-y-2">
         <p className="text-xs font-bold uppercase tracking-widest text-stone-500">Add a document</p>
         <div className="flex flex-wrap gap-2">
@@ -251,6 +277,9 @@ export const LegalSection: React.FC<Props> = ({ onRefresh }) => {
           ))}
         </div>
       )}
+
+      {/* Cross-packet legal document index (read-only) */}
+      {currentPacket && <CrossPacketLegalDocs packetId={currentPacket.id} />}
 
       {/* Find a Pro CTA */}
       {isEmpty && (
