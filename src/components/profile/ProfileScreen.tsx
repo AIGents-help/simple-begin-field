@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X, TrendingUp, ArrowRight, FileText, Heart } from 'lucide-react';
+import { Copy, User, ShieldCheck, LogOut, Loader2, LayoutDashboard, Shield, ShieldAlert, CreditCard, Download, X, TrendingUp, ArrowRight, FileText, Heart, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { DownloadPacketButton } from '../download/DownloadPacketButton';
@@ -158,6 +158,37 @@ export const ProfileScreen = () => {
     </div>
   );
 
+  const CollapsibleSection = ({
+    title,
+    children,
+    defaultOpen = false,
+  }: {
+    title: string;
+    children: React.ReactNode;
+    defaultOpen?: boolean;
+  }) => {
+    const [open, setOpen] = useState(defaultOpen);
+    return (
+      <div>
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          className="w-full flex items-center justify-between mb-4 group"
+        >
+          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 group-hover:text-stone-700 transition-colors">
+            {title}
+          </h3>
+          <ChevronDown
+            size={16}
+            className={`text-stone-400 group-hover:text-stone-600 transition-transform ${open ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {open && <div className="animate-in fade-in slide-in-from-top-1 duration-200">{children}</div>}
+      </div>
+    );
+  };
+
   return (
     <div className="p-6 pb-32">
       <div className="mb-8">
@@ -208,8 +239,7 @@ export const ProfileScreen = () => {
           </button>
         </Card>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Household Setup</h3>
+        <CollapsibleSection title="Household Setup" defaultOpen>
           <Card>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -225,10 +255,9 @@ export const ProfileScreen = () => {
             </div>
             {userMode === 'couple' && <PartnerCard />}
           </Card>
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Security & Trust</h3>
+        <CollapsibleSection title="Security & Trust">
           <div className="grid grid-cols-2 gap-4">
             <button 
               onClick={() => setView('security')}
@@ -249,10 +278,9 @@ export const ProfileScreen = () => {
               <span className="text-xs font-bold text-navy-muted">Trust Info</span>
             </button>
           </div>
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Subscription</h3>
+        <CollapsibleSection title="Subscription">
           <Card>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -281,10 +309,9 @@ export const ProfileScreen = () => {
               </button>
             )}
           </Card>
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Estate Overview</h3>
+        <CollapsibleSection title="Estate Overview">
           <button
             onClick={() => setView('estate')}
             className="w-full flex items-center justify-between p-4 bg-white border border-stone-200 rounded-2xl hover:border-navy-muted/30 transition-colors group"
@@ -330,7 +357,7 @@ export const ProfileScreen = () => {
             </div>
             <ArrowRight size={16} className="text-stone-400 group-hover:translate-x-0.5 transition-transform" />
           </button>
-        </div>
+        </CollapsibleSection>
 
         <AlertPreferences />
 
@@ -344,8 +371,7 @@ export const ProfileScreen = () => {
 
         <InactivityCheckInCard />
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Data Export</h3>
+        <CollapsibleSection title="Data Export">
           <Card>
             <div className="space-y-3 mb-4">
               <div className="flex items-center gap-3">
@@ -362,15 +388,13 @@ export const ProfileScreen = () => {
             </div>
             <DownloadPacketButton variant="settings" />
           </Card>
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Download History</h3>
+        <CollapsibleSection title="Download History">
           <DownloadHistoryList />
-        </div>
+        </CollapsibleSection>
 
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">Packet Info</h3>
+        <CollapsibleSection title="Packet Info">
           <Card>
             <div className="space-y-3">
               <div>
@@ -387,7 +411,7 @@ export const ProfileScreen = () => {
               </div>
             </div>
           </Card>
-        </div>
+        </CollapsibleSection>
 
         <button 
           onClick={handleSignOut}
