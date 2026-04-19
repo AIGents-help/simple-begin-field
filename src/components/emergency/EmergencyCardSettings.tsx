@@ -301,6 +301,14 @@ export const EmergencyCardSettings: React.FC = () => {
                   {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
                   Download Printable Cards (PDF)
                 </button>
+                <button
+                  onClick={() => setSendOpen(true)}
+                  disabled={!qrPreview || !emergencyUrl}
+                  className="mt-2 w-full py-2.5 bg-white border border-stone-300 text-navy-muted rounded-lg text-xs font-bold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-stone-50"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  Send to a Contact
+                </button>
               </div>
             </div>
 
