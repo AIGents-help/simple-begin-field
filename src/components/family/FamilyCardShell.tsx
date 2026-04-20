@@ -204,6 +204,31 @@ export const FamilyCardShell: React.FC<FamilyCardShellProps> = ({
     setPhotoPreview(null);
   }, [record.id, record.updated_at]);
 
+  // Other family members in the same packet — for the "Related to" picker.
+  const showRelatedTo = needsRelatedToField(record.relationship);
+  const [relatedOptions, setRelatedOptions] = useState<Array<{ id: string; label: string }>>([]);
+  useEffect(() => {
+    if (!showRelatedTo || !packetId) return;
+    let cancelled = false;
+    supabase
+      .from('family_members')
+      .select('id, first_name, last_name, name, relationship')
+      .eq('packet_id', packetId)
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        const opts = data
+          .filter((m: any) => m.id !== record.id) // exclude self
+          .map((m: any) => {
+            const n = [m.first_name, m.last_name].filter(Boolean).join(' ') || m.name || 'Unnamed';
+            const rel = m.relationship ? ` (${m.relationship})` : '';
+            return { id: m.id, label: `${n}${rel}`, sortKey: (m.first_name || m.name || '').toLowerCase() };
+          })
+          .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+        setRelatedOptions(opts);
+      });
+    return () => { cancelled = true; };
+  }, [showRelatedTo, packetId, record.id, record.updated_at]);
+
   const setField = (name: string, value: any) => {
     setForm((f: any) => ({ ...f, [name]: value }));
     setDirty(true);
