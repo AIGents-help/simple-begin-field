@@ -1,6 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Heart, Baby, Users, GitBranch, Crown, UserPlus, Sparkles } from 'lucide-react';
+import {
+  X, Heart, HeartCrack, Baby, Users, GitBranch, Crown, UserPlus, Sparkles,
+  UserMinus, UsersRound, Footprints, GraduationCap, UserCog,
+} from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
@@ -9,14 +12,39 @@ interface Props {
   onPick: (relationship: string) => void;
 }
 
-const OPTIONS = [
-  { rel: 'Spouse',      label: 'Spouse / Partner', icon: Heart,     color: 'text-rose-500',    bg: 'bg-rose-50' },
-  { rel: 'Child',       label: 'Child',            icon: Baby,      color: 'text-amber-600',   bg: 'bg-amber-50' },
-  { rel: 'Parent',      label: 'Parent',           icon: Users,     color: 'text-blue-600',    bg: 'bg-blue-50' },
-  { rel: 'Sibling',     label: 'Sibling',          icon: GitBranch, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { rel: 'Grandparent', label: 'Grandparent',      icon: Crown,     color: 'text-violet-600',  bg: 'bg-violet-50' },
-  { rel: 'In-Law',      label: 'In-Law',           icon: UserPlus,  color: 'text-teal-600',    bg: 'bg-teal-50' },
-  { rel: 'Other',       label: 'Other Family',     icon: Sparkles,  color: 'text-stone-600',   bg: 'bg-stone-100' },
+type Option = {
+  rel: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  color: string;
+  bg: string;
+};
+
+// Ordered top-to-bottom, paired left/right per row.
+const OPTIONS: Option[] = [
+  // Row 1
+  { rel: 'Spouse',        label: 'Spouse / Partner',     icon: Heart,         color: 'text-rose-500',    bg: 'bg-rose-50' },
+  { rel: 'Ex-Spouse',     label: 'Ex-Spouse / Partner',  icon: HeartCrack,    color: 'text-stone-500',   bg: 'bg-stone-100' },
+  // Row 2
+  { rel: 'Child',         label: 'Child',                icon: Baby,          color: 'text-amber-600',   bg: 'bg-amber-50' },
+  { rel: 'Grandchild',    label: 'Grandchild',           icon: GraduationCap, color: 'text-amber-700',   bg: 'bg-amber-50' },
+  // Row 3
+  { rel: 'Step-Child',    label: 'Step-Child',           icon: Footprints,    color: 'text-orange-600',  bg: 'bg-orange-50' },
+  { rel: 'Step-Parent',   label: 'Step-Parent',          icon: UserCog,       color: 'text-orange-700',  bg: 'bg-orange-50' },
+  // Row 4
+  { rel: 'Parent',        label: 'Parent',               icon: Users,         color: 'text-blue-600',    bg: 'bg-blue-50' },
+  { rel: 'Grandparent',   label: 'Grandparent',          icon: Crown,         color: 'text-violet-600',  bg: 'bg-violet-50' },
+  // Row 5
+  { rel: 'Sibling',       label: 'Sibling',              icon: GitBranch,     color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  { rel: 'Step-Sibling',  label: 'Step-Sibling',         icon: GitBranch,     color: 'text-emerald-700', bg: 'bg-emerald-50' },
+  // Row 6
+  { rel: 'In-Law',        label: 'In-Law',               icon: UserPlus,      color: 'text-teal-600',    bg: 'bg-teal-50' },
+  { rel: 'Cousin',        label: 'Cousin',               icon: UsersRound,    color: 'text-cyan-600',    bg: 'bg-cyan-50' },
+  // Row 7
+  { rel: 'Niece',         label: 'Niece',                icon: UserMinus,     color: 'text-pink-600',    bg: 'bg-pink-50' },
+  { rel: 'Nephew',        label: 'Nephew',               icon: UserMinus,     color: 'text-indigo-600',  bg: 'bg-indigo-50' },
+  // Row 8
+  { rel: 'Other',         label: 'Other Family',         icon: Sparkles,      color: 'text-stone-600',   bg: 'bg-stone-100' },
 ];
 
 export const AddFamilyMemberSheet: React.FC<Props> = ({ isOpen, onClose, onPick }) => {
@@ -36,7 +64,7 @@ export const AddFamilyMemberSheet: React.FC<Props> = ({ isOpen, onClose, onPick 
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-50 bg-stone-50 rounded-t-3xl shadow-2xl max-h-[80vh] flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-50 bg-stone-50 rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col"
           >
             <div className="px-5 py-4 border-b border-stone-200 flex items-center justify-between bg-white rounded-t-3xl">
               <h2 className="text-lg font-serif font-bold text-navy-muted">Add Family Member</h2>
