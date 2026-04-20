@@ -758,7 +758,34 @@ export const AddEditSheet = ({
           const dateKeys = ['last_appraisal_date', 'firearm_purchase_date', 'firearm_ccw_expiration'];
           dateKeys.forEach((k) => { if (record[k] === '') record[k] = null; });
         }
-        // Family: route through the dedicated family service so all the new
+        // Debts: estate_liabilities table — coerce booleans, blank dates → null,
+        // strip section-template-only `category` column (table has no category),
+        // require user_id, and coerce numeric fields.
+        if (activeTab === 'debts') {
+          const boolKeys = ['is_joint', 'autopay_enabled', 'is_na'];
+          boolKeys.forEach((k) => {
+            if (record[k] === 'Yes') record[k] = true;
+            else if (record[k] === 'No') record[k] = false;
+            else if (record[k] === '') record[k] = null;
+          });
+          const dateKeys = ['payoff_date'];
+          dateKeys.forEach((k) => { if (record[k] === '') record[k] = null; });
+          const numKeys = ['balance', 'original_balance', 'monthly_payment', 'interest_rate', 'payment_due_day'];
+          numKeys.forEach((k) => {
+            if (record[k] === '' || record[k] === undefined) record[k] = null;
+            else if (record[k] !== null && typeof record[k] === 'string') {
+              const parsed = parseFloat(record[k]);
+              record[k] = Number.isFinite(parsed) ? parsed : null;
+            }
+          });
+          // Default required defaults so insert never fails on NOT NULL columns
+          if (!record.balance && record.balance !== 0) record.balance = 0;
+          if (!record.liability_type) record.liability_type = 'Other';
+          // estate_liabilities requires user_id and has no category/title columns
+          record.user_id = user.id;
+          delete record.category;
+          delete record.title;
+        }
         // structured columns (is_dependent, is_beneficiary, guardian_*, etc.)
         // persist correctly. Any unknown UI-only fields are folded into
         // legacy_notes so data is never silently dropped.
