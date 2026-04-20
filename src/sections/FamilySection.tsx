@@ -103,6 +103,7 @@ export const FamilySection = ({
       return;
     }
     // Create an inline draft card for the picked relationship
+    const isEx = /^ex[-\s]?(spouse|partner)$/i.test(relationship);
     const draft: any = {
       id: draftId(),
       packet_id: currentPacket?.id,
@@ -111,6 +112,7 @@ export const FamilySection = ({
       first_name: '',
       last_name: '',
       name: 'New family member',
+      ...(isEx ? { marital_status: 'Divorced' } : {}),
     };
     setDrafts((d) => [draft, ...d]);
     setExpandedId(draft.id);
