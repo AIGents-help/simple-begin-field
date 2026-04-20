@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, ExternalLink, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { QrDesign, ProductType, PRINTIFY_SHOP_URL } from './qrShopDesigns';
+import { QrDesign, ProductType, PRINTIFY_PRODUCT_URL } from './qrShopDesigns';
 import { QrDesignPreview } from './QrDesignPreview';
 import { downloadDesignPng } from './downloadDesign';
 
@@ -64,7 +64,7 @@ export const OrderDesignModal: React.FC<Props> = ({ design, emergencyUrl, onClos
         </div>
 
         <a
-          href={PRINTIFY_SHOP_URL}
+          href={PRINTIFY_PRODUCT_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full py-3 bg-navy-muted text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-navy-muted/90 transition-colors"
