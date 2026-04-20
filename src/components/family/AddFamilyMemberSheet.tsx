@@ -15,7 +15,7 @@ interface Props {
 type Option = {
   rel: string;
   label: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<any>;
   color: string;
   bg: string;
 };
