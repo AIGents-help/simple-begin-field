@@ -15,7 +15,8 @@ import {
   Share2,
   Sparkles,
   TrendingUp,
-  Scale
+  Scale,
+  MinusCircle
 } from 'lucide-react';
 import { Section, SectionId } from './types';
 
@@ -67,6 +68,14 @@ export const SECTIONS_CONFIG: Section[] = [
     description: 'Checking, savings & everyday accounts',
     emptyStateText: 'No bank accounts added yet.',
     addButtonLabel: 'Add Account'
+  },
+  {
+    id: 'debts',
+    label: 'Debts & Obligations',
+    icon: MinusCircle,
+    description: 'Credit cards, loans & financial obligations',
+    emptyStateText: 'No debts or obligations added yet.',
+    addButtonLabel: 'Add Creditor'
   },
   {
     id: 'investments',
