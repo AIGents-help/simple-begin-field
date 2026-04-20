@@ -131,30 +131,29 @@ const DebtsView: React.FC<DebtsViewProps> = ({ records, refresh, onAddClick, onE
                   </div>
                 )}
 
-                {group.debts.map((record) => (
-                  <div key={record.id} className="relative">
+                {group.debts.map((record) => {
+                  const balanceLabel = Number(record.balance || 0) > 0
+                    ? `${formatCurrency(record.balance)} owed`
+                    : null;
+                  return (
                     <RecordCard
+                      key={record.id}
                       title={record.liability_type || 'Debt'}
                       subtitle={buildSubtitle(
+                        balanceLabel,
                         record.account_number_masked ? `****${String(record.account_number_masked).slice(-4)}` : null,
                         record.is_joint ? 'Joint' : null,
                         record.autopay_enabled ? 'Autopay' : null
                       )}
-                      subtitlePlaceholder="No account details added"
+                      subtitlePlaceholder="No balance recorded"
                       icon={MinusCircle}
                       badge={record.scope === 'shared' ? 'Shared' : undefined}
                       data={record}
                       onEdit={() => onAddClick(undefined, record)}
                       onDelete={() => handleDelete(record)}
                     />
-                    {/* Right-side balance overlay */}
-                    {Number(record.balance || 0) > 0 && (
-                      <div className="absolute top-5 right-14 pointer-events-none text-rose-700 font-bold text-sm">
-                        {formatCurrency(record.balance)}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
 
                 {!isUnknown && (
                   <button
