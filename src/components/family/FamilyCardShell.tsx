@@ -423,7 +423,32 @@ export const FamilyCardShell: React.FC<FamilyCardShellProps> = ({
             <p className="text-[10px] text-stone-500">Tap camera to add a photo</p>
           </div>
 
-          <Accordion type="multiple" defaultValue={['identity']} className="w-full">
+          <Accordion type="multiple" defaultValue={['related_to', 'identity']} className="w-full">
+            {showRelatedTo && (
+              <AccordionItem value="related_to">
+                <AccordionTrigger className="text-sm font-bold">Related to</AccordionTrigger>
+                <AccordionContent>
+                  <label className="block">
+                    <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-stone-500">
+                      Connected family member
+                    </span>
+                    <select
+                      value={form.related_to_member_id || ''}
+                      onChange={(e) => setField('related_to_member_id', e.target.value || null)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Select a family member…</option>
+                      {relatedOptions.map((o) => (
+                        <option key={o.id} value={o.id}>{o.label}</option>
+                      ))}
+                    </select>
+                    <p className="mt-1.5 text-[11px] text-stone-500">
+                      Helps place this person correctly on the family tree.
+                    </p>
+                  </label>
+                </AccordionContent>
+              </AccordionItem>
+            )}
             <AccordionItem value="identity">
               <AccordionTrigger className="text-sm font-bold">Identity</AccordionTrigger>
               <AccordionContent>
