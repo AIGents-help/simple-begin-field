@@ -24,7 +24,8 @@ export const sectionService = {
     'memories': 'memories',
     'private': 'private_items',
     'medical': 'medical_records',
-    'legal': 'legal_documents'
+    'legal': 'legal_documents',
+    'debts': 'estate_liabilities'
   } as Record<string, any>,
 
   async getRecords(packetId: string, sectionKey: string, scope?: 'personA' | 'personB' | 'shared') {

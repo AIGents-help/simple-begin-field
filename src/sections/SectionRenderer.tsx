@@ -5,6 +5,7 @@ import { InfoSection } from '../sections/InfoSection';
 import { FamilySection } from '../sections/FamilySection';
 import { RealEstateSection } from '../sections/RealEstateSection';
 import { BankingSection } from '../sections/BankingSection';
+import { DebtsSection } from '../sections/DebtsSection';
 import { InvestmentsSection } from '../sections/InvestmentsSection';
 import { RetirementSection } from '../sections/RetirementSection';
 import { VehiclesSection } from '../sections/VehiclesSection';
@@ -63,6 +64,8 @@ export const SectionRenderer = ({ onAddClick, onRefresh }: { onAddClick: (file?:
         return <RealEstateSection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'banking':
         return <BankingSection onAddClick={onAddClick} onRefresh={onRefresh} />;
+      case 'debts':
+        return <DebtsSection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'investments':
         return <InvestmentsSection onAddClick={onAddClick} onRefresh={onRefresh} />;
       case 'retirement':

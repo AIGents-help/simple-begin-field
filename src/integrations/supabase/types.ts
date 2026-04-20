@@ -997,98 +997,6 @@ export type Database = {
           },
         ]
       }
-      debt_accounts: {
-        Row: {
-          account_number: string | null
-          autopay_account: string | null
-          autopay_enabled: boolean | null
-          contact_address: string | null
-          contact_phone: string | null
-          created_at: string | null
-          created_by: string | null
-          creditor_name: string
-          current_balance: number | null
-          debt_type: string
-          id: string
-          interest_rate: number | null
-          is_joint: boolean | null
-          is_not_applicable: boolean | null
-          joint_holder_name: string | null
-          login_url: string | null
-          maturity_date: string | null
-          minimum_payment: number | null
-          notes: string | null
-          original_balance: number | null
-          packet_id: string | null
-          payment_due_day: number | null
-          payment_frequency: string | null
-          scope: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          account_number?: string | null
-          autopay_account?: string | null
-          autopay_enabled?: boolean | null
-          contact_address?: string | null
-          contact_phone?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          creditor_name: string
-          current_balance?: number | null
-          debt_type: string
-          id?: string
-          interest_rate?: number | null
-          is_joint?: boolean | null
-          is_not_applicable?: boolean | null
-          joint_holder_name?: string | null
-          login_url?: string | null
-          maturity_date?: string | null
-          minimum_payment?: number | null
-          notes?: string | null
-          original_balance?: number | null
-          packet_id?: string | null
-          payment_due_day?: number | null
-          payment_frequency?: string | null
-          scope?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          account_number?: string | null
-          autopay_account?: string | null
-          autopay_enabled?: boolean | null
-          contact_address?: string | null
-          contact_phone?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          creditor_name?: string
-          current_balance?: number | null
-          debt_type?: string
-          id?: string
-          interest_rate?: number | null
-          is_joint?: boolean | null
-          is_not_applicable?: boolean | null
-          joint_holder_name?: string | null
-          login_url?: string | null
-          maturity_date?: string | null
-          minimum_payment?: number | null
-          notes?: string | null
-          original_balance?: number | null
-          packet_id?: string | null
-          payment_due_day?: number | null
-          payment_frequency?: string | null
-          scope?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "debt_accounts_packet_id_fkey"
-            columns: ["packet_id"]
-            isOneToOne: false
-            referencedRelation: "packets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       document_alerts: {
         Row: {
           alert_sent_0: boolean
@@ -1443,44 +1351,86 @@ export type Database = {
       }
       estate_liabilities: {
         Row: {
+          account_number_masked: string | null
+          autopay_account: string | null
+          autopay_enabled: boolean | null
           balance: number
+          contact_address: string | null
+          contact_phone: string | null
           created_at: string
           id: string
           interest_rate: number | null
+          is_joint: boolean | null
+          is_na: boolean | null
+          joint_holder_name: string | null
           lender_name: string | null
           liability_type: string
+          login_url: string | null
           monthly_payment: number | null
           notes: string | null
+          original_balance: number | null
           packet_id: string
+          payment_due_day: number | null
+          payment_frequency: string | null
           payoff_date: string | null
+          scope: string | null
+          status: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          account_number_masked?: string | null
+          autopay_account?: string | null
+          autopay_enabled?: boolean | null
           balance?: number
+          contact_address?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
           interest_rate?: number | null
+          is_joint?: boolean | null
+          is_na?: boolean | null
+          joint_holder_name?: string | null
           lender_name?: string | null
           liability_type: string
+          login_url?: string | null
           monthly_payment?: number | null
           notes?: string | null
+          original_balance?: number | null
           packet_id: string
+          payment_due_day?: number | null
+          payment_frequency?: string | null
           payoff_date?: string | null
+          scope?: string | null
+          status?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          account_number_masked?: string | null
+          autopay_account?: string | null
+          autopay_enabled?: boolean | null
           balance?: number
+          contact_address?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
           interest_rate?: number | null
+          is_joint?: boolean | null
+          is_na?: boolean | null
+          joint_holder_name?: string | null
           lender_name?: string | null
           liability_type?: string
+          login_url?: string | null
           monthly_payment?: number | null
           notes?: string | null
+          original_balance?: number | null
           packet_id?: string
+          payment_due_day?: number | null
+          payment_frequency?: string | null
           payoff_date?: string | null
+          scope?: string | null
+          status?: string | null
           updated_at?: string
           user_id?: string
         }

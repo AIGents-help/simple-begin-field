@@ -214,4 +214,18 @@ export const RECOMMENDATIONS_CONFIG: Partial<Record<SectionId, SectionRecommenda
     contacts: [],
     considerations: []
   },
+  debts: {
+    aboutContent: {
+      paragraphs: [
+        "The Debts & Obligations section tracks every liability a trusted person would need to know about — outstanding loans, credit card balances, and recurring financial obligations.",
+        "Accounts are grouped by creditor so everything owed to one lender stays together. For each account, record the current balance, minimum payment, due date, and how to access or contact the creditor.",
+        "Outstanding debts reduce your net estate value. Every entry here is factored into your estate summary so your trusted contacts have an accurate picture of what remains after liabilities.",
+        "If autopay is set up, note which bank account it draws from so payments don't lapse if you're incapacitated."
+      ]
+    },
+    entries: [],
+    documents: [],
+    contacts: [],
+    considerations: []
+  },
 };
