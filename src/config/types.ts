@@ -18,6 +18,7 @@ export type SectionId =
   | 'memories'
   | 'private'
   | 'affiliate'
+  | 'debts'
   | 'custom';
 
 export type UserScope = 'personA' | 'personB' | 'shared';
