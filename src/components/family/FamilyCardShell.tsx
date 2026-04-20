@@ -19,6 +19,22 @@ import { DeathCertificateUpload } from '@/components/common/DeathCertificateUplo
 import { RecordDocumentUpload } from '@/components/common/RecordDocumentUpload';
 import { PersonAvatar } from '@/components/common/PersonAvatar';
 import { GenderSelect } from '@/components/common/GenderSelect';
+import { supabase } from '@/integrations/supabase/client';
+
+/** Relationship types where "Related to" should be shown. */
+const RELATIONSHIPS_NEEDING_LINK = [
+  'grandchild', 'niece', 'nephew',
+  'step-child', 'step child', 'stepchild',
+  'step-parent', 'step parent', 'stepparent',
+  'step-sibling', 'step sibling', 'stepsibling',
+  'cousin', 'child', 'in-law',
+];
+
+const needsRelatedToField = (rel?: string | null) => {
+  const r = String(rel || '').toLowerCase().trim();
+  if (!r) return false;
+  return RELATIONSHIPS_NEEDING_LINK.some((k) => r.includes(k));
+};
 
 const isDraft = (id?: string) => !!id && String(id).startsWith('draft-');
 
