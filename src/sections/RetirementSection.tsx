@@ -145,10 +145,14 @@ export const RetirementSection: React.FC<Props> = ({ onRefresh }) => {
         </div>
       )}
 
-      {/* Add account button — always visible */}
-      <Button onClick={handleAddDraft} className="w-full">
-        <Plus className="h-4 w-4" /> Add retirement account
-      </Button>
+      {/* Add account button — standardized dashed style */}
+      <button
+        onClick={handleAddDraft}
+        className="w-full py-4 border-2 border-dashed border-stone-200 rounded-2xl flex items-center justify-center gap-2 text-stone-400 hover:border-navy-muted hover:text-navy-muted transition-colors"
+      >
+        <Plus size={18} />
+        <span className="font-bold text-sm">Add Retirement Account</span>
+      </button>
 
       {/* Empty state */}
       {isEmpty && (
