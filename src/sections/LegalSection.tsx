@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Plus, AlertTriangle, Scale } from 'lucide-react';
+import { Plus, AlertTriangle, Scale, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '../context/AppContext';
 import { CategoryOption } from '../components/upload/types';
@@ -32,6 +32,7 @@ export const LegalSection: React.FC<Props> = ({ onRefresh }) => {
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [hasMinorChildren, setHasMinorChildren] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const fetchDocs = React.useCallback(async () => {
     if (!currentPacket) return;
@@ -221,32 +222,68 @@ export const LegalSection: React.FC<Props> = ({ onRefresh }) => {
         }}
       />
 
-      {/* Add chips — kept below recommended block */}
-      <div className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-widest text-stone-500">Add a document</p>
-        <div className="flex flex-wrap gap-2">
-          {ALL_KINDS.map((k) => {
-            const isSingle = SINGLE_INSTANCE_KINDS.includes(k);
-            const exists = existingKinds.has(k);
-            const grayed = isSingle && exists;
-            return (
+      {/* Standardized dashed add button — opens kind picker */}
+      <button
+        type="button"
+        onClick={() => setPickerOpen(true)}
+        className="w-full py-4 border-2 border-dashed border-stone-200 rounded-2xl flex items-center justify-center gap-2 text-stone-400 hover:border-navy-muted hover:text-navy-muted transition-colors"
+      >
+        <Plus size={18} />
+        <span className="font-bold text-sm">Add Legal Document</span>
+      </button>
+
+      {/* Type picker modal */}
+      {pickerOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-4"
+          onClick={() => setPickerOpen(false)}
+        >
+          <div
+            className="bg-white rounded-3xl w-full max-w-md shadow-xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-5 border-b border-stone-100">
+              <div>
+                <h3 className="font-bold text-navy-muted">Add Legal Document</h3>
+                <p className="text-xs text-stone-500 mt-0.5">Choose a document type</p>
+              </div>
               <button
-                key={k}
-                type="button"
-                onClick={() => handleAddDraft(k)}
-                className={
-                  grayed
-                    ? 'px-3 py-1.5 rounded-full text-xs font-medium bg-stone-100 text-stone-400 border border-stone-200 cursor-default'
-                    : 'px-3 py-1.5 rounded-full text-xs font-medium bg-white hover:bg-stone-100 text-stone-700 border border-stone-300'
-                }
-                title={grayed ? 'Already added — tap card to edit' : `Add ${KIND_LABELS[k]}`}
+                onClick={() => setPickerOpen(false)}
+                className="p-2 hover:bg-stone-100 rounded-lg text-stone-400"
+                aria-label="Close"
               >
-                {grayed ? '✓ ' : '+ '}{KIND_LABELS[k]}
+                <X size={18} />
               </button>
-            );
-          })}
+            </div>
+            <div className="p-3 max-h-[60vh] overflow-y-auto">
+              {ALL_KINDS.map((k) => {
+                const isSingle = SINGLE_INSTANCE_KINDS.includes(k);
+                const exists = existingKinds.has(k);
+                const grayed = isSingle && exists;
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => {
+                      handleAddDraft(k);
+                      setPickerOpen(false);
+                    }}
+                    className={
+                      grayed
+                        ? 'w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-stone-400 hover:bg-stone-50 flex items-center justify-between'
+                        : 'w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-navy-muted hover:bg-stone-100 flex items-center justify-between'
+                    }
+                    title={grayed ? 'Already added — tap to edit existing' : `Add ${KIND_LABELS[k]}`}
+                  >
+                    <span>{KIND_LABELS[k]}</span>
+                    {grayed && <span className="text-[10px] uppercase tracking-wider">Edit existing</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Empty state */}
       {isEmpty && (
