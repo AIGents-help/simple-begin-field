@@ -596,6 +596,35 @@ export const AddEditSheet = ({
           { name: 'description', label: 'Description', type: 'textarea', placeholder: 'Details about this private item' },
           { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional notes...' },
         ];
+      case 'debts':
+        return [
+          { name: 'lender_name', label: 'Creditor', required: true, placeholder: 'e.g. Chase, Sallie Mae, IRS' },
+          { name: 'liability_type', label: 'Debt Type', required: true, type: 'select', options: [
+            'Credit Card', 'Student Loan', 'Personal Loan', 'Auto Loan',
+            'Medical Debt', 'Tax Debt', 'Business Loan', 'Line of Credit',
+            'Mortgage', 'Other'
+          ]},
+          { name: 'account_number_masked', label: 'Account Number', placeholder: 'Last 4 digits only for security' },
+          { name: 'balance', label: 'Current Balance ($) — feeds estate calculation', required: true, type: 'number', placeholder: '0.00' },
+          { name: 'original_balance', label: 'Original Loan Amount ($)', type: 'number', placeholder: '0.00' },
+          { name: 'interest_rate', label: 'Interest Rate (%)', type: 'number', placeholder: 'e.g. 5.25' },
+          { name: 'monthly_payment', label: 'Minimum Payment ($)', type: 'number', placeholder: '0.00' },
+          { name: 'payment_due_day', label: 'Payment Due Day (day of month, 1–31)', type: 'number', placeholder: 'e.g. 15' },
+          { name: 'payment_frequency', label: 'Payment Frequency', type: 'select', options: ['Monthly', 'Quarterly', 'Annual'] },
+          { name: 'payoff_date', label: 'Maturity / Payoff Date', type: 'date' },
+          { name: 'is_joint', label: 'Joint Account', type: 'select', options: ['No', 'Yes'] },
+          ...(String(formData.is_joint) === 'Yes' || formData.is_joint === true
+            ? [{ name: 'joint_holder_name', label: 'Joint Account Holder', placeholder: 'Co-borrower name' }]
+            : []),
+          { name: 'autopay_enabled', label: 'Autopay Enabled', type: 'select', options: ['No', 'Yes'] },
+          ...(String(formData.autopay_enabled) === 'Yes' || formData.autopay_enabled === true
+            ? [{ name: 'autopay_account', label: 'Draws From (which bank account)', placeholder: 'e.g. Chase checking ****4821' }]
+            : []),
+          { name: 'login_url', label: 'Login / Account URL', placeholder: 'https://...' },
+          { name: 'contact_phone', label: 'Contact Phone', type: 'tel', placeholder: '(555) 123-4567' },
+          { name: 'contact_address', label: 'Contact Address', type: 'textarea', placeholder: 'Mailing address for the creditor', rows: 2 },
+          { name: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Any additional details...' },
+        ];
       default:
         return null; // Use generic form
     }
@@ -895,6 +924,7 @@ export const AddEditSheet = ({
                   'funeral': 'Add Funeral Wishes',
                   'private': 'Add Private Item',
                   'family': 'Add Family Member',
+                  'debts': 'Add Debt',
                 };
                 // Dynamic title based on prefilled select field
                 if (sectionFields && initialData) {
