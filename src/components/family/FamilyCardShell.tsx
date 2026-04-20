@@ -19,6 +19,22 @@ import { DeathCertificateUpload } from '@/components/common/DeathCertificateUplo
 import { RecordDocumentUpload } from '@/components/common/RecordDocumentUpload';
 import { PersonAvatar } from '@/components/common/PersonAvatar';
 import { GenderSelect } from '@/components/common/GenderSelect';
+import { supabase } from '@/integrations/supabase/client';
+
+/** Relationship types where "Related to" should be shown. */
+const RELATIONSHIPS_NEEDING_LINK = [
+  'grandchild', 'niece', 'nephew',
+  'step-child', 'step child', 'stepchild',
+  'step-parent', 'step parent', 'stepparent',
+  'step-sibling', 'step sibling', 'stepsibling',
+  'cousin', 'child', 'in-law',
+];
+
+const needsRelatedToField = (rel?: string | null) => {
+  const r = String(rel || '').toLowerCase().trim();
+  if (!r) return false;
+  return RELATIONSHIPS_NEEDING_LINK.some((k) => r.includes(k));
+};
 
 const isDraft = (id?: string) => !!id && String(id).startsWith('draft-');
 
@@ -187,6 +203,31 @@ export const FamilyCardShell: React.FC<FamilyCardShellProps> = ({
     setPhotoFile(null);
     setPhotoPreview(null);
   }, [record.id, record.updated_at]);
+
+  // Other family members in the same packet — for the "Related to" picker.
+  const showRelatedTo = needsRelatedToField(record.relationship);
+  const [relatedOptions, setRelatedOptions] = useState<Array<{ id: string; label: string }>>([]);
+  useEffect(() => {
+    if (!showRelatedTo || !packetId) return;
+    let cancelled = false;
+    supabase
+      .from('family_members')
+      .select('id, first_name, last_name, name, relationship')
+      .eq('packet_id', packetId)
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        const opts = data
+          .filter((m: any) => m.id !== record.id) // exclude self
+          .map((m: any) => {
+            const n = [m.first_name, m.last_name].filter(Boolean).join(' ') || m.name || 'Unnamed';
+            const rel = m.relationship ? ` (${m.relationship})` : '';
+            return { id: m.id, label: `${n}${rel}`, sortKey: (m.first_name || m.name || '').toLowerCase() };
+          })
+          .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+        setRelatedOptions(opts);
+      });
+    return () => { cancelled = true; };
+  }, [showRelatedTo, packetId, record.id, record.updated_at]);
 
   const setField = (name: string, value: any) => {
     setForm((f: any) => ({ ...f, [name]: value }));
@@ -382,7 +423,32 @@ export const FamilyCardShell: React.FC<FamilyCardShellProps> = ({
             <p className="text-[10px] text-stone-500">Tap camera to add a photo</p>
           </div>
 
-          <Accordion type="multiple" defaultValue={['identity']} className="w-full">
+          <Accordion type="multiple" defaultValue={['related_to', 'identity']} className="w-full">
+            {showRelatedTo && (
+              <AccordionItem value="related_to">
+                <AccordionTrigger className="text-sm font-bold">Related to</AccordionTrigger>
+                <AccordionContent>
+                  <label className="block">
+                    <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-stone-500">
+                      Connected family member
+                    </span>
+                    <select
+                      value={form.related_to_member_id || ''}
+                      onChange={(e) => setField('related_to_member_id', e.target.value || null)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Select a family member…</option>
+                      {relatedOptions.map((o) => (
+                        <option key={o.id} value={o.id}>{o.label}</option>
+                      ))}
+                    </select>
+                    <p className="mt-1.5 text-[11px] text-stone-500">
+                      Helps place this person correctly on the family tree.
+                    </p>
+                  </label>
+                </AccordionContent>
+              </AccordionItem>
+            )}
             <AccordionItem value="identity">
               <AccordionTrigger className="text-sm font-bold">Identity</AccordionTrigger>
               <AccordionContent>

@@ -1488,6 +1488,7 @@ export type Database = {
           place_of_birth: string | null
           place_of_death: string | null
           preferred_name: string | null
+          related_to_member_id: string | null
           related_to_spouse_id: string | null
           relationship: string | null
           relationship_subtype: string | null
@@ -1546,6 +1547,7 @@ export type Database = {
           place_of_birth?: string | null
           place_of_death?: string | null
           preferred_name?: string | null
+          related_to_member_id?: string | null
           related_to_spouse_id?: string | null
           relationship?: string | null
           relationship_subtype?: string | null
@@ -1604,6 +1606,7 @@ export type Database = {
           place_of_birth?: string | null
           place_of_death?: string | null
           preferred_name?: string | null
+          related_to_member_id?: string | null
           related_to_spouse_id?: string | null
           relationship?: string | null
           relationship_subtype?: string | null
@@ -1630,6 +1633,13 @@ export type Database = {
           {
             foreignKeyName: "family_members_parent_member_id_fkey"
             columns: ["parent_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_related_to_member_id_fkey"
+            columns: ["related_to_member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
             referencedColumns: ["id"]

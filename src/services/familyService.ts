@@ -28,6 +28,7 @@ const ALLOWED_COLUMNS = new Set([
   'guardian_name', 'guardian_relationship', 'guardian_phone',
   'school_name', 'lives_with_user',
   'which_parent', 'parent_side', 'inlaw_subtype', 'related_to_spouse_id',
+  'related_to_member_id',
   'created_at', 'updated_at',
 ]);
 
@@ -85,6 +86,7 @@ export const sanitizeFamilyPayload = (form: any, opts?: { extraLegacy?: string[]
 
   // Coerce empty strings on FK columns to null
   if (payload.related_to_spouse_id === '') payload.related_to_spouse_id = null;
+  if (payload.related_to_member_id === '') payload.related_to_member_id = null;
   if (payload.parent_member_id === '') payload.parent_member_id = null;
 
   // Normalize boolean-like values
@@ -156,26 +158,72 @@ export const familyService = {
   },
 };
 
-/** Standard relationship buckets used to group cards in the list view. */
+/**
+ * Standard relationship buckets used to group cards in the list view.
+ *
+ * Order in this array IS the top-to-bottom render order. Specific matchers
+ * (e.g. step-child, grandchild, ex-spouse) MUST come before broader ones
+ * (e.g. child, spouse) — first match wins. `other` is the catch-all.
+ */
 export const RELATIONSHIP_GROUPS: Array<{
   key: string;
   label: string;
   matches: (rel: string) => boolean;
 }> = [
-  { key: 'spouse',      label: 'Spouse / Partner', matches: (r) => /spouse|partner/.test(r) },
-  { key: 'child',       label: 'Children',         matches: (r) => /child|son|daughter/.test(r) },
-  { key: 'parent',      label: 'Parents',          matches: (r) => /^parent|mother|father|mom|dad/.test(r) },
-  { key: 'sibling',     label: 'Siblings',         matches: (r) => /sibling|brother|sister/.test(r) },
-  { key: 'grandparent', label: 'Grandparents',     matches: (r) => /grandparent|grandmother|grandfather/.test(r) },
-  { key: 'grandchild',  label: 'Grandchildren',    matches: (r) => /grandchild/.test(r) },
-  { key: 'inlaw',       label: 'In-Laws',          matches: (r) => /in.?law/.test(r) },
-  { key: 'other',       label: 'Other Family',     matches: () => true },
+  // Current spouse / partner only — exes are filtered out by the section
+  // renderer using marital_status, not by relationship text.
+  { key: 'spouse',       label: 'Spouse / Partner',     matches: (r) => /(^|\s)(spouse|partner)/.test(r) && !/^ex[-\s]?(spouse|partner)/.test(r) },
+
+  // Specific child variants before generic "child"
+  { key: 'stepchild',    label: 'Step-Children',        matches: (r) => /step[-\s]?(child|son|daughter)/.test(r) },
+  { key: 'grandchild',   label: 'Grandchildren',        matches: (r) => /grandchild|grandson|granddaughter/.test(r) },
+  { key: 'child',        label: 'Children',             matches: (r) => /child|son|daughter/.test(r) },
+
+  // Specific parent variants before generic "parent"
+  { key: 'stepparent',   label: 'Step-Parents',         matches: (r) => /step[-\s]?(parent|mother|father|mom|dad)/.test(r) },
+  { key: 'grandparent',  label: 'Grandparents',         matches: (r) => /grandparent|grandmother|grandfather/.test(r) },
+  { key: 'parent',       label: 'Parents',              matches: (r) => /^parent|^mother|^father|^mom$|^dad$/.test(r) },
+
+  // Specific sibling variants before generic "sibling"
+  { key: 'stepsibling',  label: 'Step-Siblings',        matches: (r) => /step[-\s]?(sibling|brother|sister)/.test(r) },
+  { key: 'sibling',      label: 'Siblings',             matches: (r) => /sibling|brother|sister/.test(r) },
+
+  { key: 'inlaw',        label: 'In-Laws',              matches: (r) => /in.?law/.test(r) },
+  { key: 'cousin',       label: 'Cousins',              matches: (r) => /cousin/.test(r) },
+  { key: 'nieceNephew',  label: 'Nieces & Nephews',     matches: (r) => /niece|nephew/.test(r) },
+
+  { key: 'other',        label: 'Other Family',         matches: () => true },
+
+  // Always rendered LAST by the section, regardless of array position above.
+  // Kept here so it has a label and matcher for any direct lookups.
+  { key: 'ex',           label: 'Ex-Spouse / Partner',  matches: (r) => /^ex[-\s]?(spouse|partner)/.test(r) },
 ];
 
 export const groupRelationship = (record: any): string => {
-  const rel = (record?.relationship || '').toLowerCase();
+  const rel = (record?.relationship || '').toLowerCase().trim();
+  // Ex bucket — explicit relationship label OR spouse with ex-style status
+  if (/^ex[-\s]?(spouse|partner)/.test(rel)) return 'ex';
+  const status = String(record?.marital_status || '').toLowerCase();
+  if (/spouse|partner/.test(rel) && /(divorced|separated|former|ex)/.test(status)) {
+    return 'ex';
+  }
   for (const g of RELATIONSHIP_GROUPS) {
+    if (g.key === 'ex') continue; // handled above
     if (g.matches(rel)) return g.key;
   }
   return 'other';
+};
+
+/** True if a spouse-group record represents an ex (used for sorting). */
+export const isExPartner = (record: any): boolean => {
+  const rel = String(record?.relationship || '').toLowerCase();
+  if (/^ex[-\s]?(spouse|partner)/.test(rel)) return true;
+  const status = String(record?.marital_status || '').toLowerCase();
+  return /(divorced|separated|former|ex)/.test(status);
+};
+
+/** Display label for a relationship value, used in the "Related to" dropdown. */
+export const relationshipDisplayLabel = (rel?: string | null): string => {
+  if (!rel) return 'Family';
+  return rel;
 };

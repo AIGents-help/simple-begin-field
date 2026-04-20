@@ -15,7 +15,7 @@ import { GrandparentCard } from '../components/family/cards/GrandparentCard';
 import { InLawCard } from '../components/family/cards/InLawCard';
 import { OtherFamilyCard } from '../components/family/cards/OtherFamilyCard';
 import { TemplateLauncher } from '../components/templates/TemplateLauncher';
-import { groupRelationship, RELATIONSHIP_GROUPS, isMinorFromBirthday } from '../services/familyService';
+import { groupRelationship, RELATIONSHIP_GROUPS, isMinorFromBirthday, isExPartner } from '../services/familyService';
 
 type RelKey = 'spouse' | 'child' | 'parent' | 'sibling' | 'grandparent' | 'inlaw' | 'other' | 'grandchild';
 
@@ -23,14 +23,53 @@ const draftId = () => `draft-${Date.now()}-${Math.random().toString(36).slice(2,
 
 const cardForGroup = (group: string) => {
   switch (group) {
-    case 'spouse': return SpouseCard;
-    case 'child': return ChildCard;
-    case 'parent': return ParentCard;
-    case 'sibling': return SiblingCard;
+    case 'spouse':
+    case 'ex': return SpouseCard;
+    case 'child':
+    case 'stepchild':
+    case 'grandchild': return ChildCard;
+    case 'parent':
+    case 'stepparent': return ParentCard;
+    case 'sibling':
+    case 'stepsibling': return SiblingCard;
     case 'grandparent': return GrandparentCard;
     case 'inlaw': return InLawCard;
     default: return OtherFamilyCard;
   }
+};
+
+/** Top-to-bottom render order of groups. Ex always last. */
+const GROUP_ORDER: string[] = [
+  'spouse', 'child', 'grandchild', 'stepchild',
+  'parent', 'stepparent', 'grandparent',
+  'sibling', 'stepsibling',
+  'inlaw', 'cousin', 'nieceNephew',
+  'other',
+  'ex',
+];
+
+const labelForGroupKey = (key: string): string => {
+  const found = RELATIONSHIP_GROUPS.find((g) => g.key === key);
+  return found?.label || key;
+};
+
+const sortFirstNameAsc = (a: any, b: any) => {
+  const an = String(a.first_name || a.name || '').toLowerCase();
+  const bn = String(b.first_name || b.name || '').toLowerCase();
+  return an.localeCompare(bn);
+};
+
+/** Sort spouse group: current first, separated/unknown next, ex/divorced last. */
+const sortSpouseGroup = (a: any, b: any) => {
+  const rank = (r: any) => {
+    const status = String(r.marital_status || '').toLowerCase();
+    if (/(divorced|former|ex)/.test(status) || isExPartner(r)) return 2;
+    if (/(separated)/.test(status)) return 1;
+    return 0; // married / partner / active
+  };
+  const diff = rank(a) - rank(b);
+  if (diff !== 0) return diff;
+  return sortFirstNameAsc(a, b);
 };
 
 export const FamilySection = ({
@@ -64,6 +103,7 @@ export const FamilySection = ({
       return;
     }
     // Create an inline draft card for the picked relationship
+    const isEx = /^ex[-\s]?(spouse|partner)$/i.test(relationship);
     const draft: any = {
       id: draftId(),
       packet_id: currentPacket?.id,
@@ -72,6 +112,7 @@ export const FamilySection = ({
       first_name: '',
       last_name: '',
       name: 'New family member',
+      ...(isEx ? { marital_status: 'Divorced' } : {}),
     };
     setDrafts((d) => [draft, ...d]);
     setExpandedId(draft.id);
@@ -168,33 +209,28 @@ export const FamilySection = ({
                   />
                 )}
 
-                {RELATIONSHIP_GROUPS.map((group) => {
-                  const list = grouped[group.key] || [];
+                {GROUP_ORDER.map((groupKey) => {
+                  const list = grouped[groupKey] || [];
                   if (list.length === 0) return null;
+
+                  // Sort within group
+                  const sorted = [...list].sort(
+                    groupKey === 'spouse' || groupKey === 'ex'
+                      ? sortSpouseGroup
+                      : sortFirstNameAsc,
+                  );
+
+                  const label = labelForGroupKey(groupKey);
+                  const isExGroup = groupKey === 'ex';
+
                   return (
-                    <div key={group.key}>
-                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-400 mb-2 px-1">
-                        {group.label} <span className="text-stone-300">({list.length})</span>
+                    <div key={groupKey} className={isExGroup ? 'pt-4 mt-2 border-t border-stone-200' : undefined}>
+                      <h3 className={`text-[11px] font-bold uppercase tracking-widest mb-2 px-1 ${isExGroup ? 'text-stone-500' : 'text-stone-400'}`}>
+                        {label} <span className="text-stone-300">({sorted.length})</span>
                       </h3>
                       <div className="space-y-3">
-                        {list.map((record) => {
-                          if (group.key === 'spouse') {
-                            const Card = SpouseCard;
-                            return (
-                              <div key={record.id} id={`family-card-${record.id}`}>
-                                <Card
-                                  record={record}
-                                  packetId={currentPacket?.id}
-                                  expanded={expandedId === record.id}
-                                  onToggle={() => setExpandedId(expandedId === record.id ? null : record.id)}
-                                  onSaved={handleSaved}
-                                  onDeleted={(id: string) => { handleDeleted(id); refresh(); }}
-                                  onCancelDraft={handleCancelDraft}
-                                />
-                              </div>
-                            );
-                          }
-                          const Card = cardForGroup(group.key);
+                        {sorted.map((record) => {
+                          const Card = cardForGroup(groupKey);
                           return (
                             <div key={record.id} id={`family-card-${record.id}`}>
                               <Card
