@@ -1460,6 +1460,7 @@ export type Database = {
           email: string | null
           employer: string | null
           first_name: string | null
+          gender: string | null
           guardian_name: string | null
           guardian_phone: string | null
           guardian_relationship: string | null
@@ -1519,6 +1520,7 @@ export type Database = {
           email?: string | null
           employer?: string | null
           first_name?: string | null
+          gender?: string | null
           guardian_name?: string | null
           guardian_phone?: string | null
           guardian_relationship?: string | null
@@ -1578,6 +1580,7 @@ export type Database = {
           email?: string | null
           employer?: string | null
           first_name?: string | null
+          gender?: string | null
           guardian_name?: string | null
           guardian_phone?: string | null
           guardian_relationship?: string | null

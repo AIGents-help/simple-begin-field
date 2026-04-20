@@ -11,6 +11,7 @@ const ALLOWED_COLUMNS = new Set([
   'first_name', 'middle_name', 'last_name', 'suffix', 'preferred_name',
   'relationship', 'relationship_subtype', 'category',
   'birthday', 'place_of_birth', 'gender',
+
   'phone', 'email', 'address',
   'occupation', 'employer',
   'photo_path',
