@@ -30,4 +30,8 @@ export const PRODUCT_FILTERS: Array<'All' | ProductType> = [
   'All', 'Fridge Magnet', 'Wallet Card', 'Sticker', 'Keychain',
 ];
 
+/** Shop homepage URL (used for general browsing) */
 export const PRINTIFY_SHOP_URL = 'https://survivorpacket.printify.me';
+
+/** Direct product URL for the fridge magnet (used for "Shop Now" buttons) */
+export const PRINTIFY_PRODUCT_URL = 'https://survivorpacket.printify.me/product/28085406';
