@@ -15,7 +15,7 @@ import { GrandparentCard } from '../components/family/cards/GrandparentCard';
 import { InLawCard } from '../components/family/cards/InLawCard';
 import { OtherFamilyCard } from '../components/family/cards/OtherFamilyCard';
 import { TemplateLauncher } from '../components/templates/TemplateLauncher';
-import { groupRelationship, RELATIONSHIP_GROUPS, isMinorFromBirthday } from '../services/familyService';
+import { groupRelationship, RELATIONSHIP_GROUPS, isMinorFromBirthday, isExPartner } from '../services/familyService';
 
 type RelKey = 'spouse' | 'child' | 'parent' | 'sibling' | 'grandparent' | 'inlaw' | 'other' | 'grandchild';
 
@@ -23,14 +23,53 @@ const draftId = () => `draft-${Date.now()}-${Math.random().toString(36).slice(2,
 
 const cardForGroup = (group: string) => {
   switch (group) {
-    case 'spouse': return SpouseCard;
-    case 'child': return ChildCard;
-    case 'parent': return ParentCard;
-    case 'sibling': return SiblingCard;
+    case 'spouse':
+    case 'ex': return SpouseCard;
+    case 'child':
+    case 'stepchild':
+    case 'grandchild': return ChildCard;
+    case 'parent':
+    case 'stepparent': return ParentCard;
+    case 'sibling':
+    case 'stepsibling': return SiblingCard;
     case 'grandparent': return GrandparentCard;
     case 'inlaw': return InLawCard;
     default: return OtherFamilyCard;
   }
+};
+
+/** Top-to-bottom render order of groups. Ex always last. */
+const GROUP_ORDER: string[] = [
+  'spouse', 'child', 'grandchild', 'stepchild',
+  'parent', 'stepparent', 'grandparent',
+  'sibling', 'stepsibling',
+  'inlaw', 'cousin', 'nieceNephew',
+  'other',
+  'ex',
+];
+
+const labelForGroupKey = (key: string): string => {
+  const found = RELATIONSHIP_GROUPS.find((g) => g.key === key);
+  return found?.label || key;
+};
+
+const sortFirstNameAsc = (a: any, b: any) => {
+  const an = String(a.first_name || a.name || '').toLowerCase();
+  const bn = String(b.first_name || b.name || '').toLowerCase();
+  return an.localeCompare(bn);
+};
+
+/** Sort spouse group: current first, separated/unknown next, ex/divorced last. */
+const sortSpouseGroup = (a: any, b: any) => {
+  const rank = (r: any) => {
+    const status = String(r.marital_status || '').toLowerCase();
+    if (/(divorced|former|ex)/.test(status) || isExPartner(r)) return 2;
+    if (/(separated)/.test(status)) return 1;
+    return 0; // married / partner / active
+  };
+  const diff = rank(a) - rank(b);
+  if (diff !== 0) return diff;
+  return sortFirstNameAsc(a, b);
 };
 
 export const FamilySection = ({
