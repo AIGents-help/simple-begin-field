@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Trash2, Save, Loader2, ChevronDown, ChevronUp, FileText, Eye, EyeOff } from 'lucide-react';
 import { useConfirm } from '@/context/ConfirmDialogContext';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import { RecordDocumentUpload } from '@/components/common/RecordDocumentUpload';
+import { cn, formatPhone } from '@/lib/utils';
+ import { RecordDocumentUpload } from '@/components/common/RecordDocumentUpload';
 
 export type MedicalFieldType = 'text' | 'textarea' | 'date' | 'masked' | 'select' | 'tel' | 'number' | 'boolean';
 
@@ -142,7 +142,7 @@ export const MedicalField: React.FC<{
         type={field.type === 'date' ? 'date' : field.type === 'tel' ? 'tel' : field.type === 'number' ? 'number' : 'text'}
         value={v}
         placeholder={field.placeholder}
-        onChange={(e) => onChange(field.type === 'number' ? (e.target.value === '' ? null : Number(e.target.value)) : e.target.value)}
+                  onChange={(e) => onChange(field.type === 'number' ? (e.target.value === '' ? null : Number(e.target.value)) : field.type === 'tel' ? formatPhone(e.target.value) : e.target.value)}
       />
     </label>
   );
